@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/rcon"
+          android:title="@string/menu_rcon" />
+<item android:id="@+id/show_players"
+          android:title="@string/menu_show_players" />
+<item android:id="@+id/edit_server"
+          android:title="@string/menu_edit_server" />
+<item android:id="@+id/move_up"
+          android:title="@string/menu_move_up" />
+<item android:id="@+id/move_down"
+          android:title="@string/menu_move_down" />
+<item android:id="@+id/delete_server"
+          android:title="@string/menu_delete_server" />
+<item android:id="@+id/cancel"
+          android:title="@string/menu_cancel" />
+</menu>

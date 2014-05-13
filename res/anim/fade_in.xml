@@ -1,0 +1,6 @@
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/anim_fade_in"
+	android:fromAlpha="0.0"
+	android:toAlpha="1.0"
+	android:duration="500"
+	android:fillAfter="true" />

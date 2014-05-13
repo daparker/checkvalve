@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_pane"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#262626"
+    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_layout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#262626"
+    >
+    <TextView  
+    android:id="@+id/title"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:textSize="20.0dip"
+	android:textColor="#FFFFFF"
+	android:paddingTop="10dip"
+	android:paddingBottom="15dip"
+	android:paddingLeft="10dip"
+	android:paddingRight="10dip"
+	android:gravity="center"
+    android:text="@string/title_search_results"
+    />
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_table"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="0"
+>
+</TableLayout>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_results_table"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dip"
+    android:shrinkColumns="0"
+>
+</TableLayout>
+</LinearLayout>
+</ScrollView>
