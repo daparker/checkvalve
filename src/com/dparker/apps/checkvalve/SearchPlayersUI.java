@@ -103,6 +103,7 @@ public class SearchPlayersUI extends Activity
 	    }
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void searchPlayers(String search)
 	{
 		// Show the progress dialog
@@ -157,7 +158,7 @@ public class SearchPlayersUI extends Activity
             	if( tableRows[i] != null )
             	{
     	            search_results_table.addView(tableRows[i], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
             	}
             }

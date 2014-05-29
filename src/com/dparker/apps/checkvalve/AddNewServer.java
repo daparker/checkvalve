@@ -101,7 +101,7 @@ public class AddNewServer extends Activity
 		    	}
 		    	else
 		    	{
-		    		message = (String)context.getText(R.string.msg_unknown_host) + server + "\n";
+		    		message = (String)context.getText(R.string.msg_unknown_host) + " " + server + "\n";
 		    		showMessage(message);
 		    	}
 	        }

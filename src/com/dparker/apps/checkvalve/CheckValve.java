@@ -120,6 +120,7 @@ public class CheckValve extends Activity
 	    return true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -305,6 +306,7 @@ public class CheckValve extends Activity
         }
     };
     
+	@SuppressWarnings("deprecation")
 	public void queryServers()
 	{
         // Make sure the database is open
@@ -381,7 +383,7 @@ public class CheckValve extends Activity
                     TableRow spacerRow = new TableRow(context);
                     spacerRow.setId(0);
                     spacerRow.setLayoutParams(new LayoutParams(
-                            LayoutParams.FILL_PARENT,
+                            LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
                     
                     spacerRow.addView(spacer);
@@ -410,31 +412,31 @@ public class CheckValve extends Activity
     	            tableRows[i][5].setFocusable(false);
     	            
     	            server_info_table.addView(spacerRow, new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
     	            
     	            server_info_table.addView(tableRows[i][0], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
     	
     	            server_info_table.addView(tableRows[i][1], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
     	            
     	            server_info_table.addView(tableRows[i][2], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
     	            
     	            server_info_table.addView(tableRows[i][3], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
     	            
     	            server_info_table.addView(tableRows[i][4], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
 
     	            server_info_table.addView(tableRows[i][5], new TableLayout.LayoutParams(
-    	                    LayoutParams.FILL_PARENT,
+    	                    LayoutParams.MATCH_PARENT,
     	                    LayoutParams.WRAP_CONTENT));
             	}
             }

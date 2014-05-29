@@ -336,7 +336,7 @@ public class QueryPlayers extends Activity
 		            TableRow row = new TableRow(this);
 		            row.setId(index);
 		            row.setLayoutParams(new LayoutParams(
-		                    LayoutParams.FILL_PARENT,
+		                    LayoutParams.MATCH_PARENT,
 		                    LayoutParams.WRAP_CONTENT));   
 		
 		            row.addView(playerName);
@@ -345,7 +345,7 @@ public class QueryPlayers extends Activity
 		
 		            // Add the TableRow to the TableLayout
 		            player_info_table.addView(row, new TableLayout.LayoutParams(
-		                    LayoutParams.FILL_PARENT,
+		                    LayoutParams.MATCH_PARENT,
 		                    LayoutParams.WRAP_CONTENT));
                 }
                 
@@ -375,14 +375,14 @@ public class QueryPlayers extends Activity
             TableRow messageRow = new TableRow(this);
             messageRow.setId(2);
             messageRow.setLayoutParams(new LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));   
 
             messageRow.addView(errorMessage);
                         
             // Add the TableRow to the TableLayout
             message_table.addView(messageRow, new TableLayout.LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
 
             message_table.setVisibility(1);
@@ -410,14 +410,14 @@ public class QueryPlayers extends Activity
             TableRow messageRow = new TableRow(this);
             messageRow.setId(2);
             messageRow.setLayoutParams(new LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));   
 
             messageRow.addView(errorMessage);
                         
             // Add the TableRow to the TableLayout
             message_table.addView(messageRow, new TableLayout.LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
 
             message_table.setVisibility(1);
@@ -446,14 +446,14 @@ public class QueryPlayers extends Activity
             TableRow messageRow = new TableRow(this);
             messageRow.setId(2);
             messageRow.setLayoutParams(new LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
 
             messageRow.addView(errorMessage);
                         
             // Add the TableRow to the TableLayout
             message_table.addView(messageRow, new TableLayout.LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
 
             message_table.setVisibility(1);

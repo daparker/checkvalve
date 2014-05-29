@@ -146,7 +146,8 @@ public class RconUI extends Activity
         	catch(TimeoutException e)
         	{
         		// Ignore a TimeoutException (happens if RCON password was already sent)
-        		return;
+        		//return;
+        		rcon_console.setText((String)context.getText(R.string.msg_rcon_timeout_exception));
         	}
         	catch(Exception e)
         	{

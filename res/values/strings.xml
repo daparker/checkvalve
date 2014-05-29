@@ -20,12 +20,12 @@ along with the CheckValve source code.  If not, see
 -->
 
 <resources>
-    <string name="app_credits">Copyright 2010-2011 by David A. Parker</string>
+    <string name="app_credits">Copyright 2010-2014 by David A. Parker</string>
     <string name="app_license">CheckValve is free software under the terms of the GNU General Public License version 3.</string>
     <string name="app_link">http://sites.google.com/site/checkvalveapp/</string>
     <string name="app_name">CheckValve</string>
     <string name="app_notes">CheckValve makes use of the Steam Condenser library: https://github.com/koraktor/steam-condenser/</string>
-    <string name="app_version">Version 1.3.3</string>
+    <string name="app_version">Version 1.3.4</string>
 	<string name="button_add">Add Server</string>
 	<string name="button_cancel">Cancel</string>
 	<string name="button_delete">Delete</string>
@@ -36,7 +36,7 @@ along with the CheckValve source code.  If not, see
 	<string name="button_search">Search</string>
 	<string name="button_send">Send</string>
 	<string name="button_submit">Submit</string>
-	<string name="general_exception">An exception has occurred</string>
+	<string name="general_exception">An exception has occurred.</string>
 	<string name="header_kills">Kills</string>
 	<string name="header_player">Player</string>
 	<string name="header_time">Time</string>
@@ -80,6 +80,7 @@ along with the CheckValve source code.  If not, see
 	<string name="msg_no_search_results">No matches were found.</string>
 	<string name="msg_no_tags">(None)</string>
 	<string name="msg_rcon_ban_exception">You have been banned from this server.</string>
+	<string name="msg_rcon_timeout_exception">The connection timed out. Please try again.</string>
 	<string name="msg_rcon_general_error">An error has occurred. Please try again.</string>
 	<string name="msg_rcon_sending">Sending</string>
 	<string name="msg_server_deleted">The server has been deleted.</string>
@@ -107,5 +108,5 @@ along with the CheckValve source code.  If not, see
 	<string name="title_rcon_password">RCON Password</string>
 	<string name="title_search_results">Search Results</string>
 	<string name="title_server_info">Server Information</string>
-	<string name="unsupported_encoding_exception">An unsupported encoding type was specified</string>
+	<string name="unsupported_encoding_exception">An unsupported encoding type was specified.</string>
 </resources>

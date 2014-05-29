@@ -29,6 +29,8 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.steam.servers.GoldSrcServer;
@@ -205,22 +207,42 @@ public class ServerQuery extends Thread
 	            
 	            while( bufferIn[byteNum] != 0x00 ) { gameVersion += (char)bufferIn[byteNum++]; }
 	            byteNum++;
-
+	            
 	            // If we're not at the end of the array then get the additional data
 	            if( byteNum < bufferIn.length ) {	            	
-                    // This byte is the Extra Data Flag (EDF)
-                    int EDF = (int)bufferIn[byteNum];
-                    byteNum += 3;
+	                // This byte is the Extra Data Flag (EDF)
+	                int EDF = (int)bufferIn[byteNum];
+	                byteNum++;
 
-                    // TEMPORARY FIX FOR PROBLEM IN L4D2 DEMO RESPONSE -- 10/29/2009 (DAP)
-                    if( bufferIn[byteNum] < 0x20 || bufferIn[byteNum] > 0x7e )
-                    	byteNum += 8;
+	                // Skip the port number if included
+	                if( (EDF & 0x80) > 0 )
+	                	byteNum += 2;
 
+	                // TEMPORARY FIX FOR PROBLEM IN L4D2 DEMO RESPONSE -- 10/29/2009 (DAP)
+	                //if( bufferIn[byteNum] < 0x20 || bufferIn[byteNum] > 0x7e )
+	                //	byteNum += 8;
+	                
+	                // Skip the SteamID if included
+	                if( (EDF & 0x10) > 0 )
+	                	byteNum += 8;
+	                
+	                // Skip SourceTV information if included
+	                if( (EDF & 0x40) > 0 )
+	                {
+	                	byteNum += 2;
+	                	while( bufferIn[byteNum] != 0x00 ) { byteNum++; }
+	                    byteNum++;
+	                }
+	                
                     // Get the server tags (sv_tags) if any are included
                     if( (EDF & 0x20) > 0 )
                     {
                     	while( bufferIn[byteNum] != 0 ) { serverTags += (char)bufferIn[byteNum++]; }
                     }
+                    
+                    /*
+                     * Stop here (we're only interested in getting the server tags in this query)
+                     */
 	            }
 	            
 	            // Close the UDP socket
@@ -356,7 +378,7 @@ public class ServerQuery extends Thread
 	            TableRow spacerRow = new TableRow(context);
 	            spacerRow.setId(0);
 	            spacerRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));
 	            
 	            spacerRow.addView(spacer);
@@ -365,37 +387,37 @@ public class ServerQuery extends Thread
 	            TableRow serverRow = new TableRow(context);
 	            serverRow.setId(serverRowId);
 	            serverRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));   
 	
 	            TableRow ipRow = new TableRow(context);
 	            ipRow.setId(serverRowId);
 	            ipRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));   
 	
 	            TableRow gameRow = new TableRow(context);
 	            gameRow.setId(serverRowId);
 	            gameRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));   
 	
 	            TableRow mapRow = new TableRow(context);
 	            mapRow.setId(serverRowId);
 	            mapRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));   
 	
 	            TableRow playersRow = new TableRow(context);
 	            playersRow.setId(serverRowId);
 	            playersRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));
 	            
 	            TableRow tagsRow = new TableRow(context);
 	            tagsRow.setId(serverRowId);
 	            tagsRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));
 	
 	            serverRow.addView(serverLabel);
@@ -443,7 +465,7 @@ public class ServerQuery extends Thread
 	            messageRow.setId(0);
 	            messageRow.setBackgroundResource(R.color.translucent_red);
 	            messageRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));   
 	
 	            messageRow.addView(errorMessage);
@@ -508,13 +530,66 @@ public class ServerQuery extends Thread
             while( bufferIn[byteNum] != 0x00 ) { byteNum++; }
             byteNum++;
 
-            // Get the Steam application ID
+            // Get the old Steam application ID
             firstByte  = (int)(bufferIn[byteNum] & 0xff);
             secondByte = (int)(bufferIn[byteNum+1] & 0xff);
             appId = firstByte | (secondByte << 8);
             
-            // If the app ID is less than 200 then the engine is GoldSource
+            // If the app ID is less than 200 then the engine is assumed to be GoldSource,
+            // but we'll check for the 64-bit game ID later and use that if possible since
+            // it's more accurate
             if( appId < 200 ) { engine[0] = 1; }
+            
+            // Skip the next 9 bytes
+            byteNum += 9;
+            
+            // Skip the game version string
+            while( bufferIn[byteNum] != 0x00 ) { byteNum++; }
+            byteNum++;
+
+            // If we're not at the end of the array then get the additional data
+            if( byteNum < bufferIn.length ) {	            	
+                // This byte is the Extra Data Flag (EDF)
+                int EDF = (int)bufferIn[byteNum];
+                byteNum++;
+
+                // Skip the port number if included
+                if( (EDF & 0x80) > 0 )
+                	byteNum += 2;
+
+                // TEMPORARY FIX FOR PROBLEM IN L4D2 DEMO RESPONSE -- 10/29/2009 (DAP)
+                //if( bufferIn[byteNum] < 0x20 || bufferIn[byteNum] > 0x7e )
+                //	byteNum += 8;
+                
+                // Skip the SteamID if included
+                if( (EDF & 0x10) > 0 )
+                	byteNum += 8;
+                
+                // Skip SourceTV information if included
+                if( (EDF & 0x40) > 0 )
+                {
+                	byteNum += 2;
+                	while( bufferIn[byteNum] != 0x00 ) { byteNum++; }
+                    byteNum++;
+                }
+
+                // Skip the server tags (sv_tags) if included
+                if( (EDF & 0x20) > 0 )
+                {
+                	while( bufferIn[byteNum] != 0 ) { byteNum++; }
+                	byteNum++;
+                }
+                
+                // Get the 64-bit game ID if it's included
+                if( (EDF & 0x01) > 0 )
+                {
+                	// Get the app ID from the lowest 24 bits of the game ID
+                	appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn,byteNum,3).put((byte)0x00).getInt(0);
+
+                    // Use this app ID to determine the engine
+                	engine[0] = (short)((appId < 200)?1:0);
+                }
+            }
 		}
         // Handle a socket timeout
         catch( Exception e )

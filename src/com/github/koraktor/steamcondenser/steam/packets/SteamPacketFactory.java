@@ -83,6 +83,7 @@ public abstract class SteamPacketFactory {
 		return SteamPacketFactory.reassemblePacket(splitPackets, false, 0, 0);
 	}
 
+	@SuppressWarnings("resource")
 	public static SteamPacket reassemblePacket(ArrayList<byte[]> splitPackets,
 			boolean isCompressed, int uncompressedSize, int packetChecksum)
 			throws IOException, SteamCondenserException {

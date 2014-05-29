@@ -250,7 +250,7 @@ public class SearchPlayers extends Thread
 				            TableRow row = new TableRow(context);
 				            row.setId(0);
 				            row.setLayoutParams(new LayoutParams(
-				                    LayoutParams.FILL_PARENT,
+				                    LayoutParams.MATCH_PARENT,
 				                    LayoutParams.WRAP_CONTENT));
 				            
 				            row.addView(searchResult);
@@ -285,7 +285,7 @@ public class SearchPlayers extends Thread
 	            TableRow messageRow = new TableRow(context);
 	            messageRow.setId(2);
 	            messageRow.setLayoutParams(new LayoutParams(
-	                    LayoutParams.FILL_PARENT,
+	                    LayoutParams.MATCH_PARENT,
 	                    LayoutParams.WRAP_CONTENT));
 	
 	            messageRow.addView(errorMessage);
@@ -315,7 +315,7 @@ public class SearchPlayers extends Thread
 	        TableRow row = new TableRow(context);
 	        row.setId(0);
 	        row.setLayoutParams(new LayoutParams(
-	                LayoutParams.FILL_PARENT,
+	                LayoutParams.MATCH_PARENT,
 	                LayoutParams.WRAP_CONTENT));   
 	
 	        row.addView(searchResult);

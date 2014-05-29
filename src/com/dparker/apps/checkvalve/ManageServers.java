@@ -181,6 +181,7 @@ public class ManageServers extends Activity
     	return;
     }
     
+	@SuppressWarnings("deprecation")
 	public void showServerList()
 	{
 		if( ! database.isOpen() )
@@ -218,10 +219,10 @@ public class ManageServers extends Activity
 			
             serverName.setText(server + ":" + port);
             serverName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-            serverName.setPadding(5,0,0,0);
             serverName.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+            serverName.setPadding(5,0,5,0);
             serverName.setLayoutParams(new LayoutParams(
-            		LayoutParams.WRAP_CONTENT,
+            		LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
 
             editButton.setId(rowId);
@@ -229,33 +230,46 @@ public class ManageServers extends Activity
             editButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8.0f);
             editButton.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             editButton.setTypeface(null, Typeface.BOLD);
-            editButton.setLayoutParams(new LayoutParams(65,50));
+            //editButton.setLayoutParams(new LayoutParams(70,50));
+            editButton.setLayoutParams(new LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
 
             deleteButton.setId(rowId);
             deleteButton.setText(this.getText(R.string.button_delete));
             deleteButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8.0f);
             deleteButton.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             deleteButton.setTypeface(null, Typeface.BOLD);
-            deleteButton.setLayoutParams(new LayoutParams(85,50));
+            //deleteButton.setLayoutParams(new LayoutParams(90,50));
+            deleteButton.setLayoutParams(new LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
 
             moveUpButton.setId(rowId);
             moveUpButton.setText(this.getText(R.string.button_move_up));
             moveUpButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8.0f);
             moveUpButton.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             moveUpButton.setTypeface(null, Typeface.BOLD);
-            moveUpButton.setLayoutParams(new LayoutParams(65,50));
+            //moveUpButton.setLayoutParams(new LayoutParams(70,50));
+            moveUpButton.setLayoutParams(new LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
 
             moveDownButton.setId(rowId);
             moveDownButton.setText(this.getText(R.string.button_move_down));
             moveDownButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8.0f);
             moveDownButton.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             moveDownButton.setTypeface(null, Typeface.BOLD);
-            moveDownButton.setLayoutParams(new LayoutParams(75,50));
+            //moveDownButton.setLayoutParams(new LayoutParams(80,50));
+            moveDownButton.setLayoutParams(new LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
             
             TableRow serverRow = new TableRow(this);
             serverRow.setId(i);
+            serverRow.setPadding(0,0,0,0);
             serverRow.setLayoutParams(new LayoutParams(
-                    LayoutParams.FILL_PARENT,
+                    LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));   
 
             serverRow.addView(serverName);
