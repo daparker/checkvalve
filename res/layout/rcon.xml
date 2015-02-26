@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -21,86 +21,98 @@ along with the CheckValve source code.  If not, see
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/parent_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#262626"
-    >
-    <TextView  
-    	android:id="@+id/title"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_weight="0.0"
-    	android:layout_alignParentTop="true"
-		android:textSize="20.0dip"
-		android:textColor="#FFFFFF"
-		android:paddingTop="10dip"
-		android:paddingBottom="5.0dip"
-		android:gravity="center"
-    	android:text="@string/title_rcon_console"
-    	android:background="#262626"
-    />
-    <TextView  
-    	android:id="@+id/rcon_console"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_weight="1.0"
-    	android:layout_below="@+id/title"
-    	android:layout_above="@+id/command_table"
-    	android:scrollbars="horizontal|vertical"
- 		android:textSize="9.0dip"
-		android:textColor="#FFFFFF"
-		android:typeface="monospace"
-		android:paddingTop="5.0dip"
-		android:paddingBottom="5.0dip"
-		android:gravity="left"
-    	android:text=""
-    	android:background="#000000"
-    />
-    <TextView  
-    	android:id="@+id/sending"
-    	android:layout_width="wrap_content"
-    	android:layout_height="wrap_content"
-    	android:layout_weight="0.0"
-    	android:layout_alignTop="@+id/rcon_console"
-    	android:layout_centerHorizontal="true"
- 		android:textSize="14.0dip"
-		android:textColor="#FFFFFF"
-		android:gravity="center_vertical|center_horizontal"
-		android:paddingTop="5.0dip"
-		android:paddingBottom="5.0dip"
-		android:paddingLeft="10.0dip"
-		android:paddingRight="10.0dip"
-    	android:text="@string/msg_rcon_sending"
-    	android:background="#262626"
-    />
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:id="@+id/command_table"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_weight="0.0"
-    	android:layout_alignParentBottom="true"
-		android:paddingTop="5.0dip"
-		android:paddingBottom="5.0dip"
-    	android:background="#262626"
-    	android:stretchColumns="0"
-	>
-    <TableRow>
-    <EditText  
-	 	android:id="@+id/field_command"
-   		android:layout_width="wrap_content"
-   		android:layout_height="fill_parent"
-   		android:singleLine="true"
-  		android:text=""
-    	android:textSize="14.0dip"
-    	android:gravity="left|center_vertical"
-    />
-    <Button
-		android:id="@+id/send_button"
-		android:text="@string/button_send"
-    	android:width="100.0sp"
-    	android:gravity="center_horizontal|center_vertical"
-   	/>
-   	</TableRow>
-   	</TableLayout>
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/command_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#262626"
+        android:paddingBottom="5.0dp"
+        android:paddingTop="5.0dp" >
+
+        <Button
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/button_send" />
+
+<!--
+        <EditText
+            android:id="@+id/field_command"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/send_button"
+            android:gravity="left|center_vertical"
+            android:inputType="text"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="14.0sp" />
+-->
+
+        <AutoCompleteTextView
+            android:id="@+id/field_command"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/send_button"
+            android:gravity="left|center_vertical"
+            android:inputType="text"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="14.0sp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#262626"
+        android:gravity="center"
+        android:paddingBottom="5.0dp"
+        android:paddingTop="10dp"
+        android:text="@string/title_rcon_console"
+        android:textColor="#FFFFFF"
+        android:textSize="20.0sp" />
+
+    <TextView
+        android:id="@+id/rcon_console"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/command_table"
+        android:layout_below="@id/title"
+        android:background="#000000"
+        android:gravity="left"
+        android:paddingBottom="5.0dp"
+        android:paddingTop="5.0dp"
+        android:scrollbars="horizontal|vertical"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="9.0sp"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/sending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/rcon_console"
+        android:layout_centerHorizontal="true"
+        android:background="#262626"
+        android:gravity="center_vertical|center_horizontal"
+        android:paddingBottom="5.0dp"
+        android:paddingLeft="10.0dp"
+        android:paddingRight="10.0dp"
+        android:paddingTop="5.0dp"
+        android:text="@string/msg_rcon_sending"
+        android:textColor="#FFFFFF"
+        android:textSize="14.0sp" />
+
 </RelativeLayout>
