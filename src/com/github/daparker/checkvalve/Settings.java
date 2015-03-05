@@ -36,7 +36,7 @@ import com.github.daparker.checkvalve.R;
 public class Settings extends Activity
 {
     private static final String TAG = Settings.class.getSimpleName();
-    
+
     private boolean rconShowPasswords;
     private boolean rconWarnUnsafeCommand;
     private boolean rconShowSuggestions;
@@ -45,7 +45,7 @@ public class Settings extends Activity
     private boolean showServerMapName;
     private boolean showServerNumPlayers;
     private boolean showServerTags;
-    
+
     private Button saveButton;
     private Button cancelButton;
     private CheckBox checkbox_rcon_show_passwords;
@@ -61,9 +61,9 @@ public class Settings extends Activity
     private EditText field_default_relay_host;
     private EditText field_default_relay_port;
     private EditText field_default_relay_password;
-    
+
     private DatabaseProvider db;
-    
+
     private OnClickListener saveButtonListener = new OnClickListener()
     {
         public void onClick( View v )
@@ -73,10 +73,9 @@ public class Settings extends Activity
              */
 
             saveSettings();
-            
-            if( db.isOpen() )
-                db.close();
-            
+
+            if( db.isOpen() ) db.close();
+
             finish();
         }
     };
@@ -88,9 +87,8 @@ public class Settings extends Activity
             /*
              * "Cancel" button was clicked
              */
-            if( db.isOpen() )
-                db.close();
-            
+            if( db.isOpen() ) db.close();
+            setResult(-1);
             finish();
         }
     };
@@ -102,16 +100,20 @@ public class Settings extends Activity
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.settings);
-        
-        setResult(1);
+
+        setResult(-1);
 
         db = new DatabaseProvider(Settings.this);
         db.open();
-        
-        saveButton = (Button)findViewById(R.id.settings_save_button);
-        saveButton.setOnClickListener(saveButtonListener);
+
         cancelButton = (Button)findViewById(R.id.settings_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
+        cancelButton.setFocusable(true);
+        cancelButton.setFocusableInTouchMode(true);
+
+        saveButton = (Button)findViewById(R.id.settings_save_button);
+        saveButton.setOnClickListener(saveButtonListener);
+
         checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
         checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
         checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.checkbox_rcon_show_suggestions);
@@ -125,6 +127,9 @@ public class Settings extends Activity
         field_default_relay_host = (EditText)findViewById(R.id.field_default_relay_host);
         field_default_relay_port = (EditText)findViewById(R.id.field_default_relay_port);
         field_default_relay_password = (EditText)findViewById(R.id.field_default_relay_password);
+
+        boolean cancelButtonTookFocus = cancelButton.requestFocus();
+        Log.d(TAG, "cancelButtonTookFocus = " + cancelButtonTookFocus);
         
         showCurrentValues();
     }
@@ -133,33 +138,24 @@ public class Settings extends Activity
     protected void onPause()
     {
         super.onPause();
-        
-        if( db.isOpen() )
-            db.close();
-        
-        finish();
+
+        if( db.isOpen() ) db.close();
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        
-        if( ! db.isOpen() )
-            db.open();
-        
-        saveButton = (Button)findViewById(R.id.settings_save_button);
-        saveButton.setOnClickListener(saveButtonListener);
-        cancelButton = (Button)findViewById(R.id.settings_cancel_button);
-        cancelButton.setOnClickListener(cancelButtonListener);
+
+        if( ! db.isOpen() ) db.open();
     }
-    
+
     public void showCurrentValues()
-    {        
+    {
         Bundle b = db.getSettingsAsBundle();
-        
+
         Log.i(TAG, "showCurrentValues(): Applying values from Bundle " + b.toString());
-        
+
         rconShowPasswords = b.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS);
         rconWarnUnsafeCommand = b.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
         rconShowSuggestions = b.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS);
@@ -168,7 +164,7 @@ public class Settings extends Activity
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
         showServerNumPlayers = b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
         showServerTags = b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS);
-        
+
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
         checkbox_rcon_warn_unsafe_command.setChecked(rconWarnUnsafeCommand);
         checkbox_rcon_show_suggestions.setChecked(rconShowSuggestions);
@@ -177,20 +173,21 @@ public class Settings extends Activity
         checkbox_show_server_map_name.setChecked(showServerMapName);
         checkbox_show_server_num_players.setChecked(showServerNumPlayers);
         checkbox_show_server_tags.setChecked(showServerTags);
-        
+
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_default_query_timeout.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
         field_default_relay_host.setText(b.getString(Values.SETTING_DEFAULT_RELAY_HOST));
         field_default_relay_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_RELAY_PORT)));
         field_default_relay_password.setText(b.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD));
     }
-    
-    public void settingCheckboxHandler(View view)
-    {
-        boolean checked = ((CheckBox) view).isChecked();
 
-        Log.i(TAG, "settingCheckboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked=" + checked);
-        
+    public void settingCheckboxHandler( View view )
+    {
+        boolean checked = ((CheckBox)view).isChecked();
+
+        Log.i(TAG, "settingCheckboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked="
+                + checked);
+
         switch( view.getId() )
         {
             case R.id.checkbox_rcon_show_passwords:
@@ -226,7 +223,7 @@ public class Settings extends Activity
                 Log.i(TAG, "settingCheckboxHandler(): Set showServerTags = " + showServerTags);
                 break;
         }
-        
+
         Log.d(TAG, "settingCheckboxHandler(): rconWarnUnsafeCommand = " + rconWarnUnsafeCommand);
         Log.d(TAG, "settingCheckboxHandler(): rconShowPasswords = " + rconShowPasswords);
         Log.d(TAG, "settingCheckboxHandler(): showServerIP = " + showServerIP);
@@ -235,9 +232,9 @@ public class Settings extends Activity
         Log.d(TAG, "settingCheckboxHandler(): showServerNumPlayers = " + showServerNumPlayers);
         Log.d(TAG, "settingCheckboxHandler(): showServerTags = " + showServerTags);
     }
-    
+
     public void saveSettings()
-    {   
+    {
         Bundle b = new Bundle();
 
         int defaultQueryPort;
@@ -245,7 +242,7 @@ public class Settings extends Activity
         int defaultRelayPort;
         String defaultRelayHost;
         String defaultRelayPassword;
-        
+
         Log.d(TAG, "saveSettings(): rconWarnUnsafeCommand = " + rconWarnUnsafeCommand);
         Log.d(TAG, "saveSettings(): rconShowPasswords = " + rconShowPasswords);
         Log.d(TAG, "saveSettings(): showServerIP = " + showServerIP);
@@ -253,7 +250,7 @@ public class Settings extends Activity
         Log.d(TAG, "saveSettings(): showServerMapName = " + showServerMapName);
         Log.d(TAG, "saveSettings(): showServerNumPlayers = " + showServerNumPlayers);
         Log.d(TAG, "saveSettings(): showServerTags = " + showServerTags);
-        
+
         try
         {
             try
@@ -264,7 +261,7 @@ public class Settings extends Activity
             {
                 defaultQueryPort = 27015;
             }
-            
+
             try
             {
                 defaultQueryTimeout = Integer.parseInt(field_default_query_timeout.getText().toString());
@@ -273,7 +270,7 @@ public class Settings extends Activity
             {
                 defaultQueryTimeout = 1;
             }
-            
+
             try
             {
                 defaultRelayPort = Integer.parseInt(field_default_relay_port.getText().toString());
@@ -282,10 +279,10 @@ public class Settings extends Activity
             {
                 defaultRelayPort = 1;
             }
-            
+
             defaultRelayHost = field_default_relay_host.getText().toString();
             defaultRelayPassword = field_default_relay_password.getText().toString();
-            
+
             b.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, rconShowPasswords);
             b.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, rconWarnUnsafeCommand);
             b.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, rconShowSuggestions);
@@ -299,11 +296,11 @@ public class Settings extends Activity
             b.putInt(Values.SETTING_DEFAULT_RELAY_PORT, defaultRelayPort);
             b.putString(Values.SETTING_DEFAULT_RELAY_HOST, defaultRelayHost);
             b.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, defaultRelayPassword);
-            
+
             Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b.toString());
             if( db.updateSettings(b) )
             {
-            	Log.i(TAG, "Success!");
+                Log.i(TAG, "Success!");
                 setResult(0);
             }
             else
@@ -311,19 +308,19 @@ public class Settings extends Activity
                 Log.e(TAG, "saveSettings(): Failed to update settings in database.");
                 setResult(1);
             }
-    
+
             db.close();
         }
         catch( Exception e )
         {
             Log.e(TAG, "Caught an exception while saving settings:");
             Log.e(TAG, e.toString());
-            
+
             StackTraceElement[] ste = e.getStackTrace();
 
             for( int i = 0; i < ste.length; i++ )
                 Log.e(TAG, "    " + ste[i].toString());
-            
+
             setResult(1);
         }
     }

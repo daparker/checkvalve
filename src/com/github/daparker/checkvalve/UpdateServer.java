@@ -34,7 +34,7 @@ import com.github.daparker.checkvalve.R;
 public class UpdateServer extends Activity
 {
     private static final String TAG = UpdateServer.class.getSimpleName();
-    
+
     private DatabaseProvider database;
     private Cursor databaseCursor;
     private EditText field_server;
@@ -77,10 +77,10 @@ public class UpdateServer extends Activity
                 }
                 else
                 {
-                    errorMsg  = "Database insert failed! [db=" + database.toString() + "]";
+                    errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                     errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
                     Log.w(TAG, errorMsg);
-                    
+
                     UserVisibleMessage.showMessage(UpdateServer.this, R.string.msg_db_failure);
                 }
 

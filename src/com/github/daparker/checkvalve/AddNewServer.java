@@ -41,19 +41,19 @@ import com.github.daparker.checkvalve.R;
 public class AddNewServer extends Activity
 {
     private static final String TAG = AddNewServer.class.getSimpleName();
-    
+
     private DatabaseProvider database;
     private Button addButton;
     private Button cancelButton;
     private Context context;
-    
+
     private ProgressDialog p;
 
     private EditText field_server;
     private EditText field_port;
     private EditText field_timeout;
     private EditText field_rcon_password;
-    
+
     private OnClickListener addButtonListener = new OnClickListener()
     {
         public void onClick( View v )
@@ -86,11 +86,11 @@ public class AddNewServer extends Activity
                 Handler checkServerHandler = new Handler()
                 {
                     String errorMsg = "";
-                    
+
                     public void handleMessage( Message msg )
                     {
                         if( p.isShowing() ) p.dismiss();
-                        
+
                         switch( msg.what )
                         {
                             case 0:
@@ -101,10 +101,10 @@ public class AddNewServer extends Activity
                                 }
                                 else
                                 {
-                                    errorMsg  = "Database insert failed! [db=" + database.toString() + "]";
+                                    errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                                     errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
                                     Log.w(TAG, errorMsg);
-                                    
+
                                     UserVisibleMessage.showMessage(AddNewServer.this, R.string.msg_db_failure);
                                 }
 
@@ -126,16 +126,16 @@ public class AddNewServer extends Activity
                                 break;
                             default:
                                 UserVisibleMessage.showMessage(AddNewServer.this, R.string.msg_server_validation_failed);
-                                break;  
+                                break;
                         }
                     }
                 };
-                
+
                 // Show the progress dialog
                 p = ProgressDialog.show(AddNewServer.this, "", context.getText(R.string.status_verifying_server), true, false);
 
                 // Run the server query in a separate thread
-                new Thread( new ServerCheck(server, port, timeout, checkServerHandler) ).start();
+                new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
             }
         }
     };
@@ -173,18 +173,31 @@ public class AddNewServer extends Activity
 
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
-        
+
         field_server = (EditText)findViewById(R.id.field_server);
         field_port = (EditText)findViewById(R.id.field_port);
         field_timeout = (EditText)findViewById(R.id.field_timeout);
         field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
+
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        }
+        else
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
     }
 
     @Override
     protected void onPause()
     {
         super.onPause();
-        database.close();
+
+        if( database.isOpen() ) database.close();
+
         finish();
     }
 
@@ -201,14 +214,14 @@ public class AddNewServer extends Activity
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
     }
-    
-    public void showPasswordCheckboxHandler(View view)
+
+    public void showPasswordCheckboxHandler( View view )
     {
-        boolean checked = ((CheckBox) view).isChecked();
-        
+        boolean checked = ((CheckBox)view).isChecked();
+
         if( checked )
-            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         else
-            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 }

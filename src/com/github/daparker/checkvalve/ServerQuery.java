@@ -59,20 +59,17 @@ public class ServerQuery implements Runnable
     private static final String TAG = ServerQuery.class.getSimpleName();
 
     /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON.
+     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p> <b>Note:</b> If both the
+     * <tt>SourceServer</tt> and <tt>GoldSrcServer</tt> arguments are provided, then only the <tt>SourceServer</tt> will
+     * be used. The <tt>SourceServer</tt> argument should be <b>null</b> in order to use a <tt>GoldSrcServer</tt>. </p>
      * <p>
-     * <b>Note:</b> If both the <tt>SourceServer</tt> and <tt>GoldSrcServer</tt> arguments are
-     * provided, then only the <tt>SourceServer</tt> will be used.  The <tt>SourceServer</tt>
-     * argument should be <b>null</b> in order to use a <tt>GoldSrcServer</tt>.
-     * </p>
-     * <p>
+     * 
      * @param x The context to use
      * @param c The RCON command to execute
      * @param r The String array in which to store the RCON response
      * @param s The SourceServer on which to execute the command
      * @param g The GoldSrcServer on which to execute the command
-     * @param h The Handler to use
-     * </p>
+     * @param h The Handler to use </p>
      */
     public ServerQuery( Context x, String c, String[] r, SourceServer s, GoldSrcServer g, Handler h )
     {
@@ -86,13 +83,12 @@ public class ServerQuery implements Runnable
     }
 
     /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON.
-     * <p>
+     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p>
+     * 
      * @param x The context to use
      * @param p The RCON password to use
      * @param s The SourceServer on which to execute the command
-     * @param h The Handler to use
-     * </p>
+     * @param h The Handler to use </p>
      */
     public ServerQuery( Context x, String p, SourceServer s, Handler h )
     {
@@ -102,15 +98,14 @@ public class ServerQuery implements Runnable
         this.status = 0;
         this.handler = h;
     }
-    
+
     /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON.
-     * <p>
+     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p>
+     * 
      * @param x The context to use
      * @param p The RCON password to use
      * @param g The GoldSrcServer on which to execute the command
-     * @param h The Handler to use
-     * </p>
+     * @param h The Handler to use </p>
      */
     public ServerQuery( Context x, String p, GoldSrcServer g, Handler h )
     {
@@ -120,14 +115,14 @@ public class ServerQuery implements Runnable
         this.status = 0;
         this.handler = h;
     }
+
     /**
-     * Construct a new instance of the ServerQuery class for collecting server information.
-     * <p>
+     * Construct a new instance of the ServerQuery class for collecting server information. <p>
+     * 
      * @param c The context to use
      * @param t The TableRow array in which server information will be stored
      * @param m The TableRow array in which error messages will be stored
-     * @param h The Handler to use
-     * </p>
+     * @param h The Handler to use </p>
      */
     public ServerQuery( Context c, TableRow[][] t, TableRow[] m, Handler h )
     {
@@ -160,14 +155,13 @@ public class ServerQuery implements Runnable
     }
 
     /**
-     * Construct a new instance of the ServerQuery class to determine a server's engine
-     * <p>
+     * Construct a new instance of the ServerQuery class to determine a server's engine <p>
+     * 
      * @param c The context to use
      * @param s The IP address or URL of the server
      * @param p The listen port of the server
      * @param t The timeout for the server query (in milliseconds)
-     * @param e The array in which to store the result (0 = Source, 1 = GoldSource)
-     * </p>
+     * @param e The array in which to store the result (0 = Source, 1 = GoldSource) </p>
      */
     public ServerQuery( Context c, String s, int p, int t, short[] e )
     {
@@ -185,13 +179,13 @@ public class ServerQuery implements Runnable
         this.timeout = t;
         this.context = c;
     }
-    
+
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         status = 0;
-        
+
         if( tableRows != null )
         {
             Log.d(TAG, "Calling queryServers()");
@@ -225,10 +219,9 @@ public class ServerQuery implements Runnable
         {
             Message msg = new Message();
             msg.what = status;
-            
-            if( obj != null )
-                msg.obj = obj;
-            
+
+            if( obj != null ) msg.obj = obj;
+
             this.handler.sendMessage(msg);
         }
     }
@@ -596,7 +589,7 @@ public class ServerQuery implements Runnable
         int secondByte = 0;
 
         //if( engine != null )
-            engine[0] = 0;
+        engine[0] = 0;
 
         try
         {
@@ -715,10 +708,10 @@ public class ServerQuery implements Runnable
             }
 
             socket.close();
-            
+
             engine[0] = engineType;
             status = engineType;
-            
+
             if( engineType == Values.ENGINE_GOLDSRC )
             {
                 gsrv = new GoldSrcServer(InetAddress.getByName(server), port);
@@ -756,9 +749,9 @@ public class ServerQuery implements Runnable
             obj = e;
         }
     }
-    
+
     public void rconAuthenticate()
-    {   
+    {
         try
         {
             if( gsrv != null )

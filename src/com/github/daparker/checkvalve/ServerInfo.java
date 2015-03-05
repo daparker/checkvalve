@@ -32,7 +32,6 @@ public class ServerInfo
     private int numPlayers;
     private int maxPlayers;
 
-
     public ServerInfo( String name, String addr, String version, String map, String tags, int numPlayers, int maxPlayers )
     {
         this.name = name;
@@ -43,37 +42,37 @@ public class ServerInfo
         this.numPlayers = numPlayers;
         this.maxPlayers = maxPlayers;
     }
-    
+
     public String getName()
     {
         return this.name;
     }
-    
+
     public String getAddr()
     {
         return this.addr;
     }
-    
+
     public String getVersion()
     {
         return this.version;
     }
-    
+
     public String getMap()
     {
         return this.map;
     }
-    
+
     public String getTags()
     {
         return this.tags;
     }
-    
+
     public int getNumPlayers()
     {
         return this.numPlayers;
     }
-    
+
     public int getMaxPlayers()
     {
         return this.maxPlayers;

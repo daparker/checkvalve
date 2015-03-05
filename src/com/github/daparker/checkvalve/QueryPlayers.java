@@ -336,35 +336,35 @@ public class QueryPlayers extends Activity
                 player_info_table.setVisibility(1);
             }
         }
-/*        catch( NullPointerException npe )
-        {
-            player_info_table.setVisibility(-1);
+        /*        catch( NullPointerException npe )
+                {
+                    player_info_table.setVisibility(-1);
 
-            String message = new String();
+                    String message = new String();
 
-            message += this.getText(R.string.msg_no_challenge_response);
-            message += " " + serverURL + ":" + serverPort;
+                    message += this.getText(R.string.msg_no_challenge_response);
+                    message += " " + serverURL + ":" + serverPort;
 
-            TextView errorMessage = new TextView(this);
+                    TextView errorMessage = new TextView(this);
 
-            errorMessage.setId(1);
-            errorMessage.setText(message);
-            errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-            errorMessage.setPadding(3, 0, 3, 0);
-            errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    errorMessage.setId(1);
+                    errorMessage.setText(message);
+                    errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    errorMessage.setPadding(3, 0, 3, 0);
+                    errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-            // Create a TableRow and give it an ID
-            TableRow messageRow = new TableRow(this);
-            messageRow.setId(2);
-            messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    // Create a TableRow and give it an ID
+                    TableRow messageRow = new TableRow(this);
+                    messageRow.setId(2);
+                    messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-            messageRow.addView(errorMessage);
+                    messageRow.addView(errorMessage);
 
-            // Add the TableRow to the TableLayout
-            message_table.addView(messageRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    // Add the TableRow to the TableLayout
+                    message_table.addView(messageRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-            message_table.setVisibility(1);
-        }*/
+                    message_table.setVisibility(1);
+                }*/
         catch( NullPointerException npe )
         {
             String message = new String();

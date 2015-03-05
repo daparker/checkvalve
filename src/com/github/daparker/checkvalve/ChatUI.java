@@ -59,7 +59,7 @@ import com.github.koraktor.steamcondenser.servers.SourceServer;
 public class ChatUI extends Activity
 {
     private final static String TAG = ChatUI.class.getSimpleName();
-    
+
     private Animation fade_in;
     private Animation fade_out;
     private Button say_button;
@@ -123,7 +123,7 @@ public class ChatUI extends Activity
              */
 
             String message = field_command.getText().toString();
-            
+
             if( message.length() == 0 )
                 UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_empty_rcon_command);
             else
@@ -142,12 +142,12 @@ public class ChatUI extends Activity
             if( (e.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (e.getAction() == KeyEvent.ACTION_UP) )
             {
                 String message = field_command.getText().toString();
-        
+
                 if( message.length() == 0 )
                     UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_empty_rcon_command);
                 else
                     sendCommand(message);
-                
+
                 return true;
             }
 
@@ -185,7 +185,7 @@ public class ChatUI extends Activity
              */
 
             if( p.isShowing() ) p.dismiss();
-            
+
             switch( msg.what )
             {
                 case -2:
@@ -232,15 +232,15 @@ public class ChatUI extends Activity
 
                     if( !scrollLock ) layout.fullScroll(View.FOCUS_DOWN);
                     UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_chat_connect_success);
-                    
-                    if( ! rconPasswordDialogDismissed )
+
+                    if( !rconPasswordDialogDismissed )
                     {
                         if( rconPassword.isEmpty() )
                             getRCONPassword();
                         else
                             rconAuthenticate();
                     }
-                    
+
                     break;
                 case 5:
                     try
@@ -431,15 +431,15 @@ public class ChatUI extends Activity
         public void handleMessage( Message msg )
         {
             runFadeOutAnimation(ChatUI.this, sending);
-            
-            switch(msg.what)
+
+            switch( msg.what )
             {
                 case -1:
                     // An error occurred getting the engine type (most likely a socket timeout)
                     break;
                 case 0:
                     int rconAuthStatus = checkRCON();
-                    
+
                     if( rconAuthStatus == 1 )
                     {
                         // Failed authentication
@@ -469,13 +469,13 @@ public class ChatUI extends Activity
                     }
                     else
                     {
-                        
+
                     }
                     break;
             }
         }
     };
-    
+
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
@@ -497,7 +497,7 @@ public class ChatUI extends Activity
         {
             gameServerIP = InetAddress.getByName(thisIntent.getStringExtra("server")).getHostAddress();
             gameServerPort = Integer.toString(thisIntent.getIntExtra("port", 27015));
-            
+
             gameServerIP = "127.0.0.1";
             gameServerPort = "2345";
         }
@@ -505,11 +505,11 @@ public class ChatUI extends Activity
         {
             String errorMsg = (String)context.getText(R.string.msg_unknown_host) + " "
                     + thisIntent.getStringExtra("server");
-            
+
             UserVisibleMessage.showMessage(ChatUI.this, errorMsg);
-            
+
             Log.w(TAG, "Unknown host " + thisIntent.getStringExtra("server"));
-            
+
             finish();
         }
         catch( Exception e )
@@ -584,7 +584,7 @@ public class ChatUI extends Activity
                 UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_general_error);
                 finish();
             }
-            
+
             receiverThread.start();
             receiverRunnable.registerReceiver();
         }
@@ -697,7 +697,7 @@ public class ChatUI extends Activity
         try
         {
             rconIsAuthenticated = false;
-            
+
             if( engine[0] == Values.ENGINE_GOLDSRC )
             {
                 g = new GoldSrcServer(InetAddress.getByName(rconServer), rconPort);
@@ -710,7 +710,7 @@ public class ChatUI extends Activity
                 authenticated = s.rconAuth(rconPassword);
             }
 
-            if( ! authenticated )
+            if( !authenticated )
             {
                 return 1;
             }
@@ -753,19 +753,19 @@ public class ChatUI extends Activity
     {
         //if( rconPassword.isEmpty() )
         //    getRCONPassword();
-        
+
         sending.setText(R.string.status_rcon_verifying_password);
         runFadeInAnimation(context, sending);
 
-        new Thread( new ServerQuery(context, rconServer, rconPort, rconTimeout, engine, rconAuthHandler) ).start();
+        new Thread(new ServerQuery(context, rconServer, rconPort, rconTimeout, engine, rconAuthHandler)).start();
     }
-    
-    public void sendCommand(String message)
+
+    public void sendCommand( String message )
     {
         //if( rconPasswordDialogDismissed )
         //    return;
-        
-        if( ! rconIsAuthenticated )
+
+        if( !rconIsAuthenticated )
         {
             rconAuthenticate();
             //getRCONPassword();
@@ -783,13 +783,13 @@ public class ChatUI extends Activity
                 field_command.setText("");
                 sending.setText(R.string.status_rcon_sending);
                 runFadeInAnimation(ChatUI.this, sending);
-    
+
                 if( engine[0] == 1 )
                     q = new ServerQuery(context, command, response, null, g, popUpHandler);
                 else
                     q = new ServerQuery(context, command, response, s, null, popUpHandler);
-    
-                new Thread( q ).start();
+
+                new Thread(q).start();
             }
         }
     }

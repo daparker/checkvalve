@@ -27,7 +27,7 @@ public class Values
     // Engine types
     protected static final int ENGINE_SOURCE = 0;
     protected static final int ENGINE_GOLDSRC = 1;
-    
+
     // Activity codes
     protected static final int ACTIVITY_ABOUT = 2;
     protected static final int ACTIVITY_ADD_NEW_SERVER = 3;
@@ -41,7 +41,7 @@ public class Values
     protected static final int ACTIVITY_UPDATE_SERVER = 11;
     protected static final int ACTIVITY_CONFIRM_UNSAFE_COMMAND = 12;
     protected static final int ACTIVITY_SETTINGS = 13;
-    
+
     // Intent extra names
     protected static final String EXTRA_ROW_ID = "rowId";
     protected static final String EXTRA_SERVER = "server";
@@ -50,7 +50,7 @@ public class Values
     protected static final String EXTRA_PASSWORD = "password";
     protected static final String EXTRA_CHALLENGE_RESPONSE = "challengeRespone";
     protected static final String EXTRA_SEARCH = "search";
-    
+
     // Bundle keys
     protected static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
     protected static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
@@ -65,7 +65,7 @@ public class Values
     protected static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
     protected static final String SETTING_DEFAULT_RELAY_PORT = "defaultRelayPort";
     protected static final String SETTING_DEFAULT_RELAY_PASSWORD = "defaultRelayPassword";
-    
+
     // TextView tag values
     protected static final String TAG_SERVER_NAME = "serverName";
     protected static final String TAG_SERVER_IP = "serverIP";

@@ -19,8 +19,6 @@
 
 package com.github.daparker.checkvalve;
 
-import java.util.HashMap;
-import java.util.Map;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -58,7 +56,8 @@ public class CheckValve extends Activity
     private TableRow[][] tableRows;
     private TableRow[] messageRows;
     private Context context;
-    private Map<String, Boolean> settings;
+
+    public static Bundle settings;
 
     private long selectedServerRowId;
 
@@ -68,7 +67,7 @@ public class CheckValve extends Activity
         super.onCreate(savedInstanceState);
 
         Log.i(TAG, "Starting CheckValve.");
-        
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         context = CheckValve.this;
@@ -236,10 +235,8 @@ public class CheckValve extends Activity
 
     public void onActivityResult( int request, int result, Intent data )
     {
-        if( (request == Values.ACTIVITY_ADD_NEW_SERVER
-                || request == Values.ACTIVITY_MANAGE_SERVERS
-                || request == Values.ACTIVITY_UPDATE_SERVER
-                || request == Values.ACTIVITY_CONFIRM_DELETE)
+        if( (request == Values.ACTIVITY_ADD_NEW_SERVER || request == Values.ACTIVITY_MANAGE_SERVERS
+                || request == Values.ACTIVITY_UPDATE_SERVER || request == Values.ACTIVITY_CONFIRM_DELETE)
                 && result == 1 )
         {
             queryServers();
@@ -368,7 +365,7 @@ public class CheckValve extends Activity
             messageRows = new TableRow[count];
 
             // Run the server queries in a separate thread
-            new Thread( new ServerQuery(context, tableRows, messageRows, progressHandler) ).start();
+            new Thread(new ServerQuery(context, tableRows, messageRows, progressHandler)).start();
         }
     }
 
@@ -378,7 +375,7 @@ public class CheckValve extends Activity
         public void handleMessage( Message msg )
         {
             String tag = new String();
-            
+
             /*
              * Build and display the messages table if there are errors to be displayed
              */
@@ -413,26 +410,31 @@ public class CheckValve extends Activity
 
                     tableRows[i][0].setOnFocusChangeListener(tableRowFocusChangeListener);
 
-                    for( int j = 0; j < tableRows[i].length ; j++ )
+                    for( int j = 0; j < tableRows[i].length; j++ )
                     {
                         registerForContextMenu(tableRows[i][j]);
                         tableRows[i][j].setOnTouchListener(tableRowTouchListener);
                         tableRows[i][j].setFocusable(false);
-                        
+
                         tag = (String)tableRows[i][j].getTag();
-                                                
+
                         if( tag.equals(Values.TAG_SERVER_IP) )
-                            tableRows[i][j].setVisibility((settings.get(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
+                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE
+                                    :View.GONE);
                         else if( tag.equals(Values.TAG_SERVER_GAME) )
-                            tableRows[i][j].setVisibility((settings.get(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
+                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE
+                                    :View.GONE);
                         else if( tag.equals(Values.TAG_SERVER_MAP) )
-                            tableRows[i][j].setVisibility((settings.get(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
+                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE
+                                    :View.GONE);
                         else if( tag.equals(Values.TAG_SERVER_PLAYERS) )
-                            tableRows[i][j].setVisibility((settings.get(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
+                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE
+                                    :View.GONE);
                         else if( tag.equals(Values.TAG_SERVER_TAGS) )
-                            tableRows[i][j].setVisibility((settings.get(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
+                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE
+                                    :View.GONE);
                     }
-                    
+
                     server_info_table.addView(spacerRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
                     server_info_table.addView(tableRows[i][0], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
                     server_info_table.addView(tableRows[i][1], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -452,52 +454,48 @@ public class CheckValve extends Activity
     {
         String tag = new String();
         int childCount = server_info_table.getChildCount();
-        
+
         Log.i(TAG, "TableLayout " + server_info_table.toString() + " has " + childCount + " child views");
-        
+
         for( int i = 0; i < server_info_table.getChildCount(); i++ )
         {
             server_info_table.getChildAt(i).setVisibility(View.VISIBLE);
             tag = (String)server_info_table.getChildAt(i).getTag();
-            
+
             if( tag != null )
             {
                 if( tag.equals(Values.TAG_SERVER_IP) )
-                    server_info_table.getChildAt(i).setVisibility((settings.get(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE
+                            :View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_GAME) )
-                    server_info_table.getChildAt(i).setVisibility((settings.get(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE
+                            :View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_MAP) )
-                    server_info_table.getChildAt(i).setVisibility((settings.get(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE
+                            :View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_PLAYERS) )
-                    server_info_table.getChildAt(i).setVisibility((settings.get(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE
+                            :View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_TAGS) )
-                    server_info_table.getChildAt(i).setVisibility((settings.get(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE
+                            :View.GONE);
             }
-            
-            Log.d(TAG, "server_info_table child " + i + ": "
-                    + "string=" + server_info_table.getChildAt(i).toString() + "; "
-                    + "tag=" + tag + "; "
-                    + "visibility=" + server_info_table.getChildAt(i).getVisibility());
+
+            Log.d(TAG, "server_info_table child " + i + ": " + "string=" + server_info_table.getChildAt(i).toString()
+                    + "; " + "tag=" + tag + "; " + "visibility=" + server_info_table.getChildAt(i).getVisibility());
         }
-        
+
         server_info_table.invalidate();
     }
-    
+
     public void getSettings()
     {
         // Make sure the database is open
         if( !database.isOpen() ) database.open();
-        
-        Bundle b = database.getSettingsAsBundle();
 
-        settings = new HashMap<String, Boolean>(5);
-        settings.put(Values.SETTING_SHOW_SERVER_IP, b.getBoolean(Values.SETTING_SHOW_SERVER_IP));
-        settings.put(Values.SETTING_SHOW_SERVER_GAME_INFO, b.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO));
-        settings.put(Values.SETTING_SHOW_SERVER_MAP_NAME, b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME));
-        settings.put(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS));
-        settings.put(Values.SETTING_SHOW_SERVER_TAGS, b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS));
+        settings = database.getSettingsAsBundle();
     }
-    
+
     public void quit()
     {
         // Close the database
@@ -527,9 +525,9 @@ public class CheckValve extends Activity
         String serverURL = databaseCursor.getString(1);
         int serverPort = databaseCursor.getInt(2);
         int serverTimeout = databaseCursor.getInt(3);
-        
+
         byte[] challengeResponse = ServerQuery.getChallengeResponse(serverURL, serverPort, serverTimeout);
-        
+
         if( challengeResponse == null )
         {
             String message = new String();
@@ -634,7 +632,7 @@ public class CheckValve extends Activity
         aboutIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.About");
         startActivityForResult(aboutIntent, Values.ACTIVITY_ABOUT);
     }
-    
+
     public void settings()
     {
         Intent settingsIntent = new Intent();

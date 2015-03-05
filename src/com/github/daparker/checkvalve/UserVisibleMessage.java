@@ -30,12 +30,11 @@ import android.widget.Toast;
  * Custom wrapper around the built-in Toast class for displaying messages to the user.
  */
 public class UserVisibleMessage
-{   
+{
     private static final String TAG = UserVisibleMessage.class.getSimpleName();
 
     /**
-     * Displays the specified CharSequence centered on the screen for the duration Toast.LENGTH_SHORT.
-     * <p>
+     * Displays the specified CharSequence centered on the screen for the duration Toast.LENGTH_SHORT. <p>
      * 
      * @param context The context to use
      * @param text The text to be displayed in the message </p>
@@ -53,8 +52,7 @@ public class UserVisibleMessage
     }
 
     /**
-     * Displays the specified string resource centered on the screen for the duration Toast.LENGTH_SHORT.
-     * <p>
+     * Displays the specified string resource centered on the screen for the duration Toast.LENGTH_SHORT. <p>
      * 
      * @param context The context to use
      * @param resId The ID of the string resource to be displayed in the message </p>

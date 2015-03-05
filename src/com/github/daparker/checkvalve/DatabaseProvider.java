@@ -61,33 +61,23 @@ public class DatabaseProvider
     private static final String SETTINGS_FIELD_DEFAULT_RELAY_HOST = "default_relay_host";
     private static final String SETTINGS_FIELD_DEFAULT_RELAY_PORT = "default_relay_port";
     private static final String SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD = "default_relay_password";
-    
-    private static final String CREATE_TABLE_SERVERS = 
-            "CREATE TABLE " + TABLE_SERVERS + "("
-            + SERVERS_FIELD_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + SERVERS_FIELD_SERVER + " TEXT NOT NULL, "
-            + SERVERS_FIELD_PORT + " TEXT NOT NULL, "
-            + SERVERS_FIELD_TIMEOUT + " INTEGER NOT NULL, "
-            + SERVERS_FIELD_LISTPOS + " INTEGER NOT NULL DEFAULT 0, "
-            + SERVERS_FIELD_RCON + " TEXT NOT NULL DEFAULT ''"
-            + ");";
-    
-    private static final String CREATE_TABLE_SETTINGS =
-            "CREATE TABLE " + TABLE_SETTINGS + "("
-            + SETTINGS_FIELD_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + SETTINGS_FIELD_RCON_WARN_UNSAFE + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_RCON_SHOW_PASSWORDS + " INTEGER NOT NULL DEFAULT 0, "
-            + SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
+
+    private static final String CREATE_TABLE_SERVERS = "CREATE TABLE " + TABLE_SERVERS + "(" + SERVERS_FIELD_ROWID
+            + " INTEGER PRIMARY KEY AUTOINCREMENT, " + SERVERS_FIELD_SERVER + " TEXT NOT NULL, " + SERVERS_FIELD_PORT
+            + " TEXT NOT NULL, " + SERVERS_FIELD_TIMEOUT + " INTEGER NOT NULL, " + SERVERS_FIELD_LISTPOS
+            + " INTEGER NOT NULL DEFAULT 0, " + SERVERS_FIELD_RCON + " TEXT NOT NULL DEFAULT ''" + ");";
+
+    private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE " + TABLE_SETTINGS + "(" + SETTINGS_FIELD_ROWID
+            + " INTEGER PRIMARY KEY AUTOINCREMENT, " + SETTINGS_FIELD_RCON_WARN_UNSAFE
+            + " INTEGER NOT NULL DEFAULT 1, " + SETTINGS_FIELD_RCON_SHOW_PASSWORDS + " INTEGER NOT NULL DEFAULT 0, "
+            + SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1, " + SETTINGS_FIELD_SHOW_SERVER_IP
+            + " INTEGER NOT NULL DEFAULT 1, " + SETTINGS_FIELD_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_FIELD_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, " + SETTINGS_FIELD_SHOW_SERVER_GAME
+            + " INTEGER NOT NULL DEFAULT 1, " + SETTINGS_FIELD_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_FIELD_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_FIELD_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_FIELD_DEFAULT_RELAY_HOST + " TEXT NOT NULL DEFAULT '', "
-            + SETTINGS_FIELD_DEFAULT_RELAY_PORT + " INTEGER NOT NULL DEFAULT 23456, "
-            + SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT ''"
+            + SETTINGS_FIELD_DEFAULT_RELAY_HOST + " TEXT NOT NULL DEFAULT '', " + SETTINGS_FIELD_DEFAULT_RELAY_PORT
+            + " INTEGER NOT NULL DEFAULT 23456, " + SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT ''"
             + ");";
 
     private Context context;
@@ -95,15 +85,10 @@ public class DatabaseProvider
     private SQLiteDatabase db;
 
     /**
-     * Construct a new instance of the DatabaseProvider class.
-     * <p>
-     * This class provides persistent access to the application's database.
-     * </p>
-     * <p>
+     * Construct a new instance of the DatabaseProvider class. <p> This class provides persistent access to the
+     * application's database. </p> <p>
      * 
-     * @param c
-     *            The context to use
-     *            </p>
+     * @param c The context to use </p>
      */
     public DatabaseProvider( Context c )
     {
@@ -112,10 +97,8 @@ public class DatabaseProvider
     }
 
     /**
-     * Helper class to simplify the creation and upgrading of the application's database.
-     * <p>
-     * This class extends <tt>SQLiteOpenHelper</tt>.
-     * </p>
+     * Helper class to simplify the creation and upgrading of the application's database. <p> This class extends
+     * <tt>SQLiteOpenHelper</tt>. </p>
      */
     private static class DatabaseHelper extends SQLiteOpenHelper
     {
@@ -127,19 +110,20 @@ public class DatabaseProvider
         @Override
         public void onCreate( SQLiteDatabase db )
         {
-        	try
+            try
             {
-        		Log.i(TAG, "Creating table " + TABLE_SERVERS);
+                Log.i(TAG, "Creating table " + TABLE_SERVERS);
                 db.execSQL(CREATE_TABLE_SERVERS);
-                
+
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
 
                 ContentValues values = new ContentValues();
-                
+
                 Log.i(TAG, "Assembling default values in ContentValues object " + values.toString());
                 values.put(SETTINGS_FIELD_RCON_WARN_UNSAFE, 1);
                 values.put(SETTINGS_FIELD_RCON_SHOW_PASSWORDS, 1);
+                values.put(SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_IP, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_MAP, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_PLAYERS, 1);
@@ -150,7 +134,7 @@ public class DatabaseProvider
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_HOST, "");
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_PORT, 23456);
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD, "");
-                
+
                 Log.i(TAG, "Inserting default values");
                 db.insert(TABLE_SETTINGS, null, values);
             }
@@ -169,18 +153,19 @@ public class DatabaseProvider
         @Override
         public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion )
         {
-        	Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
-        	
+            Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
+
             try
             {
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
 
                 ContentValues values = new ContentValues();
-                
+
                 Log.i(TAG, "Assembling default values in ContentValues object " + values.toString());
                 values.put(SETTINGS_FIELD_RCON_WARN_UNSAFE, 1);
                 values.put(SETTINGS_FIELD_RCON_SHOW_PASSWORDS, 1);
+                values.put(SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_IP, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_MAP, 1);
                 values.put(SETTINGS_FIELD_SHOW_SERVER_PLAYERS, 1);
@@ -191,7 +176,7 @@ public class DatabaseProvider
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_HOST, "");
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_PORT, 23456);
                 values.put(SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD, "");
-                
+
                 Log.i(TAG, "Inserting default values");
                 db.insert(TABLE_SETTINGS, null, values);
             }
@@ -209,14 +194,10 @@ public class DatabaseProvider
     }
 
     /**
-     * Opens the database for reading and writing
-     * <p>
+     * Opens the database for reading and writing <p>
      * 
-     * @return A <tt>DatabaseProvider</tt> object.
-     *         </p>
-     *         <p>
-     * @throws SQLException
-     *             </p>
+     * @return A <tt>DatabaseProvider</tt> object. </p> <p>
+     * @throws SQLException </p>
      */
     public DatabaseProvider open() throws SQLException
     {
@@ -233,11 +214,9 @@ public class DatabaseProvider
     }
 
     /**
-     * Determines if the database is open or closed.
-     * <p>
+     * Determines if the database is open or closed. <p>
      * 
-     * @return A boolean value indicating whether or not the database is currently open.
-     *         </p>
+     * @return A boolean value indicating whether or not the database is currently open. </p>
      */
     public boolean isOpen()
     {
@@ -245,21 +224,13 @@ public class DatabaseProvider
     }
 
     /**
-     * Adds a new server to the database.
-     * <p>
+     * Adds a new server to the database. <p>
      * 
-     * @param server
-     *            The URL or IP address of the server
-     * @param port
-     *            The listen port of the server
-     * @param timeout
-     *            The query timeout for the server (in seconds)
-     * @param password
-     *            The RCON password for the server
-     *            </p>
-     *            <p>
-     * @return The ID of the newly created database row.
-     *         </p>
+     * @param server The URL or IP address of the server
+     * @param port The listen port of the server
+     * @param timeout The query timeout for the server (in seconds)
+     * @param password The RCON password for the server </p> <p>
+     * @return The ID of the newly created database row. </p>
      */
     public long insertServer( String server, int port, int timeout, String password )
     {
@@ -279,15 +250,10 @@ public class DatabaseProvider
     }
 
     /**
-     * Deletes the specified server from the database.
-     * <p>
+     * Deletes the specified server from the database. <p>
      * 
-     * @param rowId
-     *            The database row which contains the server's data
-     *            </p>
-     *            <p>
-     * @return A boolean value indicating whether or not the operation was successful.
-     *         </p>
+     * @param rowId The database row which contains the server's data </p> <p>
+     * @return A boolean value indicating whether or not the operation was successful. </p>
      */
     public boolean deleteServer( long rowId )
     {
@@ -295,11 +261,9 @@ public class DatabaseProvider
     }
 
     /**
-     * Queries the database for all server information.
-     * <p>
+     * Queries the database for all server information. <p>
      * 
-     * @return A <tt>Cursor</tt> containing the results of the query.
-     *         </p>
+     * @return A <tt>Cursor</tt> containing the results of the query. </p>
      */
     public Cursor getAllServers()
     {
@@ -307,8 +271,8 @@ public class DatabaseProvider
 
         try
         {
-            result = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_ROWID, SERVERS_FIELD_SERVER, SERVERS_FIELD_PORT, SERVERS_FIELD_TIMEOUT,
-                    SERVERS_FIELD_LISTPOS, SERVERS_FIELD_RCON }, null, null, null, null, SERVERS_FIELD_LISTPOS);
+            result = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_ROWID, SERVERS_FIELD_SERVER,
+                    SERVERS_FIELD_PORT, SERVERS_FIELD_TIMEOUT, SERVERS_FIELD_LISTPOS, SERVERS_FIELD_RCON }, null, null, null, null, SERVERS_FIELD_LISTPOS);
         }
         catch( Exception e )
         {
@@ -325,23 +289,17 @@ public class DatabaseProvider
     }
 
     /**
-     * Queries the database for the specified server's data.
-     * <p>
+     * Queries the database for the specified server's data. <p>
      * 
-     * @param rowId
-     *            The database row which contains the server's data
-     *            </p>
-     *            <p>
-     * @return A <tt>Cursor</tt> containing the results of the query.
-     *         </p>
-     *         <p>
-     * @throws SQLException
-     *             </p>
+     * @param rowId The database row which contains the server's data </p> <p>
+     * @return A <tt>Cursor</tt> containing the results of the query. </p> <p>
+     * @throws SQLException </p>
      */
     public Cursor getServer( long rowId ) throws SQLException
     {
-        Cursor result = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_ROWID, SERVERS_FIELD_SERVER, SERVERS_FIELD_PORT, SERVERS_FIELD_TIMEOUT,
-                SERVERS_FIELD_LISTPOS, SERVERS_FIELD_RCON }, SERVERS_FIELD_ROWID + "=" + rowId, null, null, null, null);
+        Cursor result = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_ROWID, SERVERS_FIELD_SERVER,
+                SERVERS_FIELD_PORT, SERVERS_FIELD_TIMEOUT, SERVERS_FIELD_LISTPOS, SERVERS_FIELD_RCON }, SERVERS_FIELD_ROWID
+                + "=" + rowId, null, null, null, null);
 
         if( result != null ) result.moveToFirst();
 
@@ -349,23 +307,14 @@ public class DatabaseProvider
     }
 
     /**
-     * Updates the specified server's information in the database.
-     * <p>
+     * Updates the specified server's information in the database. <p>
      * 
-     * @param rowId
-     *            The database row which contains the server's data
-     * @param server
-     *            The URL or IP address of the server
-     * @param port
-     *            The listen port of the server
-     * @param timeout
-     *            The query timeout for the server (in seconds)
-     * @param password
-     *            The RCON password for the server
-     *            </p>
-     *            <p>
-     * @return A boolean value indicating whether or not the operation was successful.
-     *         </p>
+     * @param rowId The database row which contains the server's data
+     * @param server The URL or IP address of the server
+     * @param port The listen port of the server
+     * @param timeout The query timeout for the server (in seconds)
+     * @param password The RCON password for the server </p> <p>
+     * @return A boolean value indicating whether or not the operation was successful. </p>
      */
     public boolean updateServer( long rowId, String server, int port, int timeout, String password )
     {
@@ -382,11 +331,9 @@ public class DatabaseProvider
     }
 
     /**
-     * Gets the last used position number in the database.
-     * <p>
+     * Gets the last used position number in the database. <p>
      * 
-     * @return The last used position number.
-     *         </p>
+     * @return The last used position number. </p>
      */
     public int getLastPosition()
     {
@@ -405,18 +352,11 @@ public class DatabaseProvider
     }
 
     /**
-     * Moves the specified server up one position in the list.
-     * <p>
-     * If the server is already at position 0, then this method simply returns <b>true</b> and takes no other action.
-     * </p>
-     * <p>
+     * Moves the specified server up one position in the list. <p> If the server is already at position 0, then this
+     * method simply returns <b>true</b> and takes no other action. </p> <p>
      * 
-     * @param rowId
-     *            The database row which contains the server's data
-     *            </p>
-     *            <p>
-     * @return A boolean value indicating whether or not the operation was successful.
-     *         </p>
+     * @param rowId The database row which contains the server's data </p> <p>
+     * @return A boolean value indicating whether or not the operation was successful. </p>
      */
     public boolean moveServerUp( long rowId )
     {
@@ -449,25 +389,17 @@ public class DatabaseProvider
     }
 
     /**
-     * Move the specified server down one position in the list.
-     * <p>
-     * If the server is already at the last position, then this method simply returns <b>true</b> and takes no other
-     * action.
-     * </p>
-     * <p>
+     * Move the specified server down one position in the list. <p> If the server is already at the last position, then
+     * this method simply returns <b>true</b> and takes no other action. </p> <p>
      * 
-     * @param rowId
-     *            The database row which contains the server's data
-     *            </p>
-     *            <p>
-     * @return A boolean value indicating whether or not the operation was successful.
-     *         </p>
-     *         <p>
+     * @param rowId The database row which contains the server's data </p> <p>
+     * @return A boolean value indicating whether or not the operation was successful. </p> <p>
      * @see com.github.daparker.checkvalve.DatabaseProvider#getLastPosition()
      */
     public boolean moveServerDown( long rowId )
     {
-        Cursor cursor = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_LISTPOS }, SERVERS_FIELD_ROWID + "=" + rowId, null, null, null, null);
+        Cursor cursor = db.query(TABLE_SERVERS, new String[] { SERVERS_FIELD_LISTPOS }, SERVERS_FIELD_ROWID + "="
+                + rowId, null, null, null, null);
 
         cursor.moveToFirst();
 
@@ -492,35 +424,19 @@ public class DatabaseProvider
 
         return ((r1 == 1) && (r2 == 1) && (r3 == 1));
     }
-    
+
     public Cursor getSettingsAsCursor()
     {
         Cursor result = null;
 
         try
         {
-            result = db.query(
-                    TABLE_SETTINGS,
-                    new String[] {
-                            SETTINGS_FIELD_RCON_WARN_UNSAFE,
-                            SETTINGS_FIELD_RCON_SHOW_PASSWORDS,
-                            SETTINGS_FIELD_SHOW_SERVER_IP,
-                            SETTINGS_FIELD_SHOW_SERVER_MAP,
-                            SETTINGS_FIELD_SHOW_SERVER_PLAYERS,
-                            SETTINGS_FIELD_SHOW_SERVER_GAME,
-                            SETTINGS_FIELD_SHOW_SERVER_TAGS,
-                            SETTINGS_FIELD_DEFAULT_QUERY_PORT,
-                            SETTINGS_FIELD_DEFAULT_QUERY_TIMEOUT,
-                            SETTINGS_FIELD_DEFAULT_RELAY_HOST,
-                            SETTINGS_FIELD_DEFAULT_RELAY_PORT,
-                            SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD
-                    },
-                    null,
-                    null,
-                    null,
-                    null,
-                    SETTINGS_FIELD_ROWID
-                );
+            result = db.query(TABLE_SETTINGS, new String[] { SETTINGS_FIELD_RCON_WARN_UNSAFE,
+                    SETTINGS_FIELD_RCON_SHOW_PASSWORDS, SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS, SETTINGS_FIELD_SHOW_SERVER_IP, SETTINGS_FIELD_SHOW_SERVER_MAP,
+                    SETTINGS_FIELD_SHOW_SERVER_PLAYERS, SETTINGS_FIELD_SHOW_SERVER_GAME,
+                    SETTINGS_FIELD_SHOW_SERVER_TAGS, SETTINGS_FIELD_DEFAULT_QUERY_PORT,
+                    SETTINGS_FIELD_DEFAULT_QUERY_TIMEOUT, SETTINGS_FIELD_DEFAULT_RELAY_HOST,
+                    SETTINGS_FIELD_DEFAULT_RELAY_PORT, SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD }, null, null, null, null, SETTINGS_FIELD_ROWID);
         }
         catch( Exception e )
         {
@@ -536,38 +452,38 @@ public class DatabaseProvider
         Log.i(TAG, "getSettingsAsCursor(): Returning Cursor " + result.toString());
         return result;
     }
-    
+
     public Bundle getSettingsAsBundle()
     {
         String column = new String();
         Bundle result = new Bundle();
         Cursor cursor = this.getSettingsAsCursor();
-        
+
         cursor.moveToFirst();
-        
+
         for( int i = 0; i < cursor.getColumnCount(); i++ )
         {
             column = cursor.getColumnName(i);
-            
-            Log.i(TAG, "Cursor=" + cursor.toString()
-            		+ "; column=" + i
-            		+ "; name=" + column
-            		+ "; null=" + cursor.isNull(i));
-            
+
+            Log.i(TAG, "Cursor=" + cursor.toString() + "; column=" + i + "; name=" + column + "; null="
+                    + cursor.isNull(i));
+
             if( column.equals(SETTINGS_FIELD_RCON_WARN_UNSAFE) )
-                result.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_RCON_SHOW_PASSWORDS) )
-                result.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, (cursor.getInt(i) == 1)?true:false);
+            else if( column.equals(SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS) )
+                result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_SHOW_SERVER_IP) )
-                result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_SHOW_SERVER_GAME) )
-                result.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_SHOW_SERVER_MAP) )
-                result.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_SHOW_SERVER_PLAYERS) )
-                result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_SHOW_SERVER_TAGS) )
-                result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (cursor.getInt(i)==1)?true:false);
+                result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (cursor.getInt(i) == 1)?true:false);
             else if( column.equals(SETTINGS_FIELD_DEFAULT_QUERY_PORT) )
                 result.putInt(Values.SETTING_DEFAULT_QUERY_PORT, cursor.getInt(i));
             else if( column.equals(SETTINGS_FIELD_DEFAULT_QUERY_TIMEOUT) )
@@ -581,35 +497,37 @@ public class DatabaseProvider
         }
 
         cursor.close();
-        
+
         Log.i(TAG, "getSettingsAsBundle(): Returning Bundle " + result.toString());
         return result;
     }
-    
+
     public boolean updateSettings( Bundle settings )
     {
         ContentValues values = new ContentValues();
-        
+
         // Get boolean values from the Bundle as integers (0 or 1)
         int warnUnsafe = (settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, true))?1:0;
         int showPwds = (settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, true))?1:0;
+        int showSuggest = (settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
-        
+
         // Get int values from the Bundle
         int defaultQueryPort = settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT, 27015);
         int defaultQueryTimeout = settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, 1);
         int defaultRelayPort = settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT, 23456);
-        
+
         // Get string values from the Bundle
         String defaultRelayHost = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
         String defaultRelayPswd = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
-        
+
         values.put(SETTINGS_FIELD_RCON_WARN_UNSAFE, warnUnsafe);
         values.put(SETTINGS_FIELD_RCON_SHOW_PASSWORDS, showPwds);
+        values.put(SETTINGS_FIELD_RCON_SHOW_SUGGESTIONS, showSuggest);
         values.put(SETTINGS_FIELD_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_FIELD_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_FIELD_SHOW_SERVER_PLAYERS, showPlayers);
@@ -620,11 +538,11 @@ public class DatabaseProvider
         values.put(SETTINGS_FIELD_DEFAULT_RELAY_HOST, defaultRelayHost);
         values.put(SETTINGS_FIELD_DEFAULT_RELAY_PORT, defaultRelayPort);
         values.put(SETTINGS_FIELD_DEFAULT_RELAY_PASSWORD, defaultRelayPswd);
-        
+
         Log.i(TAG, "Updating " + TABLE_SETTINGS + " with ContentValues " + values.toString());
         int result = db.update(TABLE_SETTINGS, values, null, null);
         Log.i(TAG, "Updated " + result + " row(s)");
-        
-        return (result==0)?false:true;
+
+        return (result == 0)?false:true;
     }
 }

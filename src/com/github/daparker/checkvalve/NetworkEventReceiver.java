@@ -46,18 +46,12 @@ public class NetworkEventReceiver implements Runnable
     private int event;
 
     /**
-     * Construct a new instance of the NetworkEventReceiver class.
-     * <p>
-     * This class implements a <tt>BroadcastReceiver</tt> listening for network events, and sends messages to the caller
-     * via a <tt>Handler</tt> when events occur.
-     * </p>
-     * <p>
+     * Construct a new instance of the NetworkEventReceiver class. <p> This class implements a
+     * <tt>BroadcastReceiver</tt> listening for network events, and sends messages to the caller via a <tt>Handler</tt>
+     * when events occur. </p> <p>
      * 
-     * @param c
-     *            The context to use
-     * @param h
-     *            The handler to use
-     *            </p>
+     * @param c The context to use
+     * @param h The handler to use </p>
      */
     public NetworkEventReceiver( Context c, Handler h )
     {
@@ -69,7 +63,7 @@ public class NetworkEventReceiver implements Runnable
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         registered = false;
         connected = false;
         lastNetworkType = 0;
@@ -255,11 +249,8 @@ public class NetworkEventReceiver implements Runnable
     }
 
     /**
-     * Shuts down the NetworkEventReceiver.
-     * <p>
-     * This method simply calls the <tt>interrupt()<tt> method on the NetworkEventReceiver
-     * object's thread.
-     * </p>
+     * Shuts down the NetworkEventReceiver. <p> This method simply calls the <tt>interrupt()<tt> method on the
+     * NetworkEventReceiver object's thread. </p>
      */
     public void shutDown()
     {

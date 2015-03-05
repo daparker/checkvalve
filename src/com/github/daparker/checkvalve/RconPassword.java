@@ -96,6 +96,17 @@ public class RconPassword extends Activity
 
         cancel_button = (Button)findViewById(R.id.cancel_button);
         cancel_button.setOnClickListener(cancelButtonListener);
+
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        }
+        else
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
     }
 
     @Override
@@ -110,14 +121,14 @@ public class RconPassword extends Activity
     {
         super.onResume();
     }
-    
-    public void showPasswordCheckboxHandler(View view)
+
+    public void showPasswordCheckboxHandler( View view )
     {
-        boolean checked = ((CheckBox) view).isChecked();
-        
+        boolean checked = ((CheckBox)view).isChecked();
+
         if( checked )
-            field_password.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         else
-            field_password.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 }

@@ -74,28 +74,15 @@ public class Chat implements Runnable
     private static Handler handler;
 
     /**
-     * Construct a new instance of the Chat class.
-     * <p>
-     * This class implements a CheckValve Chat Relay client.
-     * </p>
-     * <p>
+     * Construct a new instance of the Chat class. <p> This class implements a CheckValve Chat Relay client. </p> <p>
      * 
-     * @param crIP
-     *            The URL or IP address of the Chat Relay
-     * @param crPort
-     *            The client listen port of the Chat Relay
-     * @param crPassword
-     *            The password for the Chat Relay
-     * @param gsIP
-     *            The URL or IP address of the game server from which you want chat messages
-     * @param gsPort
-     *            The listen port of the game server from which you want chat messages
-     * @param h
-     *            The handler to use
-     *            </p>
-     *            <p>
-     * @throws UnknownHostException
-     *             </p>
+     * @param crIP The URL or IP address of the Chat Relay
+     * @param crPort The client listen port of the Chat Relay
+     * @param crPassword The password for the Chat Relay
+     * @param gsIP The URL or IP address of the game server from which you want chat messages
+     * @param gsPort The listen port of the game server from which you want chat messages
+     * @param h The handler to use </p> <p>
+     * @throws UnknownHostException </p>
      */
     public Chat( String crIP, String crPort, String crPassword, String gsIP, String gsPort, Handler h )
             throws UnknownHostException
@@ -111,7 +98,7 @@ public class Chat implements Runnable
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         try
         {
             runChatRelayClient();
@@ -134,7 +121,7 @@ public class Chat implements Runnable
         {
             if( s != null )
             {
-                if( ! s.isClosed() )
+                if( !s.isClosed() )
                 {
                     try
                     {
@@ -145,9 +132,9 @@ public class Chat implements Runnable
                     {
                         Log.w(TAG, "Caught an exception while shutting down the socket:");
                         Log.w(TAG, ioe.toString());
-    
+
                         StackTraceElement[] ste = ioe.getStackTrace();
-    
+
                         for( int i = 0; i < ste.length; i++ )
                             Log.e(TAG, "    " + ste[i].toString());
                     }
@@ -157,15 +144,11 @@ public class Chat implements Runnable
     }
 
     /**
-     * Establishes a client connection to the Chat Relay and then listens for incoming data.
-     * <p>
-     * <b>This method should not be explicitly called. It is started when the <tt>start()</tt> method is called on the
-     * Chat object or its thread.</b>
-     * </p>
-     * <p>
+     * Establishes a client connection to the Chat Relay and then listens for incoming data. <p> <b>This method should
+     * not be explicitly called. It is started when the <tt>start()</tt> method is called on the Chat object or its
+     * thread.</b> </p> <p>
      * 
-     * @throws Exception
-     *             </p>
+     * @throws Exception </p>
      */
     public void runChatRelayClient() throws Exception
     {
@@ -408,21 +391,18 @@ public class Chat implements Runnable
     }
 
     /**
-     * Shuts down the Chat Relay client.
-     * <p>
-     * This method closes the network socket and then calls <tt>interrupt()<tt> on the Chat
-     * object's thread.
-     * </p>
+     * Shuts down the Chat Relay client. <p> This method closes the network socket and then calls <tt>interrupt()<tt> on
+     * the Chat object's thread. </p>
      */
     public void shutDown()
     {
         try
         {
             Log.d(TAG, this.toString() + ": Shutdown was requested.");
-            
+
             if( s != null )
             {
-                if( ! s.isClosed() )
+                if( !s.isClosed() )
                 {
                     Log.d(TAG, this.toString() + ": Closing socket " + s.toString() + ".");
                     s.close();

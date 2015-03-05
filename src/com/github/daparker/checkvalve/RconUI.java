@@ -128,12 +128,12 @@ public class RconUI extends Activity
         {
             // Dismiss the progress dialog
             //p.dismiss();
-            
+
             switch( msg.what )
             {
                 case -1:
                     Log.d(TAG, "progressHandler [" + msg.toString() + "]");
-                    Log.d(TAG, "Message object string = " + msg.obj.toString() );
+                    Log.d(TAG, "Message object string = " + msg.obj.toString());
                     Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
                 case Values.ENGINE_GOLDSRC:
                     g = (GoldSrcServer)msg.obj;
@@ -145,10 +145,10 @@ public class RconUI extends Activity
                     UserVisibleMessage.showMessage(RconUI.this, R.string.msg_rcon_general_error);
                     break;
             }
-            
+
             p.dismiss();
-            
-            if( ! rconIsAuthenticated )
+
+            if( !rconIsAuthenticated )
             {
                 if( password.length() == 0 )
                     getPassword();
@@ -195,7 +195,7 @@ public class RconUI extends Activity
             command = "";
         }
     };
-    
+
     // Handler for the RCON authentication thread
     private Handler rconAuthHandler = new Handler()
     {
@@ -203,8 +203,8 @@ public class RconUI extends Activity
         public void handleMessage( Message msg )
         {
             runFadeOutAnimation(RconUI.this, sending);
-            
-            switch(msg.what)
+
+            switch( msg.what )
             {
                 case -1:
                     // An error occurred getting the engine type (most likely a socket timeout)
@@ -218,9 +218,9 @@ public class RconUI extends Activity
                     break;
                 case 1:
                     Log.d(TAG, "rconAuthHandler [" + msg.toString() + "]");
-                    Log.d(TAG, "Message object string = " + msg.obj.toString() );
+                    Log.d(TAG, "Message object string = " + msg.obj.toString());
                     Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
-                    
+
                     if( msg.obj.getClass() == RCONNoAuthException.class )
                     {
                         // Failed authentication
@@ -245,7 +245,7 @@ public class RconUI extends Activity
 
                     break;
             }
-            
+
             p.dismiss();
         }
     };
@@ -292,8 +292,13 @@ public class RconUI extends Activity
 
         field_command = (AutoCompleteTextView)findViewById(R.id.field_command);
         field_command.setAdapter(adapter);
-        field_command.setThreshold(1);
         field_command.setOnKeyListener(enterKeyListener);
+
+        // Hack to disable auto-complete if desired by the user
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS) == true )
+            field_command.setThreshold(1);
+        else
+            field_command.setThreshold(1000);
 
         unsafeCommands = res.getStringArray(R.array.unsafe_commands);
 
@@ -359,9 +364,9 @@ public class RconUI extends Activity
         }
     }
 
-    public void sendCommand(boolean force)
+    public void sendCommand( boolean force )
     {
-        if( ! force )
+        if( !force )
         {
             // Get the bare command without any arguments
             String bareCommand = (command.indexOf(" ") != -1)?command.substring(0, command.indexOf(" ")):command;
@@ -383,7 +388,7 @@ public class RconUI extends Activity
         else
             q = new ServerQuery(context, command, response, s, null, popUpHandler);
 
-        new Thread( q ).start();
+        new Thread(q).start();
     }
 
     public void getServerType()
@@ -392,7 +397,7 @@ public class RconUI extends Activity
         p = ProgressDialog.show(this, "", context.getText(R.string.status_connecting), true, false);
 
         // Run the server queries in a new thread
-        new Thread( new ServerQuery(context, server, port, timeout, engine, progressHandler) ).start();
+        new Thread(new ServerQuery(context, server, port, timeout, engine, progressHandler)).start();
     }
 
     public void scrollToBottomOfText()
@@ -411,15 +416,15 @@ public class RconUI extends Activity
 
         rcon_console.scrollTo(0, difference);
     }
-    
+
     public void rconAuthenticate()
-    {   
+    {
         p = ProgressDialog.show(this, "", context.getText(R.string.status_rcon_verifying_password), true, false);
-        
+
         if( engine[0] == Values.ENGINE_GOLDSRC )
-            new Thread( new ServerQuery(RconUI.this, password, g, rconAuthHandler) ).start();
+            new Thread(new ServerQuery(RconUI.this, password, g, rconAuthHandler)).start();
         else
-            new Thread( new ServerQuery(RconUI.this, password, s, rconAuthHandler) ).start();
+            new Thread(new ServerQuery(RconUI.this, password, s, rconAuthHandler)).start();
     }
 
     public void runFadeInAnimation( Context c, View v )

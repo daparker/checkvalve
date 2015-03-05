@@ -24,27 +24,29 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/settings_save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/button_save"
-            android:textColor="#ffffff" />
-
-        <Button
             android:id="@+id/settings_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:focusable="true"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:text="@string/button_cancel"
+            android:textColor="#ffffff" />
+        
+        <Button
+            android:id="@+id/settings_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/button_save"
             android:textColor="#ffffff" />
     </LinearLayout>
 
@@ -69,6 +71,7 @@
                     android:id="@+id/label_rcon_settings_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
                     android:background="@color/steam_blue"
                     android:gravity="center"
                     android:singleLine="true"
@@ -84,6 +87,7 @@
                         android:id="@+id/label_rcon_warn_unsafe_command"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -94,6 +98,7 @@
                         android:id="@+id/checkbox_rcon_warn_unsafe_command"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -103,6 +108,7 @@
                         android:id="@+id/label_rcon_show_suggestions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -113,6 +119,7 @@
                         android:id="@+id/checkbox_rcon_show_suggestions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -124,6 +131,7 @@
                         android:id="@+id/label_rcon_show_passwords"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -134,6 +142,7 @@
                         android:id="@+id/checkbox_rcon_show_passwords"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
             </TableLayout>
@@ -148,6 +157,7 @@
                     android:id="@+id/label_server_settings_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
                     android:background="@color/steam_blue"
                     android:gravity="center"
                     android:singleLine="true"
@@ -163,6 +173,7 @@
                         android:id="@+id/label_servers_show_ip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -173,6 +184,7 @@
                         android:id="@+id/checkbox_servers_show_ip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -184,6 +196,7 @@
                         android:id="@+id/label_servers_show_game"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -194,6 +207,7 @@
                         android:id="@+id/checkbox_servers_show_game"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -205,6 +219,7 @@
                         android:id="@+id/label_servers_show_map"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -215,6 +230,7 @@
                         android:id="@+id/checkbox_servers_show_map"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -226,6 +242,7 @@
                         android:id="@+id/label_servers_show_players"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -236,6 +253,7 @@
                         android:id="@+id/checkbox_servers_show_players"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
 
@@ -247,6 +265,7 @@
                         android:id="@+id/label_servers_show_tags"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -257,6 +276,7 @@
                         android:id="@+id/checkbox_servers_show_tags"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:onClick="settingCheckboxHandler" />
                 </TableRow>
             </TableLayout>
@@ -271,6 +291,7 @@
                     android:id="@+id/label_query_settings_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
                     android:background="@color/steam_blue"
                     android:gravity="center"
                     android:singleLine="true"
@@ -286,6 +307,7 @@
                         android:id="@+id/label_default_query_port"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -296,6 +318,7 @@
                         android:id="@+id/field_default_query_port"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:inputType="number"
                         android:maxLength="5"
                         android:textSize="14.0sp" />
@@ -309,6 +332,7 @@
                         android:id="@+id/label_default_query_timeout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -319,6 +343,7 @@
                         android:id="@+id/field_default_query_timeout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:inputType="number"
                         android:textSize="14.0sp" />
                 </TableRow>
@@ -334,6 +359,7 @@
                     android:id="@+id/label_chat_relay_settings_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
                     android:background="@color/steam_blue"
                     android:gravity="center"
                     android:singleLine="true"
@@ -349,6 +375,7 @@
                         android:id="@+id/label_default_relay_host"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -359,6 +386,7 @@
                         android:id="@+id/field_default_relay_host"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:inputType="text"
                         android:textSize="14.0sp" />
                 </TableRow>
@@ -371,6 +399,7 @@
                         android:id="@+id/label_default_relay_port"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -381,6 +410,7 @@
                         android:id="@+id/field_default_relay_port"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:inputType="number"
                         android:maxLength="5"
                         android:textSize="14.0sp" />
@@ -394,6 +424,7 @@
                         android:id="@+id/label_default_relay_password"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
@@ -404,6 +435,7 @@
                         android:id="@+id/field_default_relay_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:focusable="true"
                         android:inputType="textPassword"
                         android:textSize="14.0sp" />
                 </TableRow>

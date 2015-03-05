@@ -153,9 +153,9 @@ public final class R {
         public static final int server_info_table=0x7f090029;
         public static final int settings=0x7f090075;
         public static final int settings_button_bar=0x7f09003e;
-        public static final int settings_cancel_button=0x7f090040;
+        public static final int settings_cancel_button=0x7f09003f;
         public static final int settings_master_layout=0x7f09003d;
-        public static final int settings_save_button=0x7f09003f;
+        public static final int settings_save_button=0x7f090040;
         public static final int settings_scrollview=0x7f090041;
         public static final int show_password_layout=0x7f090013;
         public static final int show_players=0x7f090069;
