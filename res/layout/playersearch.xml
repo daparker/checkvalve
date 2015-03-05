@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -20,75 +20,81 @@ along with the CheckValve source code.  If not, see
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:gravity="center"
     android:id="@+id/parentLayout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-    <TextView  
-    android:id="@+id/search_title"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-	android:textSize="20.0dip"
-	android:textColor="#FFFFFF"
-	android:paddingTop="10dip"
-	android:paddingBottom="15dip"
-	android:gravity="center"
-    android:text="@string/title_player_search"
-    />
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/player_search_table"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="15.0dip"
-    android:paddingRight="15.0dip"
-    android:stretchColumns="0"
-	>
-	<TableRow>
-    <TextView  
-    	android:id="@+id/label_playersearch"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:singleLine="true"
-		android:text="@string/label_playersearch"
-	    android:textSize="12.0dip"
-	    android:textStyle="bold"
-	    android:gravity="left|center_vertical"
-    />
-    </TableRow>
-    <TableRow>
-    <EditText  
-    	android:id="@+id/field_playersearch"
-    	android:layout_width="wrap_content"
-    	android:layout_height="wrap_content"
-    	android:singleLine="true"
-	  	android:text=""
-	    android:textSize="14.0dip"
-	    android:gravity="left|center_vertical"
-    />
-    </TableRow>
-</TableLayout>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/buttonTable"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:shrinkColumns="1"
-    android:gravity="center_horizontal"
-	>
-	<TableRow android:gravity="center_horizontal" android:paddingTop="10dip">
-	<Button
-		android:id="@+id/search_button"
-		android:text="@string/button_search"
-    	android:width="100.0sp"
-    	android:gravity="center_horizontal|center_vertical"
-   	/>
-   	<Button
-		android:id="@+id/cancel_button"
-		android:text="@string/button_cancel"
-    	android:width="100.0sp"
-    	android:gravity="center_horizontal|center_vertical"
-   	/>
-</TableRow>
-</TableLayout>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/search_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="15dip"
+        android:paddingTop="10dip"
+        android:text="@string/title_player_search"
+        android:textColor="#FFFFFF"
+        android:textSize="18.0sp" />
+
+    <TableLayout
+        android:id="@+id/player_search_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="15.0dip"
+        android:stretchColumns="0" >
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/label_playersearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:singleLine="true"
+                android:text="@string/label_playersearch"
+                android:textSize="12.0sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow>
+
+            <EditText
+                android:id="@+id/field_playersearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:singleLine="true"
+                android:inputType="text"
+                android:text=""
+                android:textSize="14.0sp" />
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/buttonTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:shrinkColumns="1" >
+
+        <TableRow
+            android:gravity="center_horizontal"
+            android:paddingTop="10dip" >
+
+            <Button
+                android:id="@+id/search_button"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="@string/button_search"
+                android:width="100.0sp" />
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="@string/button_cancel"
+                android:width="100.0sp" />
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>

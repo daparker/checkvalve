@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settings_master_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/steam_gray"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="15dp"
+        android:text="@string/title_settings"
+        android:textColor="#FFFFFF"
+        android:textSize="18.0sp" />
+
+    <LinearLayout
+        android:id="@+id/settings_button_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/steam_gray"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/settings_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/button_save"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/settings_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/button_cancel"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/settings_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/steam_gray" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/rcon_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0" >
+
+                <TextView
+                    android:id="@+id/label_rcon_settings_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/steam_blue"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_rcon"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_rcon_warn_unsafe_command"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_warn_unsafe_command"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_warn_unsafe_command"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/label_rcon_show_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_show_suggestions"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_show_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_rcon_show_passwords"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_show_passwords"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_show_passwords"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/server_info_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0" >
+
+                <TextView
+                    android:id="@+id/label_server_settings_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/steam_blue"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_server_information"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_servers_show_ip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_server_ip"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_ip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_servers_show_game"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_game_info"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_game"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_servers_show_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_map_name"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_servers_show_players"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_players"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_players"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_servers_show_tags"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_server_tags"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_tags"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="settingCheckboxHandler" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/query_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1" >
+
+                <TextView
+                    android:id="@+id/label_query_settings_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/steam_blue"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_query_options"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_default_query_port"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_default_query_port"
+                        android:textSize="14.0sp" />
+
+                    <EditText
+                        android:id="@+id/field_default_query_port"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="5"
+                        android:textSize="14.0sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_default_query_timeout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_default_query_timeout"
+                        android:textSize="14.0sp" />
+
+                    <EditText
+                        android:id="@+id/field_default_query_timeout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="14.0sp" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/chat_relay_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1" >
+
+                <TextView
+                    android:id="@+id/label_chat_relay_settings_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/steam_blue"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_chat_relay_options"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_default_relay_host"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_default_chat_relay_host"
+                        android:textSize="14.0sp" />
+
+                    <EditText
+                        android:id="@+id/field_default_relay_host"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textSize="14.0sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_default_relay_port"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_default_chat_relay_port"
+                        android:textSize="14.0sp" />
+
+                    <EditText
+                        android:id="@+id/field_default_relay_port"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="5"
+                        android:textSize="14.0sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_default_relay_password"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_default_chat_relay_password"
+                        android:textSize="14.0sp" />
+
+                    <EditText
+                        android:id="@+id/field_default_relay_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="14.0sp" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

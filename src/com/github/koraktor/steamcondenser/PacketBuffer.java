@@ -2,7 +2,7 @@
  * This code is free software; you can redistribute it and/or modify it under
  * the terms of the new BSD License.
  *
- * Copyright (c) 2008-2009, Sebastian Staudt
+ * Copyright (c) 2008-2014, Sebastian Staudt
  */
 
 package com.github.koraktor.steamcondenser;
@@ -10,112 +10,132 @@ package com.github.koraktor.steamcondenser;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
- * A convenience class wrapping around ByteBuffer, for easily retrieving
- * String values
+ * A convenience class wrapping around {@link ByteBuffer} used for easy
+ * retrieval of string values
+ *
  * @author Sebastian Staudt
  */
-public class PacketBuffer
-{
+public class PacketBuffer {
+
     private ByteBuffer byteBuffer;
 
     /**
-     * Creates a new PacketBuffer from the given byte[]
-     * @param data The data do build a PackteBuffer on
+     * Creates a new packet buffer from the given byte array
+     *
+     * @param data The data wrap into the underlying byte buffer
      */
-    public PacketBuffer(byte[] data)
-    {
-	this.byteBuffer = ByteBuffer.wrap(data);
+    public PacketBuffer(byte[] data) {
+        this.byteBuffer = ByteBuffer.wrap(data);
     }
 
     /**
-     * @return The backing byte[] of this PacketBuffer
+     * Returns the backing byte array of the underlying byte buffer
+     *
+     * @return The backing byte array
      */
-    public byte[] array()
-    {
-	return this.byteBuffer.array();
+    public byte[] array() {
+        return this.byteBuffer.array();
     }
 
     /**
-     * @return A byte at the buffer's current position
+     * Returns the next byte at the buffer's current position
+     *
+     * @return A byte
      */
-    public byte getByte()
-    {
-	return this.byteBuffer.get();
+    public byte getByte() {
+        return this.byteBuffer.get();
     }
 
     /**
-     * @return A floating-point value from the buffer's current position
+     * Returns a floating-point value from the buffer's current position
+     *
+     * @return A floating-point value
      */
-    public float getFloat()
-    {
-	return this.byteBuffer.getFloat();
+    public float getFloat() {
+        return this.byteBuffer.getFloat();
     }
 
     /**
-     * @return An integer from the buffer's current position
+     * Returns an integer value from the buffer's current position
+     *
+     * @return An integer value
      */
-    public int getInt()
-    {
-	return this.byteBuffer.getInt();
+    public int getInt() {
+        return this.byteBuffer.getInt();
     }
 
     /**
-     * @return The length of the buffer
+     * Returns the length of this buffer
+     *
+     * @return The length of this buffer
      */
-    public int getLength()
-    {
-	return this.byteBuffer.capacity();
+    public int getLength() {
+        return this.byteBuffer.capacity();
     }
 
     /**
-     * @return A short integer from the buffer's current position
+     * Returns a short integer value from the buffer's current position
+     *
+     * @return A short integer value
      */
-    public short getShort()
-    {
-	return this.byteBuffer.getShort();
+    public short getShort() {
+        return this.byteBuffer.getShort();
     }
 
     /**
-     * @return A string from the buffer's current position
+     * Returns a string value from the buffer's current position
+     * <p>
+     * This reads the bytes up to the first zero-byte of the underlying byte
+     * buffer into a String
+     *
+     * @return A string value
      */
-    public String getString()
-    {
-	byte[] remainingBytes = new byte[this.byteBuffer.remaining()];
-	this.byteBuffer.slice().get(remainingBytes);
-	String dataString = new String(remainingBytes);
-	int stringEnd = dataString.indexOf(0);
+    public String getString() {
+        byte[] remainingBytes = new byte[this.byteBuffer.remaining()];
+        this.byteBuffer.slice().get(remainingBytes);
+        int zeroPosition = ArrayUtils.indexOf(remainingBytes, (byte) 0);
 
-        if(stringEnd == -1) {
+        if (zeroPosition == ArrayUtils.INDEX_NOT_FOUND) {
             return null;
         } else {
-            dataString = dataString.substring(0, stringEnd);
-            // Setting new position by byte length of the string for compatibility with multi-byte characters
-            this.byteBuffer.position(this.byteBuffer.position() + dataString.getBytes().length + 1);
+            byte[] stringBytes = new byte[zeroPosition];
+            System.arraycopy(remainingBytes, 0, stringBytes, 0, zeroPosition);
+            this.byteBuffer.position(this.byteBuffer.position() + zeroPosition + 1);
 
-            return dataString;
+            return new String(stringBytes);
         }
     }
 
-    public PacketBuffer order(ByteOrder byteOrder)
-    {
-	this.byteBuffer.order(byteOrder);
-	return this;
+    /**
+     * Changes the byte-order of the underlying byte buffer
+     *
+     * @param byteOrder The byte-order to use in the underlying byte buffer
+     */
+    public PacketBuffer order(ByteOrder byteOrder) {
+        this.byteBuffer.order(byteOrder);
+        return this;
     }
 
     /**
+     * Returns the number of bytes remaining in the underlying byte buffer from
+     * the current position up to the end
+     *
      * @return The number of bytes remaining in this buffer
      */
-    public int remaining()
-    {
-	return this.byteBuffer.remaining();
+    public int remaining() {
+        return this.byteBuffer.remaining();
     }
 
     /**
-     * @return true, if there's at least one byte left remaining in this buffer
+     * Returns whether there is more data available in this buffer after the
+     * current position
+     *
+     * @return <code>true</code> if there's at least one byte left remaining
      */
-    public boolean hasRemaining()
-    {
-	return this.byteBuffer.hasRemaining();
+    public boolean hasRemaining() {
+        return this.byteBuffer.hasRemaining();
     }
 }

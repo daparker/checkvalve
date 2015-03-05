@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -21,83 +21,84 @@ along with the CheckValve source code.  If not, see
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll_pane"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-    <TextView  
-    android:id="@+id/title"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-	android:textSize="20.0dip"
-	android:textColor="#FFFFFF"
-	android:paddingTop="10dip"
-	android:paddingBottom="15dip"
-	android:paddingLeft="10dip"
-	android:paddingRight="10dip"
-	android:gravity="center"
-    android:text="@string/title_player_info"
-    />
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/message_table"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:shrinkColumns="*"
->
-</TableLayout>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/player_info_table"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:shrinkColumns="0"
->
-<TableRow>
-    <TextView  
-    android:id="@+id/player_header"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-	android:textSize="13.0dip"
-	android:textColor="#FFFFFF"
-	android:paddingTop="5dip"
-	android:paddingBottom="5dip"
-	android:paddingLeft="5dip"
-	android:paddingRight="5dip"
-	android:gravity="left"
-    android:text="@string/header_player"
-    />
-    <TextView  
-    android:id="@+id/kills_header"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-	android:textSize="13.0dip"
-	android:textColor="#FFFFFF"
-	android:paddingTop="5dip"
-	android:paddingBottom="5dip"
-	android:paddingLeft="5dip"
-	android:paddingRight="5dip"
-	android:gravity="center"
-    android:text="@string/header_kills"
-    />
-    <TextView  
-    android:id="@+id/time_header"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-	android:textSize="13.0dip"
-	android:textColor="#FFFFFF"
-	android:paddingTop="5dip"
-	android:paddingBottom="5dip"
-	android:paddingLeft="5dip"
-	android:paddingRight="5dip"
-	android:gravity="center"
-    android:text="@string/header_time"
-    />
-</TableRow>
-</TableLayout>
-</LinearLayout>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="15dip"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:paddingTop="10dip"
+            android:text="@string/title_player_info"
+            android:textColor="#FFFFFF"
+            android:textSize="18.0sp" />
+
+        <TableLayout
+            android:id="@+id/message_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="*" >
+        </TableLayout>
+
+        <TableLayout
+            android:id="@+id/player_info_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="0"
+            android:visibility="gone" >
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/player_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:paddingBottom="5dip"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:paddingTop="5dip"
+                    android:text="@string/header_player"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.0sp" />
+
+                <TextView
+                    android:id="@+id/kills_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="5dip"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:paddingTop="5dip"
+                    android:text="@string/header_kills"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.0sp" />
+
+                <TextView
+                    android:id="@+id/time_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="5dip"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:paddingTop="5dip"
+                    android:text="@string/header_time"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.0sp" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
 </ScrollView>
