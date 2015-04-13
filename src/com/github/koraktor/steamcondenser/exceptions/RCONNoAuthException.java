@@ -18,6 +18,11 @@ package com.github.koraktor.steamcondenser.exceptions;
 public class RCONNoAuthException extends SteamCondenserException {
 
     /**
+     * UID added by David A. Parker for CheckValve
+     */
+    private static final long serialVersionUID = 1296735201246412611L;
+
+    /**
      * Creates a new <code>RCONNoAuthException</code> instance
      */
     public RCONNoAuthException() {

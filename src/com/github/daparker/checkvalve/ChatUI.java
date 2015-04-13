@@ -69,7 +69,6 @@ public class ChatUI extends Activity
     private NetworkEventReceiver receiverRunnable;
     private ProgressDialog p;
     private ScrollView layout;
-    private ServerQuery q;
     private SimpleDateFormat sdf;
     private String chatRelayIP;
     private String chatRelayPassword;
@@ -80,7 +79,6 @@ public class ChatUI extends Activity
     private String rconPassword;
     private String rconServer;
     private String st;
-    private String[] response;
     private TableLayout chat_table;
     private TableLayout.LayoutParams bottomRowParams;
     private TableRow bottomRow;
@@ -176,7 +174,7 @@ public class ChatUI extends Activity
              * Message object "what" codes:
              * -2  =  Fatal exception (probably an IOException on the socket)
              * -1  =  Failed to connect to the chat relay (probably a SocketException)
-             *  0  =  A heartbeat was received from the server
+             *  1  =  A heartbeat was received from the server
              *  3  =  Connection failure (includes error message as String object)
              *  4  =  Connection successful
              *  5  =  Chat message (includes ChatMessage object)
@@ -196,7 +194,7 @@ public class ChatUI extends Activity
                     UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_chat_connect_failure);
                     getChatRelayDetails(chatRelayIP, chatRelayPort, null);
                     break;
-                case 0:
+                case 1:
                     break;
                 case 3:
                     String errorMsg = (String)context.getText(R.string.msg_chat_connection_refused) + " "
@@ -535,7 +533,6 @@ public class ChatUI extends Activity
         rconTimeout = thisIntent.getIntExtra("timeout", 2);
 
         engine = new short[1];
-        response = new String[1];
 
         fade_in = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         fade_out = AnimationUtils.loadAnimation(context, R.anim.fade_out);
@@ -785,11 +782,13 @@ public class ChatUI extends Activity
                 runFadeInAnimation(ChatUI.this, sending);
 
                 if( engine[0] == 1 )
-                    q = new ServerQuery(context, command, response, null, g, popUpHandler);
+                    //q = new ServerQuery(context, command, response, null, g, popUpHandler);
+                    new Thread(new RconQuery(command, g, popUpHandler)).start();
                 else
-                    q = new ServerQuery(context, command, response, s, null, popUpHandler);
+                    //q = new ServerQuery(context, command, response, s, null, popUpHandler);
+                    new Thread(new RconQuery(command, s, popUpHandler)).start();
 
-                new Thread(q).start();
+                //new Thread(q).start();
             }
         }
     }

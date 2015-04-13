@@ -36,14 +36,6 @@ public class Chat implements Runnable
 {
     private static final String TAG = "Chat";
 
-    private static final int PACKET_HEADER = 0xFFFFFFFF;
-    private static final byte PTYPE_IDENTITY_STRING = (byte)0x00;
-    private static final byte PTYPE_HEARTBEAT = (byte)0x01;
-    private static final byte PTYPE_CONNECTION_REQUEST = (byte)0x02;
-    private static final byte PTYPE_CONNECTION_FAILURE = (byte)0x03;
-    private static final byte PTYPE_CONNECTION_SUCCESS = (byte)0x04;
-    private static final byte PTYPE_MESSAGE_DATA = (byte)0x05;
-
     private static byte responseType;
     private static byte protocolVersion;
     private static byte sayTeam;
@@ -146,12 +138,20 @@ public class Chat implements Runnable
     /**
      * Establishes a client connection to the Chat Relay and then listens for incoming data. <p> <b>This method should
      * not be explicitly called. It is started when the <tt>start()</tt> method is called on the Chat object or its
-     * thread.</b> </p> <p>
+     * thread.</b>
      * 
-     * @throws Exception </p>
+     * @throws Exception
      */
     public void runChatRelayClient() throws Exception
     {
+        final int PACKET_HEADER = 0xFFFFFFFF;
+        final byte PTYPE_IDENTITY_STRING = (byte)0x00;
+        final byte PTYPE_HEARTBEAT = (byte)0x01;
+        final byte PTYPE_CONNECTION_REQUEST = (byte)0x02;
+        final byte PTYPE_CONNECTION_FAILURE = (byte)0x03;
+        final byte PTYPE_CONNECTION_SUCCESS = (byte)0x04;
+        final byte PTYPE_MESSAGE_DATA = (byte)0x05;
+        
         int i = 0;
         int pos = 0;
         int end = 0;

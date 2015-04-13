@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+    android:id="@+id/addnewserver_scroll_pane"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#262626"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parentLayout"
+        android:id="@+id/addnewserver_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -36,7 +36,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="10dip" >
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/addnewserver_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -46,7 +46,7 @@ along with the CheckValve source code.  If not, see
             android:textSize="18.0sp" />
 
         <TableLayout
-            android:id="@+id/add_new_server_table"
+            android:id="@+id/addnewserver_main_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="15.0dip"

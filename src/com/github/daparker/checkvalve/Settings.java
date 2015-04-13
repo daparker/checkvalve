@@ -25,14 +25,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Button;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import com.github.daparker.checkvalve.R;
 
-/*
- * Define the AddNewServer class
- */
 public class Settings extends Activity
 {
     private static final String TAG = Settings.class.getSimpleName();
@@ -45,6 +44,7 @@ public class Settings extends Activity
     private boolean showServerMapName;
     private boolean showServerNumPlayers;
     private boolean showServerTags;
+    private boolean validateNewServers;
 
     private Button saveButton;
     private Button cancelButton;
@@ -56,14 +56,32 @@ public class Settings extends Activity
     private CheckBox checkbox_show_server_map_name;
     private CheckBox checkbox_show_server_num_players;
     private CheckBox checkbox_show_server_tags;
+    private CheckBox checkbox_validate_new_servers;
     private EditText field_default_query_port;
     private EditText field_default_query_timeout;
     private EditText field_default_relay_host;
     private EditText field_default_relay_port;
     private EditText field_default_relay_password;
 
-    private DatabaseProvider db;
+    private DatabaseProvider database;
 
+    private OnTouchListener buttonTouchListener = new OnTouchListener()
+    {
+        public boolean onTouch( View v, MotionEvent m )
+        {
+            if( m.getAction() == MotionEvent.ACTION_DOWN )
+            {
+                v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
+            }
+            else
+            {
+                v.setBackgroundColor(getResources().getColor(R.color.steam_gray));
+            }
+            
+            return false;
+        }
+    };
+    
     private OnClickListener saveButtonListener = new OnClickListener()
     {
         public void onClick( View v )
@@ -73,9 +91,6 @@ public class Settings extends Activity
              */
 
             saveSettings();
-
-            if( db.isOpen() ) db.close();
-
             finish();
         }
     };
@@ -87,8 +102,7 @@ public class Settings extends Activity
             /*
              * "Cancel" button was clicked
              */
-            if( db.isOpen() ) db.close();
-            setResult(-1);
+            setResult(1);
             finish();
         }
     };
@@ -101,18 +115,20 @@ public class Settings extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.settings);
 
-        setResult(-1);
-
-        db = new DatabaseProvider(Settings.this);
-        db.open();
+        if( database == null )
+            database = new DatabaseProvider(Settings.this);
+        
+        setResult(1);
 
         cancelButton = (Button)findViewById(R.id.settings_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
+        cancelButton.setOnTouchListener(buttonTouchListener);
         cancelButton.setFocusable(true);
         cancelButton.setFocusableInTouchMode(true);
 
         saveButton = (Button)findViewById(R.id.settings_save_button);
         saveButton.setOnClickListener(saveButtonListener);
+        saveButton.setOnTouchListener(buttonTouchListener);
 
         checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
         checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
@@ -122,6 +138,7 @@ public class Settings extends Activity
         checkbox_show_server_map_name = (CheckBox)findViewById(R.id.checkbox_servers_show_map);
         checkbox_show_server_num_players = (CheckBox)findViewById(R.id.checkbox_servers_show_players);
         checkbox_show_server_tags = (CheckBox)findViewById(R.id.checkbox_servers_show_tags);
+        checkbox_validate_new_servers = (CheckBox)findViewById(R.id.checkbox_validate_new_servers);
         field_default_query_port = (EditText)findViewById(R.id.field_default_query_port);
         field_default_query_timeout = (EditText)findViewById(R.id.field_default_query_timeout);
         field_default_relay_host = (EditText)findViewById(R.id.field_default_relay_host);
@@ -133,26 +150,31 @@ public class Settings extends Activity
         
         showCurrentValues();
     }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-
-        if( db.isOpen() ) db.close();
-    }
-
+    
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if( ! db.isOpen() ) db.open();
+        
+        if( database == null )
+            database = new DatabaseProvider(Settings.this);
+    }
+    
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
     }
 
     public void showCurrentValues()
     {
-        Bundle b = db.getSettingsAsBundle();
+        Bundle b = database.getSettingsAsBundle();
 
         Log.i(TAG, "showCurrentValues(): Applying values from Bundle " + b.toString());
 
@@ -164,6 +186,7 @@ public class Settings extends Activity
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
         showServerNumPlayers = b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
         showServerTags = b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS);
+        validateNewServers = b.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS);
 
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
         checkbox_rcon_warn_unsafe_command.setChecked(rconWarnUnsafeCommand);
@@ -173,6 +196,7 @@ public class Settings extends Activity
         checkbox_show_server_map_name.setChecked(showServerMapName);
         checkbox_show_server_num_players.setChecked(showServerNumPlayers);
         checkbox_show_server_tags.setChecked(showServerTags);
+        checkbox_validate_new_servers.setChecked(validateNewServers);
 
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_default_query_timeout.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
@@ -192,45 +216,31 @@ public class Settings extends Activity
         {
             case R.id.checkbox_rcon_show_passwords:
                 rconShowPasswords = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set rconShowPasswords = " + rconShowPasswords);
                 break;
             case R.id.checkbox_rcon_warn_unsafe_command:
                 rconWarnUnsafeCommand = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set rconWarnUnsafeCommand = " + rconWarnUnsafeCommand);
                 break;
             case R.id.checkbox_rcon_show_suggestions:
                 rconShowSuggestions = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set rconShowSuggestions = " + rconShowSuggestions);
                 break;
             case R.id.checkbox_servers_show_ip:
                 showServerIP = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set showServerIP = " + showServerIP);
                 break;
             case R.id.checkbox_servers_show_game:
                 showServerGameInfo = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set showServerGameInfo = " + showServerGameInfo);
                 break;
             case R.id.checkbox_servers_show_map:
                 showServerMapName = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set showServerMapName = " + showServerMapName);
                 break;
             case R.id.checkbox_servers_show_players:
                 showServerNumPlayers = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set showServerNumPlayers = " + showServerNumPlayers);
                 break;
             case R.id.checkbox_servers_show_tags:
                 showServerTags = checked;
-                Log.i(TAG, "settingCheckboxHandler(): Set showServerTags = " + showServerTags);
                 break;
+            case R.id.checkbox_validate_new_servers:
+                validateNewServers = checked;
         }
-
-        Log.d(TAG, "settingCheckboxHandler(): rconWarnUnsafeCommand = " + rconWarnUnsafeCommand);
-        Log.d(TAG, "settingCheckboxHandler(): rconShowPasswords = " + rconShowPasswords);
-        Log.d(TAG, "settingCheckboxHandler(): showServerIP = " + showServerIP);
-        Log.d(TAG, "settingCheckboxHandler(): showServerGameInfo = " + showServerGameInfo);
-        Log.d(TAG, "settingCheckboxHandler(): showServerMapName = " + showServerMapName);
-        Log.d(TAG, "settingCheckboxHandler(): showServerNumPlayers = " + showServerNumPlayers);
-        Log.d(TAG, "settingCheckboxHandler(): showServerTags = " + showServerTags);
     }
 
     public void saveSettings()
@@ -242,14 +252,6 @@ public class Settings extends Activity
         int defaultRelayPort;
         String defaultRelayHost;
         String defaultRelayPassword;
-
-        Log.d(TAG, "saveSettings(): rconWarnUnsafeCommand = " + rconWarnUnsafeCommand);
-        Log.d(TAG, "saveSettings(): rconShowPasswords = " + rconShowPasswords);
-        Log.d(TAG, "saveSettings(): showServerIP = " + showServerIP);
-        Log.d(TAG, "saveSettings(): showServerGameInfo = " + showServerGameInfo);
-        Log.d(TAG, "saveSettings(): showServerMapName = " + showServerMapName);
-        Log.d(TAG, "saveSettings(): showServerNumPlayers = " + showServerNumPlayers);
-        Log.d(TAG, "saveSettings(): showServerTags = " + showServerTags);
 
         try
         {
@@ -291,6 +293,7 @@ public class Settings extends Activity
             b.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, showServerMapName);
             b.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, showServerNumPlayers);
             b.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, showServerTags);
+            b.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, validateNewServers);
             b.putInt(Values.SETTING_DEFAULT_QUERY_PORT, defaultQueryPort);
             b.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
             b.putInt(Values.SETTING_DEFAULT_RELAY_PORT, defaultRelayPort);
@@ -298,7 +301,8 @@ public class Settings extends Activity
             b.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, defaultRelayPassword);
 
             Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b.toString());
-            if( db.updateSettings(b) )
+            
+            if( database.updateSettings(b) )
             {
                 Log.i(TAG, "Success!");
                 setResult(0);
@@ -308,8 +312,6 @@ public class Settings extends Activity
                 Log.e(TAG, "saveSettings(): Failed to update settings in database.");
                 setResult(1);
             }
-
-            db.close();
         }
         catch( Exception e )
         {

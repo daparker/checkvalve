@@ -68,7 +68,7 @@ public class ConfirmDelete extends Activity
              * "Cancel" button was clicked
              */
 
-            if( database.isOpen() ) database.close();
+            //if( database.isOpen() ) database.close();
 
             setResult(0, thisIntent);
 
@@ -83,8 +83,8 @@ public class ConfirmDelete extends Activity
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        database = new DatabaseProvider(this);
-        database.open();
+        //database = new DatabaseProvider(this);
+        //database.open();
 
         thisIntent = getIntent();
 
@@ -98,23 +98,26 @@ public class ConfirmDelete extends Activity
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
     }
-
+    
     @Override
     protected void onPause()
     {
         super.onPause();
-
-        if( database.isOpen() ) database.close();
-
-        finish();
+        
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
     }
-
+    
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if( !database.isOpen() ) database.open();
+        
+        if( database == null )
+            database = new DatabaseProvider(ConfirmDelete.this);
     }
 
     public boolean deleteServer( long rowId )

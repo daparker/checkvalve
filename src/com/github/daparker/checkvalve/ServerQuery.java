@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Typeface;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -43,10 +42,7 @@ public class ServerQuery implements Runnable
     private Context context;
     private TableRow[][] tableRows;
     private TableRow[] messageRows;
-    private String[] response;
-    private String command;
     private String server;
-    private String password;
     private int status;
     private int port;
     private int timeout;
@@ -57,64 +53,6 @@ public class ServerQuery implements Runnable
     private Object obj;
 
     private static final String TAG = ServerQuery.class.getSimpleName();
-
-    /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p> <b>Note:</b> If both the
-     * <tt>SourceServer</tt> and <tt>GoldSrcServer</tt> arguments are provided, then only the <tt>SourceServer</tt> will
-     * be used. The <tt>SourceServer</tt> argument should be <b>null</b> in order to use a <tt>GoldSrcServer</tt>. </p>
-     * <p>
-     * 
-     * @param x The context to use
-     * @param c The RCON command to execute
-     * @param r The String array in which to store the RCON response
-     * @param s The SourceServer on which to execute the command
-     * @param g The GoldSrcServer on which to execute the command
-     * @param h The Handler to use </p>
-     */
-    public ServerQuery( Context x, String c, String[] r, SourceServer s, GoldSrcServer g, Handler h )
-    {
-        this.context = x;
-        this.command = c;
-        this.response = r;
-        this.ssrv = s;
-        this.gsrv = g;
-        this.status = 0;
-        this.handler = h;
-    }
-
-    /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p>
-     * 
-     * @param x The context to use
-     * @param p The RCON password to use
-     * @param s The SourceServer on which to execute the command
-     * @param h The Handler to use </p>
-     */
-    public ServerQuery( Context x, String p, SourceServer s, Handler h )
-    {
-        this.context = x;
-        this.password = p;
-        this.ssrv = s;
-        this.status = 0;
-        this.handler = h;
-    }
-
-    /**
-     * Construct a new instance of the ServerQuery class for executing commands via RCON. <p>
-     * 
-     * @param x The context to use
-     * @param p The RCON password to use
-     * @param g The GoldSrcServer on which to execute the command
-     * @param h The Handler to use </p>
-     */
-    public ServerQuery( Context x, String p, GoldSrcServer g, Handler h )
-    {
-        this.context = x;
-        this.password = p;
-        this.gsrv = g;
-        this.status = 0;
-        this.handler = h;
-    }
 
     /**
      * Construct a new instance of the ServerQuery class for collecting server information. <p>
@@ -179,7 +117,7 @@ public class ServerQuery implements Runnable
         this.timeout = t;
         this.context = c;
     }
-
+    
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
@@ -191,20 +129,10 @@ public class ServerQuery implements Runnable
             Log.d(TAG, "Calling queryServers()");
             queryServers();
         }
-        else if( command != null )
-        {
-            Log.d(TAG, "Calling getRconResponse()");
-            getRconResponse();
-        }
         else if( engine != null )
         {
             Log.d(TAG, "Calling getServerEngine()");
             getServerEngine();
-        }
-        else if( password != null )
-        {
-            Log.d(TAG, "Calling rconAuthenticate()");
-            rconAuthenticate();
         }
         else if( server != null )
         {
@@ -228,15 +156,15 @@ public class ServerQuery implements Runnable
 
     public void queryServers()
     {
+        // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
-        database.open();
+        ServerRecord[] serverList = database.getAllServers();
+        database.close();
+        
+        // Allocate the TableRow array
+        if( tableRows == null ) tableRows = new TableRow[serverList.length][6];
 
-        Cursor databaseCursor = null;
-        databaseCursor = database.getAllServers();
-        databaseCursor.moveToFirst();
-
-        if( tableRows == null ) tableRows = new TableRow[databaseCursor.getCount()][6];
-
+        // Initialize the message rows array
         for( int i = 0; i < messageRows.length; i++ )
             messageRows[i] = null;
 
@@ -256,11 +184,14 @@ public class ServerQuery implements Runnable
         int serverNumPlayers = 0;
         int serverMaxPlayers = 0;
         int serverRowId = 0;
+        int serverListPos = 0;
 
         int m = 0;
 
-        for( int i = 0; i < databaseCursor.getCount(); i++ )
+        for( int i = 0; i < serverList.length; i++ )
         {
+            ServerRecord sr = serverList[i];
+            
             try
             {
                 socket = new DatagramSocket();
@@ -274,11 +205,12 @@ public class ServerQuery implements Runnable
                 gameVersion = new String();
                 serverTags = new String();
 
-                serverRowId = (int)databaseCursor.getLong(0);
-                serverURL = databaseCursor.getString(1);
-                serverPort = databaseCursor.getInt(2);
-                serverTimeout = databaseCursor.getInt(3);
-
+                serverRowId = (int)sr.getServerRowID();
+                serverURL = sr.getServerName();
+                serverPort = sr.getServerPort();
+                serverTimeout = sr.getServerTimeout();
+                serverListPos = sr.getServerListPosition();
+                
                 // A2S_INFO query string
                 String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
 
@@ -543,6 +475,7 @@ public class ServerQuery implements Runnable
                 tableRows[i][3] = mapRow;
                 tableRows[i][4] = playersRow;
                 tableRows[i][5] = tagsRow;
+
             }
             // Handle a socket timeout
             catch( Exception e )
@@ -556,7 +489,8 @@ public class ServerQuery implements Runnable
 
                 TextView errorMessage = new TextView(context);
 
-                errorMessage.setId(100 + i + 2);
+                //errorMessage.setId(100 + i + 2);
+                errorMessage.setId(100 + serverListPos + 2);
                 errorMessage.setText(message);
                 errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
                 errorMessage.setPadding(3, 0, 3, 0);
@@ -574,11 +508,7 @@ public class ServerQuery implements Runnable
             }
 
             status++;
-            if( !databaseCursor.isLast() ) databaseCursor.moveToNext();
         }
-
-        if( databaseCursor != null ) databaseCursor.close();
-        if( database != null ) database.close();
     }
 
     public void getServerEngine()
@@ -588,7 +518,6 @@ public class ServerQuery implements Runnable
         int firstByte = 0;
         int secondByte = 0;
 
-        //if( engine != null )
         engine[0] = 0;
 
         try
@@ -731,102 +660,5 @@ public class ServerQuery implements Runnable
         }
 
         return;
-    }
-
-    public void getRconResponse()
-    {
-        try
-        {
-            if( ssrv != null )
-                response[0] = ssrv.rconExec(command);
-            else
-                response[0] = gsrv.rconExec(command);
-        }
-        catch( Exception e )
-        {
-            Log.w(TAG, "Caught exception: " + e.toString());
-            status = 1;
-            obj = e;
-        }
-    }
-
-    public void rconAuthenticate()
-    {
-        try
-        {
-            if( gsrv != null )
-            {
-                gsrv.rconAuth(password);
-                gsrv.rconExec("status");
-                obj = gsrv;
-            }
-            else
-            {
-                ssrv.rconAuth(password);
-                obj = ssrv;
-            }
-        }
-        catch( Exception e )
-        {
-            status = 1;
-            obj = e;
-        }
-    }
-
-    public static byte[] getChallengeResponse( String serverURL, int port, int timeout )
-    {
-        DatagramSocket socket;
-
-        DatagramPacket packetOut;
-        DatagramPacket packetIn;
-
-        byte[] bufferOut;
-        byte[] bufferIn;
-        byte[] response;
-
-        try
-        {
-            // Use A2S_PLAYER query string with 0xFFFFFFFF to get the challenge
-            // number
-            String queryString = "\u00FF\u00FF\u00FF\u00FF\u0055\u00FF\u00FF\u00FF\u00FF";
-
-            // Byte buffers for packet data
-            bufferOut = queryString.getBytes("ISO8859_1");
-            bufferIn = new byte[1400];
-
-            // UDP datagram packets
-            packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            packetIn = new DatagramPacket(bufferIn, bufferIn.length);
-
-            // Create a socket for querying the server
-            socket = new DatagramSocket();
-            socket.setSoTimeout(timeout * 1000);
-
-            // Connect to the remote server
-            socket.connect(InetAddress.getByName(serverURL), port);
-
-            // Return null if the connection attempt failed
-            if( !socket.isConnected() ) return null;
-
-            // Send the query string and get the response packet
-            socket.send(packetOut);
-            socket.receive(packetIn);
-
-            // Close the socket
-            socket.close();
-        }
-        catch( Exception e )
-        {
-            return null;
-        }
-
-        // Store the challenge response in a byte array
-        response = new byte[packetIn.getLength()];
-
-        for( int i = 0; i < packetIn.getLength(); i++ )
-            response[i] = bufferIn[i];
-
-        // Return the challenge response
-        return response;
     }
 }

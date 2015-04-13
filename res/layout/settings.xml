@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/settings_master_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/steam_gray"
+    android:background="#262626"
     android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingBottom="15dp"
-        android:text="@string/title_settings"
-        android:textColor="#FFFFFF"
-        android:textSize="18.0sp" />
 
     <LinearLayout
         android:id="@+id/settings_button_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:background="@color/steam_gray"
         android:orientation="horizontal" >
 
@@ -28,21 +19,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:focusable="true"
             android:background="@android:color/transparent"
+            android:focusable="true"
             android:gravity="center"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:text="@string/button_cancel"
             android:textColor="#ffffff" />
-        
+
         <Button
             android:id="@+id/settings_save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:focusable="true"
             android:background="@android:color/transparent"
+            android:focusable="true"
             android:gravity="center"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
@@ -50,11 +41,26 @@
             android:textColor="#ffffff" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/steam_gray"
+        android:gravity="center_horizontal|center_vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:text="@string/title_settings"
+        android:textColor="#FFFFFF"
+        android:textSize="18.0sp" />
+
     <ScrollView
         android:id="@+id/settings_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/steam_gray" >
+        android:layout_above="@id/settings_button_bar"
+        android:layout_below="@id/title"
+        android:background="#000000" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,66 +68,24 @@
             android:orientation="vertical" >
 
             <TableLayout
-                android:id="@+id/rcon_settings_table"
+                android:id="@+id/general_settings_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:stretchColumns="0" >
 
                 <TextView
-                    android:id="@+id/label_rcon_settings_header"
+                    android:id="@+id/label_general_settings_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@color/steam_blue"
+                    android:focusable="false"
                     android:gravity="center"
                     android:singleLine="true"
-                    android:text="@string/settings_header_rcon"
+                    android:text="@string/settings_header_general_options"
                     android:textSize="14.0sp"
                     android:textStyle="bold" />
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <TextView
-                        android:id="@+id/label_rcon_warn_unsafe_command"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="start|center_vertical"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:text="@string/settings_rcon_warn_unsafe_command"
-                        android:textSize="14.0sp" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_rcon_warn_unsafe_command"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/label_rcon_show_suggestions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="start|center_vertical"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:text="@string/settings_rcon_show_suggestions"
-                        android:textSize="14.0sp" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_rcon_show_suggestions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
-                </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -143,7 +107,32 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_validate_new_servers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_validate_new_servers"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_validate_new_servers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
             </TableLayout>
 
@@ -157,8 +146,10 @@
                     android:id="@+id/label_server_settings_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@color/steam_blue"
+                    android:focusable="false"
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_server_information"
@@ -185,7 +176,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
 
                 <TableRow
@@ -208,7 +200,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
 
                 <TableRow
@@ -231,7 +224,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
 
                 <TableRow
@@ -254,7 +248,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
 
                 <TableRow
@@ -277,7 +272,99 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
-                        android:onClick="settingCheckboxHandler" />
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/rcon_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0" >
+
+                <TextView
+                    android:id="@+id/label_rcon_settings_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/steam_blue"
+                    android:focusable="false"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_rcon"
+                    android:textSize="14.0sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_rcon_warn_unsafe_command"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_warn_unsafe_command"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_warn_unsafe_command"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/label_rcon_show_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_show_suggestions"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_show_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/label_rcon_show_passwords"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_show_passwords"
+                        android:textSize="14.0sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_show_passwords"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
                 </TableRow>
             </TableLayout>
 
@@ -291,8 +378,10 @@
                     android:id="@+id/label_query_settings_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@color/steam_blue"
+                    android:focusable="false"
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_query_options"
@@ -359,8 +448,10 @@
                     android:id="@+id/label_chat_relay_settings_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@color/steam_blue"
+                    android:focusable="false"
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_chat_relay_options"
@@ -443,4 +534,4 @@
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+</RelativeLayout>

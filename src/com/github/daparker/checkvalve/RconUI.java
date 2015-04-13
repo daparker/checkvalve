@@ -67,7 +67,7 @@ public class RconUI extends Activity
 
     private String password;
     private String command;
-    private String[] response;
+    //private String[] response;
     private String[] unsafeCommands;
     private String server;
     private int port;
@@ -168,8 +168,10 @@ public class RconUI extends Activity
             switch( msg.what )
             {
                 case 0:
+                    String response = (String)msg.obj;
                     rcon_console.append("> " + command + "\n\n");
-                    rcon_console.append(response[0] + "\n\n");
+                    //rcon_console.append(response[0] + "\n\n");
+                    rcon_console.append(response + "\n\n");
                     scrollToBottomOfText();
                     break;
                 case 1:
@@ -265,7 +267,7 @@ public class RconUI extends Activity
         timeout = thisIntent.getIntExtra("timeout", 2);
         password = thisIntent.getStringExtra("password");
         engine = new short[1];
-        response = new String[1];
+        //response = new String[1];
         rconIsAuthenticated = false;
 
         fade_in = AnimationUtils.loadAnimation(context, R.anim.fade_in);
@@ -306,13 +308,13 @@ public class RconUI extends Activity
     }
 
     @Override
-    public void onResume()
+    protected void onResume()
     {
         super.onResume();
     }
 
     @Override
-    public void onPause()
+    protected void onPause()
     {
         super.onPause();
     }
@@ -373,7 +375,7 @@ public class RconUI extends Activity
 
             if( Arrays.asList(unsafeCommands).contains(bareCommand) )
             {
-                // Show a warning and force user acknowledgement
+                // Show a warning and force user acknowledgment
                 confirmUnsafeCommand();
                 return;
             }
@@ -384,9 +386,11 @@ public class RconUI extends Activity
         runFadeInAnimation(context, sending);
 
         if( engine[0] == Values.ENGINE_GOLDSRC )
-            q = new ServerQuery(context, command, response, null, g, popUpHandler);
+            //q = new ServerQuery(context, command, response, null, g, popUpHandler);
+            new Thread(new RconQuery(command, g, popUpHandler)).start();
         else
-            q = new ServerQuery(context, command, response, s, null, popUpHandler);
+            //q = new ServerQuery(context, command, response, s, null, popUpHandler);
+            new Thread(new RconQuery(command, s, popUpHandler)).start();
 
         new Thread(q).start();
     }
@@ -422,9 +426,11 @@ public class RconUI extends Activity
         p = ProgressDialog.show(this, "", context.getText(R.string.status_rcon_verifying_password), true, false);
 
         if( engine[0] == Values.ENGINE_GOLDSRC )
-            new Thread(new ServerQuery(RconUI.this, password, g, rconAuthHandler)).start();
+            //new Thread(new ServerQuery(RconUI.this, password, g, rconAuthHandler)).start();
+            new Thread(new RconAuth(password, g, rconAuthHandler)).start();
         else
-            new Thread(new ServerQuery(RconUI.this, password, s, rconAuthHandler)).start();
+            //new Thread(new ServerQuery(RconUI.this, password, s, rconAuthHandler)).start();
+            new Thread(new RconAuth(password, s, rconAuthHandler)).start();
     }
 
     public void runFadeInAnimation( Context c, View v )

@@ -62,11 +62,6 @@ public class AddNewServer extends Activity
              * "Add" button was clicked
              */
 
-            //EditText field_server = (EditText)findViewById(R.id.field_server);
-            //EditText field_port = (EditText)findViewById(R.id.field_port);
-            //EditText field_timeout = (EditText)findViewById(R.id.field_timeout);
-            //EditText field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
-
             int server_len = field_server.getText().toString().length();
             int port_len = field_port.getText().toString().length();
             int timeout_len = field_timeout.getText().toString().length();
@@ -108,7 +103,6 @@ public class AddNewServer extends Activity
                                     UserVisibleMessage.showMessage(AddNewServer.this, R.string.msg_db_failure);
                                 }
 
-                                database.close();
                                 finish();
                                 break;
                             case 1:
@@ -131,11 +125,33 @@ public class AddNewServer extends Activity
                     }
                 };
 
-                // Show the progress dialog
-                p = ProgressDialog.show(AddNewServer.this, "", context.getText(R.string.status_verifying_server), true, false);
+                if( CheckValve.settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS) == true )
+                {
+                    // Show the progress dialog
+                    p = ProgressDialog.show(AddNewServer.this, "", context.getText(R.string.status_verifying_server), true, false);
+    
+                    // Run the server query in a separate thread
+                    new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
+                }
+                else
+                {
+                    if( (database.insertServer(server, port, timeout, password)) > -1 )
+                    {
+                        UserVisibleMessage.showMessage(AddNewServer.this, R.string.msg_success);
+                        setResult(1);
+                    }
+                    else
+                    {
+                        String errorMsg = new String();
+                        errorMsg = "Database insert failed! [db=" + database.toString() + "]";
+                        errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
+                        Log.w(TAG, errorMsg);
 
-                // Run the server query in a separate thread
-                new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
+                        UserVisibleMessage.showMessage(AddNewServer.this, R.string.msg_db_failure);
+                    }
+
+                    finish();
+                }
             }
         }
     };
@@ -148,8 +164,6 @@ public class AddNewServer extends Activity
              * "Cancel" button was clicked
              */
 
-            if( database.isOpen() ) database.close();
-
             finish();
         }
     };
@@ -160,8 +174,10 @@ public class AddNewServer extends Activity
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        database = new DatabaseProvider(this);
+        
+        if( database == null )
+            database = new DatabaseProvider(AddNewServer.this);
+        
         context = AddNewServer.this;
 
         setResult(0);
@@ -178,6 +194,9 @@ public class AddNewServer extends Activity
         field_port = (EditText)findViewById(R.id.field_port);
         field_timeout = (EditText)findViewById(R.id.field_timeout);
         field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
+        
+        field_port.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
+        field_timeout.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
         {
@@ -195,10 +214,12 @@ public class AddNewServer extends Activity
     protected void onPause()
     {
         super.onPause();
-
-        if( database.isOpen() ) database.close();
-
-        finish();
+        
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
     }
 
     @Override
@@ -206,13 +227,14 @@ public class AddNewServer extends Activity
     {
         super.onResume();
 
-        database.open();
-
         addButton = (Button)findViewById(R.id.addServerButton);
         addButton.setOnClickListener(addButtonListener);
 
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
+        
+        if( database == null )
+            database = new DatabaseProvider(AddNewServer.this);
     }
 
     public void showPasswordCheckboxHandler( View view )

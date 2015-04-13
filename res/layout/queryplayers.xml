@@ -18,87 +18,117 @@ You should have received a copy of the GNU General Public License
 along with the CheckValve source code.  If not, see
 <http://www.gnu.org/licenses/>.
 -->
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player_information"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/steam_gray"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parent_layout"
+        android:id="@+id/player_information_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:background="@color/steam_gray"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/player_information_x_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/button_x"
+            android:textColor="#ffffff"
+            android:textSize="24.0sp" />
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="15dip"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:paddingTop="10dip"
+            android:id="@+id/player_information_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:gravity="left"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingRight="20dp"
             android:text="@string/title_player_info"
             android:textColor="#FFFFFF"
             android:textSize="18.0sp" />
-
-        <TableLayout
-            android:id="@+id/message_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shrinkColumns="*" >
-        </TableLayout>
-
-        <TableLayout
-            android:id="@+id/player_info_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shrinkColumns="0"
-            android:visibility="gone" >
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/player_header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:paddingBottom="5dip"
-                    android:paddingLeft="5dip"
-                    android:paddingRight="5dip"
-                    android:paddingTop="5dip"
-                    android:text="@string/header_player"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13.0sp" />
-
-                <TextView
-                    android:id="@+id/kills_header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingBottom="5dip"
-                    android:paddingLeft="5dip"
-                    android:paddingRight="5dip"
-                    android:paddingTop="5dip"
-                    android:text="@string/header_kills"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13.0sp" />
-
-                <TextView
-                    android:id="@+id/time_header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingBottom="5dip"
-                    android:paddingLeft="5dip"
-                    android:paddingRight="5dip"
-                    android:paddingTop="5dip"
-                    android:text="@string/header_time"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13.0sp" />
-            </TableRow>
-        </TableLayout>
     </LinearLayout>
 
-</ScrollView>
+    <ScrollView
+        android:id="@+id/scroll_pane"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/parent_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/message_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shrinkColumns="*" >
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/player_info_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shrinkColumns="0"
+                android:visibility="gone" >
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/player_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="5dip"
+                        android:paddingRight="5dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/header_player"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13.0sp" />
+
+                    <TextView
+                        android:id="@+id/kills_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="5dip"
+                        android:paddingRight="5dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/header_kills"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13.0sp" />
+
+                    <TextView
+                        android:id="@+id/time_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="5dip"
+                        android:paddingRight="5dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/header_time"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13.0sp" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

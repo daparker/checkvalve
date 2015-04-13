@@ -20,37 +20,37 @@ along with the CheckValve source code.  If not, see
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+    android:id="@+id/updateserver_scroll_pane"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#262626"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parentLayout"
+        android:id="@+id/updateserver_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingBottom="10dp"
-        android:paddingTop="10dp" >
+        android:paddingTop="10dip" >
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/updateserver_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="15dp"
+            android:paddingBottom="15dip"
             android:text="@string/title_edit_server"
             android:textColor="#FFFFFF"
             android:textSize="18.0sp" />
 
         <TableLayout
-            android:id="@+id/add_new_server_table"
+            android:id="@+id/updateserver_main_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="15.0dp"
-            android:paddingRight="15.0dp"
+            android:paddingLeft="15.0dip"
+            android:paddingRight="15.0dip"
             android:stretchColumns="0" >
 
             <TableRow>
@@ -86,7 +86,7 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10.0dp"
+                    android:paddingTop="10.0dip"
                     android:singleLine="true"
                     android:text="@string/label_port"
                     android:textSize="12.0sp"
@@ -113,7 +113,7 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10.0dp"
+                    android:paddingTop="10.0dip"
                     android:singleLine="true"
                     android:text="@string/label_timeout"
                     android:textSize="12.0sp"
@@ -140,7 +140,7 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10.0dp"
+                    android:paddingTop="10.0dip"
                     android:singleLine="true"
                     android:text="@string/label_rcon_password"
                     android:textSize="12.0sp"
@@ -155,10 +155,30 @@ along with the CheckValve source code.  If not, see
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
                     android:singleLine="true"
+                    android:inputType="textPassword"
                     android:text=""
                     android:textSize="14.0sp" />
             </TableRow>
         </TableLayout>
+        
+        <LinearLayout
+            android:id="@+id/show_password_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="5dp"
+            android:paddingLeft="15dp" >
+            
+        <CheckBox
+            android:id="@+id/checkbox_show_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_show_password"
+            android:textSize="14sp"
+            android:paddingLeft="10dp"
+            android:onClick="showPasswordCheckboxHandler"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/buttonTable"
@@ -167,17 +187,6 @@ along with the CheckValve source code.  If not, see
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingTop="10dp" >
-
-            <Button
-                android:id="@+id/saveButton"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/button_save" />
 
             <Button
                 android:id="@+id/cancelButton"
@@ -189,6 +198,17 @@ along with the CheckValve source code.  If not, see
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:text="@string/button_cancel" />
+            
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/button_save" />
         </LinearLayout>
     </LinearLayout>
 

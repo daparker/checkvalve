@@ -14,6 +14,11 @@ package com.github.koraktor.steamcondenser.exceptions;
  */
 public class ConnectionResetException extends SteamCondenserException {
 
+    /**
+     * UID added by David A. Parker for CheckValve
+     */
+    private static final long serialVersionUID = 2970197351939282021L;
+
     public ConnectionResetException() {
         super("Connection reset by peer");
     }

@@ -21,9 +21,6 @@ package com.github.daparker.checkvalve;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -45,9 +42,10 @@ public class UserVisibleMessage
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-
+        
         // Show the Toast message centered on the screen
-        t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        //t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        //t.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
         t.show();
     }
 
@@ -63,9 +61,10 @@ public class UserVisibleMessage
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, resId, Toast.LENGTH_SHORT);
-
+                
         // Show the Toast message centered on the screen
-        t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        //t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        //t.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
         t.show();
     }
 }

@@ -16,6 +16,11 @@ package com.github.koraktor.steamcondenser.exceptions;
 public class PacketFormatException extends SteamCondenserException {
 
     /**
+     * UID added by David A. Parker for CheckValve
+     */
+    private static final long serialVersionUID = 7129576402277191763L;
+
+    /**
      * Creates a new <code>PacketFormatException</code> instance
      *
      * @param message The message to attach to the exception

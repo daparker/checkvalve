@@ -19,39 +19,73 @@ along with the CheckValve source code.  If not, see
 <http://www.gnu.org/licenses/>.
 -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+
+<!-- <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/manage_servers"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#262626"
+    android:background="@color/steam_gray"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parentLayout"
+        android:id="@+id/manage_servers_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#262626"
-        android:gravity="center"
-        android:orientation="vertical" >
+        android:background="@color/steam_gray"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/manage_servers_x_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/button_x"
+            android:textColor="#ffffff"
+            android:textSize="24.0sp" />
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="15dip"
-            android:paddingTop="10dip"
+            android:id="@+id/manage_servers_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:gravity="left"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
             android:text="@string/title_manage_servers"
             android:textColor="#FFFFFF"
             android:textSize="18.0sp" />
-
-        <TableLayout
-            android:id="@+id/serverTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:shrinkColumns="0" >
-        </TableLayout>
     </LinearLayout>
 
-</ScrollView>
+    <ScrollView
+        android:id="@+id/scroll_pane"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#262626"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/parentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#262626"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/serverTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:shrinkColumns="0"
+                android:stretchColumns="1" >
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

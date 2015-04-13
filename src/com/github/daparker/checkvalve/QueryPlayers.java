@@ -19,137 +19,97 @@
 
 package com.github.daparker.checkvalve;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.Window;
-import android.widget.TextView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
-import android.content.Intent;
-import android.database.Cursor;
-import com.github.daparker.checkvalve.R;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.content.Context;
 import java.lang.Math;
 import java.net.*;
+import java.util.ArrayList;
 
-public class QueryPlayers extends Activity
+public class QueryPlayers implements Runnable
 {
-    private DatabaseProvider database;
-    private Cursor databaseCursor;
-    private TableLayout player_info_table;
-    private TableLayout message_table;
-
+    private static final String TAG = QueryPlayers.class.getSimpleName();
+    
+    private int status;
     private long rowId;
     private byte[] challengeResponse;
+    private Context context;
+    private Handler handler;
 
-    @Override
-    public void onCreate( Bundle savedInstanceState )
+    public QueryPlayers( Context context, long rowId, byte[] challengeResponse, Handler handler )
     {
-        super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        Intent thisIntent = getIntent();
-        rowId = thisIntent.getLongExtra("rowId", 0);
-        challengeResponse = thisIntent.getByteArrayExtra("challengeResponse");
-
-        database = new DatabaseProvider(this);
-        database.open();
-
-        setContentView(R.layout.queryplayers);
-
-        player_info_table = (TableLayout)findViewById(R.id.player_info_table);
-        message_table = (TableLayout)findViewById(R.id.message_table);
-        message_table.setVisibility(-1);
-
-        try
-        {
-            queryPlayers();
-        }
-        catch( Exception e )
-        {
-            setResult(-1);
-
-            if( database.isOpen() ) database.close();
-
-            finish();
-        }
+        this.context = context;
+        this.rowId = rowId;
+        this.challengeResponse = challengeResponse;
+        this.handler = handler;
     }
-
-    @Override
-    public void onResume()
+    
+    public void run()
     {
-        super.onResume();
+        status = 0;
 
-        if( !database.isOpen() ) database.open();
+        Message msg = new Message();
+        
+        ArrayList<PlayerRecord> players = queryPlayers();
+        
+        if( players != null )
+            msg.obj = players;
+        
+        msg.what = status;
+        handler.sendMessage(msg);
     }
-
-    @Override
-    public void onPause()
+    
+    public ArrayList<PlayerRecord> queryPlayers()
     {
-        super.onPause();
-
-        if( database.isOpen() ) database.close();
-    }
-
-    public void queryPlayers() throws Exception
-    {
-        if( !database.isOpen() ) database.open();
-
-        message_table.removeAllViews();
-
-        databaseCursor = database.getServer(rowId);
+        DatabaseProvider database = new DatabaseProvider(this.context);
+        ServerRecord sr = database.getServer(rowId);
+        database.close();
 
         DatagramSocket socket;
-
         DatagramPacket packetOut;
         DatagramPacket packetIn;
 
+        // Player array to be returned
+        ArrayList<PlayerRecord> playerList = null;
+        
         // Byte buffers for packet data
         byte[] bufferOut;
         byte[] bufferIn;
         byte[] tempBuffer;
-        //byte[] challengeResponse;
 
         // String variables
         String serverURL = new String();
 
         // Integer variables
+        int index = 0;
         int byteNum = 0;
         int serverPort = 0;
         int serverTimeout = 0;
+        
+        serverURL = sr.getServerName();
+        serverPort = sr.getServerPort();
+        serverTimeout = sr.getServerTimeout();
+        
+        String header = new String();
+        String name = new String();
+        String totaltime = new String();
 
+        short numplayers = 0;
+        short numpackets = 0;
+        short thispacket = 0;
+        short hours = 0;
+        short minutes = 0;
+        short seconds = 0;
+
+        long kills = 0;
+        float time = 0;
+        
         // Integer variables
         try
         {
-            serverURL = databaseCursor.getString(1);
-            serverPort = databaseCursor.getInt(2);
-            serverTimeout = databaseCursor.getInt(3);
-
-            String header = new String();
-            String name = new String();
-            String totaltime = new String();
-
-            short numplayers = 0;
-            short numpackets = 0;
-            short thispacket = 0;
-            short index = 0;
-            short hours = 0;
-            short minutes = 0;
-            short seconds = 0;
-
-            long kills = 0;
-            float time = 0;
-
             socket = new DatagramSocket();
             socket.setSoTimeout(serverTimeout * 1000);
-
-            // Get the challenge response needed for the A2S_PLAYER query
-            //challengeResponse = ServerQuery.getChallengeResponse(serverURL, serverPort, serverTimeout);
-
-            //if( challengeResponse == null ) throw new NullPointerException();
 
             // Challenge response becomes the A2S_PLAYER query by changing 0x41 to 0x55
             bufferOut = challengeResponse;
@@ -165,7 +125,11 @@ public class QueryPlayers extends Activity
             socket.connect(InetAddress.getByName(serverURL), serverPort);
 
             // Show an error if the connection attempt failed
-            if( !socket.isConnected() ) throw new SocketException();
+            if( ! socket.isConnected() )
+            {
+                if( ! socket.isClosed() ) socket.close();
+                throw new SocketException();
+            }
 
             // Send the A2S_PLAYER query string and get the response packet
             socket.send(packetOut);
@@ -174,9 +138,7 @@ public class QueryPlayers extends Activity
             bufferIn = new byte[packetIn.getLength()];
 
             for( int x = 0; x < bufferIn.length; x++ )
-            {
                 bufferIn[x] = tempBuffer[x];
-            }
 
             String[] packets = new String[100];
 
@@ -246,13 +208,13 @@ public class QueryPlayers extends Activity
 
             if( numplayers == 0 )
             {
-                setResult(-2);
-
-                if( database.isOpen() ) database.close();
-
-                finish();
+                status = -2;
+                return null;
             }
 
+            // Initialize the return array once we know how many elements we need
+            playerList = new ArrayList<PlayerRecord>();
+            
             for( int i = 0; i < numpackets; i++ )
             {
                 String thisPacket = packets[i];
@@ -295,143 +257,25 @@ public class QueryPlayers extends Activity
 
                     totaltime = hourString + ":" + minuteString + ":" + secondString;
 
-                    TextView playerName = new TextView(this);
-                    TextView numKills = new TextView(this);
-                    TextView connected = new TextView(this);
-
-                    playerName.setId(i * 100);
-                    playerName.setText(name);
-                    playerName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13.0f);
-                    playerName.setPadding(5, 0, 5, 0);
-                    playerName.setGravity(Gravity.LEFT);
-                    playerName.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                    numKills.setId(i * 200);
-                    numKills.setText(Long.toString(kills));
-                    numKills.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13.0f);
-                    numKills.setPadding(5, 0, 5, 0);
-                    numKills.setGravity(Gravity.CENTER_HORIZONTAL);
-                    numKills.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                    connected.setId(i * 300);
-                    connected.setText(totaltime);
-                    connected.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13.0f);
-                    connected.setPadding(5, 0, 5, 0);
-                    connected.setGravity(Gravity.CENTER_HORIZONTAL);
-                    connected.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                    // Create a TableRow and give it an ID
-                    TableRow row = new TableRow(this);
-                    row.setId(index);
-                    row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-                    row.addView(playerName);
-                    row.addView(numKills);
-                    row.addView(connected);
-
-                    // Add the TableRow to the TableLayout
-                    player_info_table.addView(row, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                 }
-
-                player_info_table.setVisibility(1);
             }
+            
+            return playerList;
         }
-        /*        catch( NullPointerException npe )
-                {
-                    player_info_table.setVisibility(-1);
-
-                    String message = new String();
-
-                    message += this.getText(R.string.msg_no_challenge_response);
-                    message += " " + serverURL + ":" + serverPort;
-
-                    TextView errorMessage = new TextView(this);
-
-                    errorMessage.setId(1);
-                    errorMessage.setText(message);
-                    errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                    errorMessage.setPadding(3, 0, 3, 0);
-                    errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                    // Create a TableRow and give it an ID
-                    TableRow messageRow = new TableRow(this);
-                    messageRow.setId(2);
-                    messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-                    messageRow.addView(errorMessage);
-
-                    // Add the TableRow to the TableLayout
-                    message_table.addView(messageRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-                    message_table.setVisibility(1);
-                }*/
-        catch( NullPointerException npe )
-        {
-            String message = new String();
-            message += this.getText(R.string.msg_no_challenge_response);
-            message += " " + serverURL + ":" + serverPort;
-            UserVisibleMessage.showMessage(QueryPlayers.this, message);
-        }
-        catch( SocketException se )
-        {
-            player_info_table.setVisibility(-1);
-
-            String message = new String();
-
-            message += "Socket error: ";
-            message += " " + serverURL + ":" + serverPort;
-
-            TextView errorMessage = new TextView(this);
-
-            errorMessage.setId(1);
-            errorMessage.setText(message);
-            errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-            errorMessage.setPadding(3, 0, 3, 0);
-            errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-            // Create a TableRow and give it an ID
-            TableRow messageRow = new TableRow(this);
-            messageRow.setId(2);
-            messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-            messageRow.addView(errorMessage);
-
-            // Add the TableRow to the TableLayout
-            message_table.addView(messageRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-            message_table.setVisibility(1);
-        }
-        // Handle a socket timeout
         catch( Exception e )
         {
-            player_info_table.setVisibility(-1);
+            status = -1;
+            
+            Log.w(TAG, "queryPlayers(): Caught an exception:");
+            Log.w(TAG, e.toString());
 
-            String message = new String();
+            StackTraceElement[] ste = e.getStackTrace();
 
-            message += this.getText(R.string.msg_no_response);
-            message += " " + serverURL + ":" + serverPort;
-
-            TextView errorMessage = new TextView(this);
-
-            errorMessage.setId(1);
-            errorMessage.setText(message);
-            errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-            errorMessage.setPadding(3, 0, 3, 0);
-            errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-            // Create a TableRow and give it an ID
-            TableRow messageRow = new TableRow(this);
-            messageRow.setId(2);
-            messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-            messageRow.addView(errorMessage);
-
-            // Add the TableRow to the TableLayout
-            message_table.addView(messageRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-            message_table.setVisibility(1);
+            for( int i = 0; i < ste.length; i++ )
+                Log.e(TAG, "    " + ste[i].toString());
+            
+            return null;
         }
-
-        database.close();
     }
 }

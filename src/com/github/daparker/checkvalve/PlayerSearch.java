@@ -105,7 +105,6 @@ public class PlayerSearch extends Activity
     public void onPause()
     {
         super.onPause();
-        finish();
     }
 
     public void searchPlayers( String s )

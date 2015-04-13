@@ -26,44 +26,6 @@ along with the CheckValve source code.  If not, see
     android:gravity="center"
     android:orientation="horizontal" >
 
-    <!--
-    <Button android:id="@+id/edit_button"
-        android:layout_width="48dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@android:color/transparent"
-        android:textColor="#ffffff"
-        android:text="@string/button_edit"
-        android:contentDescription="@string/button_edit" />
-
-    <Button android:id="@+id/delete_button"
-        android:layout_width="48dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@android:color/transparent"
-        android:textColor="#ffffff"
-        android:text="@string/button_delete"
-        android:contentDescription="@string/button_delete" />
-        
-    <Button android:id="@+id/up_button"
-        android:layout_width="48dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@android:color/transparent"
-        android:textColor="#ffffff"
-        android:text="@string/button_move_up"
-        android:contentDescription="@string/button_move_up" />
-            
-    <Button android:id="@+id/down_button"
-        android:layout_width="48dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@android:color/transparent"
-        android:textColor="#ffffff"
-        android:text="@string/button_move_down"
-        android:contentDescription="@string/button_move_down" />
-    -->
-
     <Button
         android:id="@+id/edit_button"
         android:layout_width="wrap_content"
@@ -79,6 +41,12 @@ along with the CheckValve source code.  If not, see
         android:textColor="#ffffff"
         android:textColorHighlight="@color/steam_blue" />
 
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/steam_blue"
+        android:gravity="bottom|left" />
+    
     <Button
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
@@ -94,6 +62,12 @@ along with the CheckValve source code.  If not, see
         android:textColor="#ffffff"
         android:textColorHighlight="@color/steam_blue" />
 
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/steam_blue"
+        android:gravity="bottom|left" />
+
     <Button
         android:id="@+id/up_button"
         android:layout_width="wrap_content"
@@ -108,6 +82,12 @@ along with the CheckValve source code.  If not, see
         android:text="@string/button_move_up"
         android:textColor="#ffffff"
         android:textColorHighlight="@color/steam_blue" />
+
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/steam_blue"
+        android:gravity="bottom|left" />
 
     <Button
         android:id="@+id/down_button"

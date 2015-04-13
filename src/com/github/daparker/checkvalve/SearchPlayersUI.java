@@ -27,12 +27,11 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import com.github.daparker.checkvalve.R;
 
 public class SearchPlayersUI extends Activity
@@ -40,25 +39,21 @@ public class SearchPlayersUI extends Activity
     private ProgressDialog p;
     private SearchPlayers q;
     private DatabaseProvider database;
-    private Cursor databaseCursor;
     private TableLayout search_results_table;
     private TableLayout message_table;
     private TableRow[] tableRows;
     private TableRow[] messageRows;
-    private Context context;
 
     @Override
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
-
-        context = this;
-
+        
+        if( database == null )
+            database = new DatabaseProvider(SearchPlayersUI.this);
+        
         Intent thisIntent = this.getIntent();
         String search = thisIntent.getStringExtra("search");
-
-        database = new DatabaseProvider(context);
-        database.open();
 
         setContentView(R.layout.searchresults);
 
@@ -67,23 +62,30 @@ public class SearchPlayersUI extends Activity
 
         searchPlayers(search);
     }
-
+    
     @Override
-    public void onResume()
+    protected void onResume()
     {
         super.onResume();
-
-        if( !database.isOpen() ) database.open();
+        
+        if( database == null )
+            database = new DatabaseProvider(SearchPlayersUI.this);
     }
 
     @Override
-    public void onPause()
+    protected void onPause()
     {
         super.onPause();
-
-        if( database.isOpen() ) database.close();
+        
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
+        
+        finish();
     }
-
+    
     @Override
     public boolean onCreateOptionsMenu( Menu menu )
     {
@@ -108,29 +110,18 @@ public class SearchPlayersUI extends Activity
     public void searchPlayers( String search )
     {
         // Show the progress dialog
-        p = ProgressDialog.show(this, "", context.getText(R.string.status_searching_players), true, false);
+        p = ProgressDialog.show(this, "", this.getText(R.string.status_searching_players), true, false);
 
-        search_results_table.setVisibility(-1);
         search_results_table.removeAllViews();
-        search_results_table.setVisibility(1);
-
         message_table.removeAllViews();
 
-        if( !database.isOpen() ) database.open();
+        int count = (int)database.getServerCount();
 
-        databaseCursor = database.getAllServers();
-        //databaseCursor.moveToFirst();
-
-        //startManagingCursor(databaseCursor);
-
-        tableRows = new TableRow[(databaseCursor.getCount() * 50)];
-        messageRows = new TableRow[(databaseCursor.getCount() * 50)];
-
-        if( databaseCursor != null ) databaseCursor.close();
-
+        tableRows = new TableRow[(count * 50)];
+        messageRows = new TableRow[(count * 50)];
+        
         // Run the server queries in a new thread
-        //q = new SearchPlayers(context, databaseCursor, tableRows, messageRows, progressHandler, search);
-        q = new SearchPlayers(context, tableRows, messageRows, progressHandler, search);
+        q = new SearchPlayers(SearchPlayersUI.this, tableRows, messageRows, progressHandler, search);
         q.start();
     }
 
@@ -149,7 +140,7 @@ public class SearchPlayersUI extends Activity
                 while( messageRows[m] != null )
                     message_table.addView(messageRows[m++]);
 
-                message_table.setVisibility(1);
+                message_table.setVisibility(View.VISIBLE);
             }
 
             /*
@@ -168,8 +159,6 @@ public class SearchPlayersUI extends Activity
 
     public void quit()
     {
-        if( database.isOpen() ) database.close();
-
         finish();
     }
 }

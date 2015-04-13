@@ -17,6 +17,11 @@ package com.github.koraktor.steamcondenser.exceptions;
  */
 public class WebApiException extends SteamCondenserException {
 
+    /**
+     * UID added by David A. Parker for CheckValve
+     */
+    private static final long serialVersionUID = -7980902428594059935L;
+
     public enum Cause { HTTP_ERROR, INVALID_KEY, STATUS_BAD, UNAUTHORIZED }
 
     private String message;

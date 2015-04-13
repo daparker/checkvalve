@@ -16,6 +16,11 @@ package com.github.koraktor.steamcondenser.exceptions;
 public class SteamCondenserException extends Exception {
 
     /**
+     * UID added by David A. Parker for CheckValve
+     */
+    private static final long serialVersionUID = 3844401095096799232L;
+
+    /**
      * Creates a new <code>SteamCondenserException</code> instance
      */
     public SteamCondenserException() {}

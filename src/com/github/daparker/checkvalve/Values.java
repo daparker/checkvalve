@@ -48,8 +48,10 @@ public class Values
     protected static final String EXTRA_PORT = "port";
     protected static final String EXTRA_TIMEOUT = "timeout";
     protected static final String EXTRA_PASSWORD = "password";
-    protected static final String EXTRA_CHALLENGE_RESPONSE = "challengeRespone";
+    protected static final String EXTRA_CHALLENGE_RESPONSE = "challengeResponse";
     protected static final String EXTRA_SEARCH = "search";
+    protected static final String EXTRA_PLAYER_LIST = "playerList";
+    protected static final String EXTRA_MESSAGE_LIST = "messageList";
 
     // Bundle keys
     protected static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
@@ -65,6 +67,7 @@ public class Values
     protected static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
     protected static final String SETTING_DEFAULT_RELAY_PORT = "defaultRelayPort";
     protected static final String SETTING_DEFAULT_RELAY_PASSWORD = "defaultRelayPassword";
+    protected static final String SETTING_VALIDATE_NEW_SERVERS = "validateNewServers";
 
     // TextView tag values
     protected static final String TAG_SERVER_NAME = "serverName";
@@ -73,4 +76,7 @@ public class Values
     protected static final String TAG_SERVER_MAP = "serverMap";
     protected static final String TAG_SERVER_PLAYERS = "serverPlayers";
     protected static final String TAG_SERVER_TAGS = "serverTags";
+    protected static final String TAG_PLAYER_INFO = "playerInfo";
+    protected static final String TAG_MESSAGE_INFO = "messageInfo";
+    
 }

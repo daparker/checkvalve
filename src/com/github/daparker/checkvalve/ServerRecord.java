@@ -24,48 +24,93 @@ package com.github.daparker.checkvalve;
  */
 public class ServerRecord
 {
-    private String server_name;
-    private int server_port;
-    private int server_timeout;
+    private String name;
+    private String rcon;
+    
+    private int port;
+    private int timeout;
+    private int listpos;
+    
+    private long rowId;
 
-    public ServerRecord()
+    /**
+     * Construct a new instance of the ServerRecord class.
+     * <p>
+     * @param s The IP address or URL of this server
+     * @param r The RCON password for this server
+     * @param p The listen port of this server
+     * @param t The query timeout for this server
+     * @param l The position of this server within the server list
+     * @param i The unique row ID of this server within the database
+     * </p>
+     */
+    public ServerRecord( String s, String r, int p, int t, int l, long i )
     {
-    }
-
-    public ServerRecord( String s, int p, int t )
-    {
-        this.server_name = s;
-        this.server_port = p;
-        this.server_timeout = t;
+        this.name = s;
+        this.rcon = r; 
+        this.port = p;
+        this.timeout = t;
+        this.listpos = l;
+        this.rowId = i;
     }
 
     public String getServerName()
     {
-        return this.server_name;
+        return this.name;
+    }
+    
+    public String getServerRCONPassword()
+    {
+        return this.rcon;
     }
 
     public int getServerPort()
     {
-        return this.server_port;
+        return this.port;
     }
 
     public int getServerTimeout()
     {
-        return this.server_timeout;
+        return this.timeout;
     }
 
+    public int getServerListPosition()
+    {
+        return this.listpos;
+    }
+    
+    public long getServerRowID()
+    {
+        return this.rowId;
+    }
+    
     public void setServerName( String s )
     {
-        this.server_name = s;
+        this.name = s;
     }
 
+    public void setServerRCONPassword( String r )
+    {
+        this.rcon = r;
+    }
+    
     public void setServerPort( int p )
     {
-        this.server_port = p;
+        this.port = p;
     }
 
     public void setServerTimeout( int t )
     {
-        this.server_timeout = t;
+        this.timeout = t;
+    }
+    
+    public void setServerListPosition( int l )
+    {
+        this.listpos = l;
+    }
+    
+    public void setServerRowID( long i )
+    {
+        this.rowId = i;
     }
 }

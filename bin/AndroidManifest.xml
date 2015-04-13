@@ -68,8 +68,8 @@ along with the CheckValve source code.  If not, see
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:theme="@android:style/Theme.Dialog" />
 
-        <activity class="QueryPlayers"
-            android:name="com.github.daparker.checkvalve.QueryPlayers"
+        <activity class="ShowPlayersUI"
+            android:name="com.github.daparker.checkvalve.ShowPlayersUI"
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:theme="@android:style/Theme.Dialog" />
 

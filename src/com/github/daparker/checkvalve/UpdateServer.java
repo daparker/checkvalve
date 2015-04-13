@@ -21,10 +21,11 @@ package com.github.daparker.checkvalve;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Button;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -36,7 +37,6 @@ public class UpdateServer extends Activity
     private static final String TAG = UpdateServer.class.getSimpleName();
 
     private DatabaseProvider database;
-    private Cursor databaseCursor;
     private EditText field_server;
     private EditText field_port;
     private EditText field_timeout;
@@ -93,7 +93,10 @@ public class UpdateServer extends Activity
     {
         public void onClick( View v )
         {
-            database.close();
+            /*
+             * "Cancel" button was clicked
+             */
+            
             finish();
         }
     };
@@ -105,7 +108,10 @@ public class UpdateServer extends Activity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.updateserver);
-
+        
+        if( database == null )
+            database = new DatabaseProvider(UpdateServer.this);
+        
         setResult(0);
 
         Intent thisIntent = getIntent();
@@ -117,19 +123,8 @@ public class UpdateServer extends Activity
             finish();
         }
 
-        database = new DatabaseProvider(this);
-        database.open();
-
-        databaseCursor = null;
-        databaseCursor = database.getServer(rowId);
-
-        if( databaseCursor == null )
-        {
-            UserVisibleMessage.showMessage(UpdateServer.this, R.string.msg_db_failure);
-            database.close();
-            finish();
-        }
-
+        ServerRecord sr = database.getServer(rowId);
+        
         saveButton = (Button)findViewById(R.id.saveButton);
         saveButton.setOnClickListener(saveButtonListener);
 
@@ -140,28 +135,52 @@ public class UpdateServer extends Activity
         field_port = (EditText)findViewById(R.id.field_port);
         field_timeout = (EditText)findViewById(R.id.field_timeout);
         field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
-
-        field_server.setText(databaseCursor.getString(1));
-        field_port.setText(Integer.toString(databaseCursor.getInt(2)));
-        field_timeout.setText(Integer.toString(databaseCursor.getInt(3)));
-        field_rcon_password.setText(databaseCursor.getString(5));
-
-        if( databaseCursor != null ) databaseCursor.close();
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-        database.close();
-        finish();
+        
+        field_server.setText(sr.getServerName());
+        field_port.setText(Integer.toString(sr.getServerPort()));
+        field_timeout.setText(Integer.toString(sr.getServerTimeout()));
+        field_rcon_password.setText(sr.getServerRCONPassword());
+        
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        }
+        else
+        {
+            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
+        
+        if( database == null )
+            database = new DatabaseProvider(UpdateServer.this);
+    }
+    
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
+    }
 
-        if( !database.isOpen() ) database.open();
+    public void showPasswordCheckboxHandler( View view )
+    {
+        boolean checked = ((CheckBox)view).isChecked();
+
+        if( checked )
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        else
+            field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 }

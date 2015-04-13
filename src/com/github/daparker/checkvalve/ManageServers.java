@@ -21,7 +21,6 @@ package com.github.daparker.checkvalve;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,19 +31,32 @@ import android.widget.TableRow;
 import com.github.daparker.checkvalve.R;
 
 public class ManageServers extends Activity
-{
+{    
     private DatabaseProvider database;
     private TableLayout server_table;
     private Intent thisIntent;
-
-    private OnClickListener editButtonListener = new OnClickListener()
+    private Button x_button;
+        
+    private OnClickListener xButtonListener = new OnClickListener()
     {
         public void onClick( View v )
         {
             /*
+             * "X" button was clicked
+             */
+            v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
+            finish();
+        }
+    };
+    
+    private OnClickListener editButtonListener = new OnClickListener()
+    {
+        public void onClick( View v )
+        {            
+            /*
              * "Edit" button was clicked
              */
-
+            v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
             updateServer(rowId);
         }
@@ -57,7 +69,7 @@ public class ManageServers extends Activity
             /*
              * "Delete" button was clicked
              */
-
+            v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
 
             Intent confirmDeleteIntent = new Intent();
@@ -74,7 +86,7 @@ public class ManageServers extends Activity
             /*
              * "Move Up" button was clicked
              */
-
+            v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
 
             if( database.moveServerUp(rowId) )
@@ -96,7 +108,7 @@ public class ManageServers extends Activity
             /*
              * "Move Down" button was clicked
              */
-
+            v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
 
             if( database.moveServerDown(rowId) )
@@ -120,11 +132,13 @@ public class ManageServers extends Activity
 
         setResult(0, thisIntent);
 
-        database = new DatabaseProvider(this);
-        database.open();
+        if( database == null )
+            database = new DatabaseProvider(ManageServers.this);
 
         setContentView(R.layout.manageservers);
 
+        x_button = (Button)findViewById(R.id.manage_servers_x_button);
+        x_button.setOnClickListener(xButtonListener);
         server_table = (TableLayout)findViewById(R.id.serverTable);
 
         showServerList();
@@ -134,8 +148,9 @@ public class ManageServers extends Activity
     public void onResume()
     {
         super.onResume();
-
-        if( !database.isOpen() ) database.open();
+        
+        if( database == null )
+            database = new DatabaseProvider(ManageServers.this);
     }
 
     @Override
@@ -143,14 +158,23 @@ public class ManageServers extends Activity
     {
         super.onPause();
 
-        if( database.isOpen() ) database.close();
+        if( database != null )
+        {
+            database.close();
+            database = null;
+        }
     }
-
+    
     public void onActivityResult( int request, int result, Intent data )
     {
-        if( (request == Values.ACTIVITY_UPDATE_SERVER || request == Values.ACTIVITY_CONFIRM_DELETE) && result == 1 )
+        if( database == null )
+            database = new DatabaseProvider(ManageServers.this);
+        
+        if( request == Values.ACTIVITY_UPDATE_SERVER || request == Values.ACTIVITY_CONFIRM_DELETE )
         {
-            setResult(1, thisIntent);
+            if( result == 1 )
+                setResult(1, thisIntent);
+            
             showServerList();
         }
 
@@ -159,25 +183,21 @@ public class ManageServers extends Activity
 
     public void showServerList()
     {
-        if( !database.isOpen() ) database.open();
+        ServerRecord[] serverList = database.getAllServers();
 
-        server_table.setVisibility(View.GONE);
         server_table.removeAllViews();
-        server_table.setVisibility(View.VISIBLE);
-
-        Cursor databaseCursor = null;
-        databaseCursor = database.getAllServers();
-        databaseCursor.moveToFirst();
-
+        
         /*
          * Loop through the servers in the database
          */
-        for( int i = 0; i < databaseCursor.getCount(); i++ )
+        for( int i = 0; i < serverList.length; i++ )
         {
-            int rowId = (int)databaseCursor.getLong(0);
-            String server = databaseCursor.getString(1);
-            int port = databaseCursor.getInt(2);
+            ServerRecord sr = serverList[i];
 
+            String server = sr.getServerName();
+            int rowId = (int)sr.getServerRowID();
+            int port = sr.getServerPort();
+            
             View v = View.inflate(ManageServers.this, R.layout.manage_servers_button_bar, null);
             v.setId(i);
 
@@ -201,62 +221,24 @@ public class ManageServers extends Activity
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
 
-            if( i != 0 )
-            {
-                TableRow dividerRow = (TableRow)View.inflate(ManageServers.this, R.layout.manage_servers_tablerow_h_divider, null);
-                dividerRow.setId(i);
-                server_table.addView(dividerRow);
-            }
-
             TableRow serverRow = new TableRow(ManageServers.this);
             serverRow.setId(i);
             serverRow.addView(serverName);
             serverRow.addView(v);
-
-            server_table.addView(serverRow);
-
-            if( !databaseCursor.isLast() ) databaseCursor.moveToNext();
+            
+            TableLayout.LayoutParams params = new TableLayout.LayoutParams(
+                    TableLayout.LayoutParams.MATCH_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT);
+            
+            params.setMargins(0,50,0,0);             
+            serverRow.setLayoutParams(params);
+            
+            server_table.addView(serverRow, params);
+            
+            TableRow dividerRow = (TableRow)View.inflate(ManageServers.this, R.layout.manage_servers_tablerow_h_divider, null);
+            dividerRow.setId(i);
+            server_table.addView(dividerRow);
         }
-
-        if( databaseCursor != null ) databaseCursor.close();
-
-        int rowId = 100;
-        String server = "someInordinatelyLongServerName.myHostingService.com";
-        int port = 27015;
-
-        View v = View.inflate(ManageServers.this, R.layout.manage_servers_button_bar, null);
-        v.setId(rowId);
-
-        TextView serverName = (TextView)View.inflate(ManageServers.this, R.layout.manage_servers_servername, null);
-        serverName.setText(server + ":" + port);
-        serverName.setId(rowId);
-
-        Button editButton = (Button)v.findViewById(R.id.edit_button);
-        editButton.setId(rowId);
-        editButton.setOnClickListener(editButtonListener);
-
-        Button deleteButton = (Button)v.findViewById(R.id.delete_button);
-        deleteButton.setId(rowId);
-        deleteButton.setOnClickListener(deleteButtonListener);
-
-        Button moveUpButton = (Button)v.findViewById(R.id.up_button);
-        moveUpButton.setId(rowId);
-        moveUpButton.setOnClickListener(moveUpButtonListener);
-
-        Button moveDownButton = (Button)v.findViewById(R.id.down_button);
-        moveDownButton.setId(rowId);
-        moveDownButton.setOnClickListener(moveDownButtonListener);
-
-        TableRow dividerRow = (TableRow)View.inflate(ManageServers.this, R.layout.manage_servers_tablerow_h_divider, null);
-        dividerRow.setId(rowId);
-        server_table.addView(dividerRow);
-
-        TableRow serverRow = new TableRow(ManageServers.this);
-        serverRow.setId(rowId);
-        serverRow.addView(serverName);
-        serverRow.addView(v);
-
-        server_table.addView(serverRow);
     }
 
     public void updateServer( long rowId )
