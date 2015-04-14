@@ -13,6 +13,8 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - Cursors are only used within methods of the DatabaseProvider class
 - Made compatible with API 11+ (Android Honeycomb and above)
   - Moved all network operations to background threads
+- Redesigned UI screens for easier navigation
+- Removed unused code, classes, layouts, and string entires.
 
 **New Features**
 - Settings
@@ -32,6 +34,10 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - Default query options
     - Default port
     - Default timeout
+  - Default Chat Relay server
+    - IP
+    - Port
+    - Password
 - View chat
   - Requires CheckValve Chat Relay
 
