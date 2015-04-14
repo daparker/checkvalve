@@ -430,46 +430,37 @@ public class ChatUI extends Activity
         {
             runFadeOutAnimation(ChatUI.this, sending);
 
-            switch( msg.what )
+            if( msg.what == 0 )
             {
-                case -1:
-                    // An error occurred getting the engine type (most likely a socket timeout)
-                    break;
-                case 0:
-                    int rconAuthStatus = checkRCON();
-
-                    if( rconAuthStatus == 1 )
-                    {
+                int rconAuthStatus = checkRCON();
+                
+                switch( rconAuthStatus )
+                {
+                    case 1:
                         // Failed authentication
                         UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_no_rcon_auth);
                         getRCONPassword();
-                    }
-                    else if( rconAuthStatus == 2 )
-                    {
+                        break;
+                    case 2:
                         // RCONNoAuthException
                         UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_no_rcon_auth);
                         getRCONPassword();
-                    }
-                    else if( rconAuthStatus == 3 )
-                    {
-                        // RCONNoAuthException
+                        break;
+                    case 3:
+                        // RCONBanException
                         UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_ban_exception);
-                    }
-                    else if( rconAuthStatus == 4 )
-                    {
+                        break;
+                    case 4:
                         // TimeoutException (happens if RCON password was already sent)
                         UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_timeout_exception);
-                    }
-                    else if( rconAuthStatus == 5 )
-                    {
+                        break;
+                    case 5:
                         // Any other exception
                         UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_general_error);
-                    }
-                    else
-                    {
-
-                    }
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     };
@@ -496,8 +487,8 @@ public class ChatUI extends Activity
             gameServerIP = InetAddress.getByName(thisIntent.getStringExtra("server")).getHostAddress();
             gameServerPort = Integer.toString(thisIntent.getIntExtra("port", 27015));
 
-            gameServerIP = "127.0.0.1";
-            gameServerPort = "2345";
+            //gameServerIP = "127.0.0.1";
+            //gameServerPort = "2345";
         }
         catch( UnknownHostException e )
         {
@@ -673,7 +664,6 @@ public class ChatUI extends Activity
                 rconPasswordDialogDismissed = false;
                 rconPassword = data.getStringExtra("password");
                 rconAuthenticate();
-                //sendCommand();
             }
         }
 
@@ -707,40 +697,27 @@ public class ChatUI extends Activity
                 authenticated = s.rconAuth(rconPassword);
             }
 
-            if( !authenticated )
-            {
+            if( ! authenticated )
                 return 1;
-            }
             else
-            {
                 rconIsAuthenticated = true;
-            }
 
             return 0;
         }
         catch( RCONNoAuthException e )
         {
-            // Handle RCONNoAuthException
-            //UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_no_rcon_auth);
-            //getRCONPassword();
             return 2;
         }
         catch( RCONBanException e )
         {
-            // Handle RCONNoAuthException
-            //UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_ban_exception);
             return 3;
         }
         catch( TimeoutException e )
         {
-            // Handle a TimeoutException (happens if RCON password was already sent)
-            //UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_timeout_exception);
             return 4;
         }
         catch( Exception e )
         {
-            // Handle any other exception
-            //UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_rcon_general_error);
             Log.w(TAG, e.toString());
             return 5;
         }
@@ -748,9 +725,6 @@ public class ChatUI extends Activity
 
     public void rconAuthenticate()
     {
-        //if( rconPassword.isEmpty() )
-        //    getRCONPassword();
-
         sending.setText(R.string.status_rcon_verifying_password);
         runFadeInAnimation(context, sending);
 
@@ -759,13 +733,9 @@ public class ChatUI extends Activity
 
     public void sendCommand( String message )
     {
-        //if( rconPasswordDialogDismissed )
-        //    return;
-
         if( !rconIsAuthenticated )
         {
             rconAuthenticate();
-            //getRCONPassword();
             sendCommand(message);
         }
         else
@@ -782,13 +752,9 @@ public class ChatUI extends Activity
                 runFadeInAnimation(ChatUI.this, sending);
 
                 if( engine[0] == 1 )
-                    //q = new ServerQuery(context, command, response, null, g, popUpHandler);
                     new Thread(new RconQuery(command, g, popUpHandler)).start();
                 else
-                    //q = new ServerQuery(context, command, response, s, null, popUpHandler);
                     new Thread(new RconQuery(command, s, popUpHandler)).start();
-
-                //new Thread(q).start();
             }
         }
     }
@@ -812,16 +778,8 @@ public class ChatUI extends Activity
         // Kill the current connection
         shutdownChatRelayConnection();
 
-        // Run the server queries in a new thread
-        //q = new ServerQuery(context, rconServer, rconPort, rconTimeout, engine);
-        //q.start();
         // Show the progress dialog
         p = ProgressDialog.show(this, "", context.getText(R.string.status_connecting), true, false);
-
-        // Run the server queries in a new thread
-        //q = new ServerQuery(context, server, port, timeout, engine, progressHandler);
-        //q.start();        
-        //new Thread( new ServerQuery(context, rconServer, rconPort, rconTimeout, engine, progressHandler) ).start();
 
         try
         {
