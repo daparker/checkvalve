@@ -43,12 +43,10 @@ along with the CheckValve source code.  If not, see
     <string name="default_chat_relay_port">23456</string>
     <string name="default_query_port">27015</string>
     <string name="default_query_timeout">1</string>
-    <string name="general_exception">An exception has occurred.</string>
     <string name="header_kills">Kills</string>
     <string name="header_player">Player</string>
     <string name="header_time">Time</string>
     <string name="hint_chatui_say">Say something&#8230;</string>
-    <string name="io_exception">I/O error</string>
     <string name="label_chat_relay_password">Chat Relay Password:</string>
     <string name="label_game">Game:</string>
     <string name="label_ip">IP/Port:</string>
@@ -71,7 +69,6 @@ along with the CheckValve source code.  If not, see
     <string name="menu_move_down">Move Down</string>
     <string name="menu_move_up">Move Up</string>
     <string name="menu_new_server">Add New Server</string>
-    <string name="menu_ping_servers">Ping Servers</string>
     <string name="menu_player_search">Player Search</string>
     <string name="menu_quit">Quit</string>
     <string name="menu_rcon">RCON</string>
@@ -79,14 +76,12 @@ along with the CheckValve source code.  If not, see
     <string name="menu_settings">Settings</string>
     <string name="menu_show_players">Show Players</string>
     <string name="menu_view_chat">View Chat</string>
-    <string name="msg_bad_rcon_password">Invalid RCON password.</string>
     <string name="msg_chat_connect_success">Connected to the Chat Relay.</string>
     <string name="msg_chat_connect_failure">Failed to open a connection to the Chat Relay.</string>
     <string name="msg_chat_connection_lost">The connection was lost.</string>
     <string name="msg_chat_connection_refused">Connection refused:</string>
     <string name="msg_chat_disconnected">Disconnected.</string>
     <string name="msg_chat_not_started">Failed to start the Chat Relay client.</string>
-    <string name="msg_chat_sending">Sending</string>
     <string name="msg_connection_error">A connection error has occurred.</string>
     <string name="msg_connection_lost">The network connection has been lost.</string>
     <string name="msg_db_failure">A database error has occurred.</string>
@@ -110,14 +105,11 @@ along with the CheckValve source code.  If not, see
     <string name="msg_send_unsafe_command">This command will stop the server. Are you sure?</string>
     <string name="msg_server_deleted">The server has been deleted.</string>
     <string name="msg_server_validation_failed">An error occurred while validating the server.</string>
-    <string name="msg_socket_not_connected">Socket is not connected.</string>
     <string name="msg_success">The server information has been saved.</string>
     <string name="msg_unable_to_connect">Unable to connect.</string>
     <string name="msg_unable_to_connect_to">Unable to connect to</string>
     <string name="msg_unknown_host">Unknown host</string>
-    <string name="msg_verify_failure">Failed to verify server</string>
     <string name="playing_on">is playing on</string>
-    <string name="port_unreachable_exception">Port unreachable</string>
     <string name="settings_header_chat_relay_options">Default Chat Relay</string>
     <string name="settings_header_general_options">General</string>
     <string name="settings_header_query_options">Server Queries</string>
@@ -137,20 +129,15 @@ along with the CheckValve source code.  If not, see
     <string name="settings_default_query_port">Default query port</string>
     <string name="settings_default_query_timeout">Default query timeout</string>
     <string name="settings_validate_new_servers">Validate new servers</string>
-    <string name="socket_exception">Socket error</string>
-    <string name="socket_timeout_exception">Connection timed out</string>
     <string name="status_connecting">Connecting&#8230;</string>
-    <string name="status_down">DOWN</string>
     <string name="status_querying_server">Querying server&#8230;</string>
     <string name="status_querying_servers">Querying servers&#8230;</string>
     <string name="status_rcon_verifying_password">Verifying RCON password&#8230;</string>
     <string name="status_rcon_sending">Sending&#8230;</string>
     <string name="status_searching_players">Searching players&#8230;</string>
-    <string name="status_up">UP</string>
     <string name="status_verifying_server">Verifying server&#8230;</string>
     <string name="title_add_new_server">Add New Server</string>
     <string name="title_chat_console">Chat Viewer</string>
-    <string name="title_chat_relay_password">Chat Relay Password</string>
     <string name="title_chat_relay_details">Chat Relay Details</string>
     <string name="title_confirm_delete">Delete This Server?</string>
     <string name="title_confirm_unsafe_command">Unsafe Command</string>
@@ -163,47 +150,46 @@ along with the CheckValve source code.  If not, see
     <string name="title_search_results">Search Results</string>
     <string name="title_server_info">Server Information</string>
     <string name="title_settings">Settings</string>
-    <string name="unsupported_encoding_exception">An unsupported encoding type was specified.</string>
 
     <string-array name="all_commands">
-        <item>banid </item>
-        <item>banip </item>
+        <item>banid</item>
+        <item>banip</item>
         <item>changelevel </item>
         <item>changelevel_next</item>
         <item>exit</item>
-        <item>echo </item>
-        <item>find </item>
-        <item>help </item>
+        <item>echo</item>
+        <item>find</item>
+        <item>help</item>
         <item>listid</item>
         <item>listip</item>
-        <item>log </item>
-        <item>logaddress_add </item>
-        <item>logaddress_del </item>
+        <item>log</item>
+        <item>logaddress_add</item>
+        <item>logaddress_del</item>
         <item>logaddress_list</item>
-        <item>map </item>
-        <item>maps </item>
-        <item>mapcyclefile </item>
+        <item>map</item>
+        <item>maps</item>
+        <item>mapcyclefile</item>
         <item>memory</item>
-        <item>meta </item>
+        <item>meta</item>
         <item>meta list</item>
-        <item>motdfile </item>
-        <item>motdfile_text </item>
-        <item>mp_allowspectators </item>
-        <item>mp_autokick </item>
-        <item>mp_autoteambalance </item>
-        <item>mp_disable_autokick </item>
-        <item>mp_fraglimit </item>
-        <item>mp_freezetime </item>
-        <item>mp_friendlyfire </item>
-        <item>mp_hostagepenalty </item>
-        <item>mp_logdetail </item>
-        <item>mp_maxrounds </item>
-        <item>mp_respawnwavetime </item>
-        <item>mp_roundtime </item>
-        <item>mp_spawnprotectiontime </item>
-        <item>mp_timelimit </item>
-        <item>mp_tkpunish </item>
-        <item>mp_winlimit </item>
+        <item>motdfile</item>
+        <item>motdfile_text</item>
+        <item>mp_allowspectators</item>
+        <item>mp_autokick</item>
+        <item>mp_autoteambalance</item>
+        <item>mp_disable_autokick</item>
+        <item>mp_fraglimit</item>
+        <item>mp_freezetime</item>
+        <item>mp_friendlyfire</item>
+        <item>mp_hostagepenalty</item>
+        <item>mp_logdetail</item>
+        <item>mp_maxrounds</item>
+        <item>mp_respawnwavetime</item>
+        <item>mp_roundtime</item>
+        <item>mp_spawnprotectiontime</item>
+        <item>mp_timelimit</item>
+        <item>mp_tkpunish</item>
+        <item>mp_winlimit</item>
         <item>net_channels</item>
         <item>net_showudp</item>
         <item>net_showtcp</item>
@@ -219,45 +205,46 @@ along with the CheckValve source code.  If not, see
         <item>say</item>
         <item>stats</item>
         <item>status</item>
-        <item>sv_alltalk </item>
-        <item>sv_contact </item>
-        <item>sv_downloadurl </item>
-        <item>sv_log_onefile </item>
-        <item>sv_logbans </item>
-        <item>sv_logblocks </item>
-        <item>sv_logdownloadlist </item>
-        <item>sv_logecho </item>
-        <item>sv_logfile </item>
-        <item>sv_logflush </item>
-        <item>sv_logsdir </item>
-        <item>sv_logsecret </item>
-        <item>sv_pure </item>
-        <item>sv_pure_kick_clients </item>
-        <item>sv_rcon_banpenalty </item>
-        <item>sv_rcon_log </item>
-        <item>sv_rcon_maxfailures </item>
-        <item>sv_rcon_maxpacketbans </item>
-        <item>sv_rcon_maxpacketsize </item>
-        <item>sv_rcon_minfailures </item>
-        <item>sv_rcon_minfailuretime </item>
-        <item>sv_setsteamaccount </item>
-        <item>sv_stats </item>
-        <item>sv_steamgroup </item>
-        <item>sv_tags </item>
-        <item>sv_timeout </item>
-        <item>sv_visiblemaxplayers </item>
-        <item>sv_voiceenable </item>
+        <item>sv_alltalk</item>
+        <item>sv_contact</item>
+        <item>sv_downloadurl</item>
+        <item>sv_log_onefile</item>
+        <item>sv_logbans</item>
+        <item>sv_logblocks</item>
+        <item>sv_logdownloadlist</item>
+        <item>sv_logecho</item>
+        <item>sv_logfile</item>
+        <item>sv_logflush</item>
+        <item>sv_logsdir</item>
+        <item>sv_logsecret</item>
+        <item>sv_pure</item>
+        <item>sv_pure_kick_clients</item>
+        <item>sv_rcon_banpenalty</item>
+        <item>sv_rcon_log</item>
+        <item>sv_rcon_maxfailures</item>
+        <item>sv_rcon_maxpacketbans</item>
+        <item>sv_rcon_maxpacketsize</item>
+        <item>sv_rcon_minfailures</item>
+        <item>sv_rcon_minfailuretime</item>
+        <item>sv_setsteamaccount</item>
+        <item>sv_stats</item>
+        <item>sv_steamgroup</item>
+        <item>sv_tags</item>
+        <item>sv_timeout</item>
+        <item>sv_visiblemaxplayers</item>
+        <item>sv_voiceenable</item>
         <item>timeleft</item>
-        <item>user </item>
+        <item>user</item>
         <item>users</item>
         <item>version</item>
         <item>_restart</item>
     </string-array>
-
+    
     <string-array name="unsafe_commands">
         <item>exit</item>
         <item>quit</item>
         <item>restart</item>
         <item>_restart</item>
     </string-array>
+
 </resources>
