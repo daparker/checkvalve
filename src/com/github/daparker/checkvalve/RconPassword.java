@@ -50,8 +50,6 @@ public class RconPassword extends Activity
             /*
              * "Submit" button was clicked
              */
-
-            field_password = (EditText)findViewById(R.id.field_password);
             password = field_password.getText().toString();
 
             if( password.length() == 0 )
@@ -96,6 +94,8 @@ public class RconPassword extends Activity
 
         cancel_button = (Button)findViewById(R.id.cancel_button);
         cancel_button.setOnClickListener(cancelButtonListener);
+        
+        field_password = (EditText)findViewById(R.id.field_password);
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
         {
