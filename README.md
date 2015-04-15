@@ -9,8 +9,8 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 
 **Code Changes**
 - Completely changed the handling of database queries
-  - `DatabaseProvider` instances are now opened and closed more cleanly within each class that uses it
-  - Cursors are only used within methods of the DatabaseProvider class
+  - `DatabaseProvider` instances are now opened and closed more cleanly
+  - Cursors are only used within methods of the `DatabaseProvider` class
   - SQLite queries are now wrapped in `synchronized()` blocks
 - Made compatible with API 11+ (Android Honeycomb and above)
   - Moved all network operations to background threads
