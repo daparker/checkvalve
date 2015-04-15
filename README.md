@@ -5,7 +5,7 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 
 **Bug fixes**
 - Added better exception handling
-- Fixed a few NPEs.
+- Fixed a few NPEs
 
 **Code Changes**
 - Completely changed the handling of database queries
@@ -14,8 +14,10 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - SQLite queries are now wrapped in `synchronized()` blocks
 - Made compatible with API 11+ (Android Honeycomb and above)
   - Moved all network operations to background threads
+  - Created new classes to handle challenge response queries and RCON queries in the background
+- Eliminated the custom `MessageBox` class in favor of using standard `Toast` messages
 - Redesigned UI screens for easier navigation
-- Removed unused code, classes, layouts, and string entires.
+- Removed unused code, classes, layouts, and string entires
 
 **New Features**
 - Settings
