@@ -9,13 +9,14 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 
 
 **Code Changes**
+- Made compatible with API 11+ (Honeycomb and above)
+  - Moved all network operations to background threads
+  - Created new classes to handle challenge response queries and RCON queries in the background
+- Increased the target SDK version to 19 (KitKat)
 - Completely changed the handling of database queries
   - `DatabaseProvider` instances are now opened and closed more cleanly
   - Cursors are only used within methods of the `DatabaseProvider` class
   - SQLite queries are now wrapped in `synchronized()` blocks
-- Made compatible with API 11+ (Android Honeycomb and above)
-  - Moved all network operations to background threads
-  - Created new classes to handle challenge response queries and RCON queries in the background
 - Eliminated the custom `MessageBox` class in favor of using standard `Toast` messages
 - Redesigned some UI elements
   - The *Manage Server List* screen looks better and is easier to use
@@ -51,3 +52,7 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
     - Port
     - Password
 
+
+**Notes**
+- While the target SDK version has been increased, the minimum SDK version remains 8 (Froyo).
+- I am trying very hard to keep the minimum SDK version at 8 so that CheckValve will continue to work on older devices.  However, changes to the Android API are making it increasingly difficult to stay comaptible with any SDK version below 11 (Honeycomb), and the minimum SDK may need to be rasied in the near future out of necessity.
