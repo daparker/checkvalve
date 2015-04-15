@@ -149,18 +149,19 @@ along with the CheckValve source code.  If not, see
             android:orientation="horizontal" >
             
             <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/button_cancel" />
+            
+            <Button
                 android:id="@+id/connectButton"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/button_connect" />
 
-            <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/button_cancel" />
         </LinearLayout>    
     </LinearLayout>
 
