@@ -287,14 +287,14 @@ public class ChatUI extends Activity
                             while( ((chat_table.getChildCount()) / 2) > maxRows )
                             {
                                 chat_table.removeViews(0, 2);
-                                Log.d(TAG, "Removed 2 views from table.");
+                                Log.d(TAG, "Removed 2 views from table");
                             }
 
                             layout.fullScroll(View.FOCUS_DOWN);
                         }
                         else
                         {
-                            Log.d(TAG, "Scroll lock is active, not removing any views.");
+                            Log.d(TAG, "Scroll lock is active, not removing any views");
                         }
 
                         rowNum++;
@@ -312,10 +312,10 @@ public class ChatUI extends Activity
 
                     break;
                 case 255:
-                    Log.d(TAG, "Handler received 255 (server closed connection).");
+                    Log.d(TAG, "Handler received 255 (server closed connection)");
                     break;
                 default:
-                    Log.w(TAG, "Handler received an unexpected value (" + msg.what + ").");
+                    Log.w(TAG, "Handler received an unexpected value (" + msg.what + ")");
                     break;
             }
         }
@@ -360,12 +360,12 @@ public class ChatUI extends Activity
              *  1  =  Network connection change
              */
 
-            Log.d(TAG, "Received " + msg.what + " from NetworkEventReceiver.");
+            Log.d(TAG, "Received " + msg.what + " from NetworkEventReceiver");
 
             switch( msg.what )
             {
                 case -2:
-                    Log.e(TAG, "The network event receiver has aborted.");
+                    Log.e(TAG, "The network event receiver has aborted");
                     UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_general_error);
                     finish();
                     break;
@@ -486,18 +486,17 @@ public class ChatUI extends Activity
         {
             gameServerIP = InetAddress.getByName(thisIntent.getStringExtra("server")).getHostAddress();
             gameServerPort = Integer.toString(thisIntent.getIntExtra("port", 27015));
-
-            //gameServerIP = "127.0.0.1";
-            //gameServerPort = "2345";
         }
         catch( UnknownHostException e )
         {
-            String errorMsg = (String)context.getText(R.string.msg_unknown_host) + " "
-                    + thisIntent.getStringExtra("server");
+            String errorMsg = new String();
+            
+            errorMsg += (String)context.getText(R.string.msg_unknown_host) + " ";
+            errorMsg += thisIntent.getStringExtra("server");
 
             UserVisibleMessage.showMessage(ChatUI.this, errorMsg);
 
-            Log.w(TAG, "Unknown host " + thisIntent.getStringExtra("server"));
+            Log.w(TAG, "onCreate(): Unknown host " + thisIntent.getStringExtra("server"));
 
             finish();
         }
@@ -505,13 +504,13 @@ public class ChatUI extends Activity
         {
             UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_general_error);
 
-            Log.w(TAG, "Caught an exception in " + ChatUI.class.toString() + ":");
+            Log.w(TAG, "onCreate(): Caught an exception:");
             Log.w(TAG, e.toString());
 
             StackTraceElement[] ste = e.getStackTrace();
 
             for( int i = 0; i < ste.length; i++ )
-                Log.e(TAG, "    " + ste[i].toString());
+                Log.w(TAG, "    " + ste[i].toString());
 
             finish();
         }
@@ -558,7 +557,7 @@ public class ChatUI extends Activity
 
         if( receiverRunnable == null )
         {
-            Log.e(TAG, "NetworkEventReceiver object is null, cannot continue.");
+            Log.e(TAG, "onCreate(): NetworkEventReceiver object is null, cannot continue");
             UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_general_error);
             finish();
         }
@@ -568,7 +567,7 @@ public class ChatUI extends Activity
 
             if( receiverThread == null )
             {
-                Log.e(TAG, "NetworkEventReceiver thread is null, cannot continue.");
+                Log.e(TAG, "onCreate(): NetworkEventReceiver thread is null, cannot continue");
                 UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_general_error);
                 finish();
             }
@@ -577,7 +576,11 @@ public class ChatUI extends Activity
             receiverRunnable.registerReceiver();
         }
 
-        getChatRelayDetails(null, null, null);
+        chatRelayIP = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
+        chatRelayPort = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_PORT);
+        chatRelayPassword = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
+        
+        getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
     }
 
     @Override
@@ -630,8 +633,6 @@ public class ChatUI extends Activity
     {
         if( request == Values.ACTIVITY_CHAT_RELAY_DETAILS_DIALOG )
         {
-            Log.d(TAG, "onActivityResult(): Request CHAT_RELAY_DETAILS_DIALOG returned result " + result);
-
             if( result == 0 ) finish();
             if( result == 1 )
             {
@@ -653,8 +654,6 @@ public class ChatUI extends Activity
         }
         else if( request == Values.ACTIVITY_RCON_PASSWORD_DIALOG )
         {
-            Log.d(TAG, "onActivityResult(): Request RCON_PASSWORD_DIALOG returned result " + result);
-
             if( result == 0 )
             {
                 rconPasswordDialogDismissed = true;
@@ -783,42 +782,42 @@ public class ChatUI extends Activity
 
         try
         {
-            Log.d(TAG, "Getting new instance of class " + Chat.class.getSimpleName());
+            Log.d(TAG, "getChatRelayConnection(): Getting new instance of class " + Chat.class.getSimpleName());
             chatRunnable = new Chat(chatRelayIP, chatRelayPort, chatRelayPassword, gameServerIP, gameServerPort, chatClientHandler);
 
             if( chatRunnable != null )
             {
-                Log.d(TAG, "New object is " + chatRunnable.toString());
+                Log.d(TAG, "getChatRelayConnection(): New object is " + chatRunnable.toString());
             }
             else
             {
-                Log.d(TAG, "Failed to get an instance of class " + Chat.class.getSimpleName());
+                Log.d(TAG, "getChatRelayConnection(): Failed to get an instance of class " + Chat.class.getSimpleName());
                 UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_chat_not_started);
                 finish();
             }
 
-            Log.d(TAG, "Getting new Thread for runnable " + chatRunnable.toString());
+            Log.d(TAG, "getChatRelayConnection(): Getting new Thread for runnable " + chatRunnable.toString());
             chatThread = new Thread(chatRunnable);
 
             if( chatThread != null )
             {
-                Log.d(TAG, "Calling start() on " + chatThread.toString());
+                Log.d(TAG, "getChatRelayConnection(): Calling start() on " + chatThread.toString());
                 chatThread.start();
 
                 if( chatThread.isAlive() )
                 {
-                    Log.d(TAG, "Thread " + chatThread.toString() + " is running.");
+                    Log.d(TAG, "getChatRelayConnection(): Thread " + chatThread.toString() + " is running");
                 }
                 else
                 {
-                    Log.d(TAG, "Failed to start thread " + chatThread.toString());
+                    Log.d(TAG, "getChatRelayConnection(): Failed to start thread " + chatThread.toString());
                     UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_chat_not_started);
                     finish();
                 }
             }
             else
             {
-                Log.d(TAG, "Failed to get Thread for runnable " + chatRunnable.toString());
+                Log.d(TAG, "getChatRelayConnection(): Failed to get Thread for runnable " + chatRunnable.toString());
                 UserVisibleMessage.showMessage(ChatUI.this, R.string.msg_chat_not_started);
                 finish();
             }
@@ -845,31 +844,33 @@ public class ChatUI extends Activity
     {
         if( chatRunnable != null )
         {
-            Log.d(TAG, "Chat object is not null, calling shutDown().");
+            Log.d(TAG, "shutdownChatRelayConnection(): Chat object is not null, calling shutDown()");
             chatRunnable.shutDown();
         }
         else
         {
-            Log.d(TAG, "Chat object is null.");
+            Log.d(TAG, "shutdownChatRelayConnection(): Chat object is null");
         }
 
         if( chatThread != null )
         {
-            Log.d(TAG, "Chat thread is not null.");
+            Log.d(TAG, "shutdownChatRelayConnection(): Chat thread is not null");
 
             if( chatThread.isAlive() )
             {
-                Log.d(TAG, "Chat thread is alive, calling interrupt() on thread " + chatThread.getId() + ".");
+                Log.d(TAG, "shutdownChatRelayConnection(): Chat thread is alive, calling interrupt() on thread "
+                        + chatThread.getId());
+                
                 chatThread.interrupt();
             }
             else
             {
-                Log.d(TAG, "Chat thread is not alive, not interrupting.");
+                Log.d(TAG, "shutdownChatRelayConnection(): Chat thread is not alive, not interrupting");
             }
         }
         else
         {
-            Log.d(TAG, "Chat thread is null.");
+            Log.d(TAG, "shutdownChatRelayConnection(): Chat thread is null");
         }
     }
 
@@ -877,33 +878,34 @@ public class ChatUI extends Activity
     {
         if( receiverRunnable != null )
         {
-            Log.d(TAG, "NetworkEventReceiver object is not null, calling unregisterReceiver().");
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is not null, calling unregisterReceiver()");
             receiverRunnable.unregisterReceiver();
             receiverRunnable.shutDown();
         }
         else
         {
-            Log.d(TAG, "NetworkEventReceiver object is null.");
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is null");
         }
 
         if( receiverThread != null )
         {
-            Log.d(TAG, "NetworkEventReceiver thread is not null.");
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not null");
 
             if( receiverThread.isAlive() )
             {
-                Log.d(TAG, "NetworkEventReceiver thread is alive, calling interrupt() on thread "
-                        + receiverThread.getId() + ".");
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is alive, calling interrupt() on thread "
+                        + receiverThread.getId());
+                
                 receiverThread.interrupt();
             }
             else
             {
-                Log.d(TAG, "NetworkEventReceiver thread is not alive, not interrupting.");
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not alive, not interrupting");
             }
         }
         else
         {
-            Log.d(TAG, "NetworkEventReceiver thread is null.");
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is null");
         }
     }
 }
