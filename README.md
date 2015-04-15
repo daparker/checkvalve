@@ -3,9 +3,10 @@ CheckValve 2.0
 
 CheckValve 2.0 is currently under development.  This version of CheckValve includes many changes:
 
-**Bug fixes**
+**Bug Fixes**
 - Added better exception handling
-- Fixed a few NPEs
+- Fixed a few possible crashes due to database cursors being mishandled
+
 
 **Code Changes**
 - Completely changed the handling of database queries
@@ -16,10 +17,18 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - Moved all network operations to background threads
   - Created new classes to handle challenge response queries and RCON queries in the background
 - Eliminated the custom `MessageBox` class in favor of using standard `Toast` messages
-- Redesigned UI screens for easier navigation
+- Redesigned some UI elements
+  - The *Manage Server List* screen looks better and is easier to use
+  - Moved the *Cancel* button to the left side on any screen which has it, to be compliant with the [Android design guidelines](http://developer.android.com/design/building-blocks/dialogs.html) for dialogs and action buttons
+  - Easier navigation on several dialog screens
 - Removed unused code, classes, layouts, and string entires
 
+
 **New Features**
+- View chat
+  - Requires a [CheckValve Chat Relay](https://github.com/daparker/checkvalve-chat-relay)
+  - View in-game player chat messages in real time
+  - Send console chat messages to the server
 - Settings
   - General
     - Show RCON passwords
@@ -27,7 +36,7 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - RCON
     - Show suggested commands (auto-fill)
     - Warn before sending unsafe commands
-  - Server Information
+  - Server information
     - Show server name
     - Show IP/Port
     - Show game and version
@@ -41,6 +50,4 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
     - IP
     - Port
     - Password
-- View chat
-  - Requires CheckValve Chat Relay
 
