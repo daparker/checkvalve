@@ -107,6 +107,7 @@ public class Chat implements Runnable
                 Log.i(TAG, "    " + ste[i].toString());
 
             Log.i(TAG, "Chat Relay client thread is shutting down.");
+            handler.sendEmptyMessage(-2);
             return;
         }
         finally
