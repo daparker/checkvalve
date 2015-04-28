@@ -43,8 +43,6 @@ public abstract class QuerySocket extends SteamSocket {
             ((DatagramChannel) this.channel).connect(this.remoteSocket);
         } catch(IOException e) {
             Log.w(TAG, "Caught exception " + e.toString());
-            Log.w(TAG, "Message: " + e.getMessage());
-            Log.w(TAG, "Cause: " + e.getCause());
             Log.w(TAG, "Stack trace:");
             
             StackTraceElement[] ste = e.getStackTrace();
@@ -52,7 +50,6 @@ public abstract class QuerySocket extends SteamSocket {
             for( StackTraceElement x : ste )
                 Log.w(TAG, "    " + x.toString());
             
-            //Log.d(TAG, "Throwing new SteamCondenserException");
             throw new SteamCondenserException(e.getMessage(), e);
         }
     }
