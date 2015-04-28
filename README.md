@@ -10,8 +10,8 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 
 **Code Changes**
 - Made compatible with API 11+ (Honeycomb and above)
-  - Moved all network operations to background threads
-  - Created new classes to handle challenge response queries and RCON queries in the background
+  - Moved network operations to background threads
+  - Created new classes to handle all server queries in the background
 - Increased the target SDK version to 19 (KitKat)
 - Completely changed the handling of database queries
   - `DatabaseProvider` instances are now opened and closed more cleanly
@@ -21,6 +21,7 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 - Redesigned some UI elements
   - The *Manage Server List* screen looks better and is easier to use
   - Moved the *Cancel* button to the left side on any screen which has it, to be compliant with the [Android design guidelines](http://developer.android.com/design/building-blocks/dialogs.html) for dialogs and action buttons
+    - **Note:** Dialogs which use the built-in `AlertDialog` class will have the *Cancel* button on the right under old Android versions (prior to 11).
   - Easier navigation on several dialog screens
 - Removed unused code, classes, layouts, and string entires
 
