@@ -11,9 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
-
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-
 import com.github.koraktor.steamcondenser.Helper;
 import com.github.koraktor.steamcondenser.exceptions.PacketFormatException;
 import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
@@ -37,6 +35,7 @@ public abstract class SteamPacketFactory {
      * @throws PacketFormatException if the packet header is not recognized
      * @return The packet object generated from the packet data
      */
+    @SuppressWarnings("deprecation")
     public static SteamPacket getPacketFromData(byte[] rawData)
             throws PacketFormatException {
         byte header = rawData[0];
@@ -137,6 +136,7 @@ public abstract class SteamPacketFactory {
                 BZip2CompressorInputStream bzip2 = new BZip2CompressorInputStream(stream);
                 byte[] uncompressedPacketData = new byte[uncompressedSize];
                 bzip2.read(uncompressedPacketData, 0, uncompressedSize);
+                bzip2.close();
 
                 CRC32 crc32 = new CRC32();
                 crc32.update(uncompressedPacketData);
