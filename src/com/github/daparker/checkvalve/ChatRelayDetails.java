@@ -89,7 +89,8 @@ public class ChatRelayDetails extends Activity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
-
+        
+        setResult(0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.chatrelaydetails);
 
@@ -100,14 +101,14 @@ public class ChatRelayDetails extends Activity
 
         Intent thisIntent = getIntent();
 
-        if( !thisIntent.getStringExtra("server").isEmpty() ) field_server.setText(thisIntent.getStringExtra("server"));
+        if( ! thisIntent.getStringExtra("server").isEmpty() )
+            field_server.setText(thisIntent.getStringExtra("server"));
 
-        if( !thisIntent.getStringExtra("port").isEmpty() ) field_port.setText(thisIntent.getStringExtra("port"));
+        if( ! thisIntent.getStringExtra("port").isEmpty() )
+            field_port.setText(thisIntent.getStringExtra("port"));
 
-        if( !thisIntent.getStringExtra("password").isEmpty() )
+        if( ! thisIntent.getStringExtra("password").isEmpty() )
             field_password.setText(thisIntent.getStringExtra("password"));
-
-        setResult(0);
 
         connectButton = (Button)findViewById(R.id.connectButton);
         connectButton.setOnClickListener(connectButtonListener);

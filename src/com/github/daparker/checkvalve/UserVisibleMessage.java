@@ -31,10 +31,10 @@ public class UserVisibleMessage
     private static final String TAG = UserVisibleMessage.class.getSimpleName();
 
     /**
-     * Displays the specified CharSequence centered on the screen for the duration Toast.LENGTH_SHORT. <p>
+     * Displays the specified CharSequence centered on the screen for the duration Toast.LENGTH_SHORT.
      * 
      * @param context The context to use
-     * @param text The text to be displayed in the message </p>
+     * @param text The text to be displayed in the message
      */
     public static void showMessage( Context context, CharSequence text )
     {
@@ -42,18 +42,14 @@ public class UserVisibleMessage
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-        
-        // Show the Toast message centered on the screen
-        //t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
-        //t.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
         t.show();
     }
 
     /**
-     * Displays the specified string resource centered on the screen for the duration Toast.LENGTH_SHORT. <p>
+     * Displays the specified string resource centered on the screen for the duration Toast.LENGTH_SHORT.
      * 
      * @param context The context to use
-     * @param resId The ID of the string resource to be displayed in the message </p>
+     * @param resId The ID of the string resource to be displayed in the message
      */
     public static void showMessage( Context context, int resId )
     {
@@ -61,10 +57,6 @@ public class UserVisibleMessage
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, resId, Toast.LENGTH_SHORT);
-                
-        // Show the Toast message centered on the screen
-        //t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
-        //t.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
         t.show();
     }
 }

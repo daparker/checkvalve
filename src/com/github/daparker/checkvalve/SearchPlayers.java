@@ -38,14 +38,14 @@ import java.util.Arrays;
 public class SearchPlayers extends Thread
 {
     private static final String TAG = SearchPlayers.class.getSimpleName();
-    
+
     private Handler handler;
     private Context context;
     private TableRow[] tableRows;
     private TableRow[] messageRows;
     private String search;
     private byte[] challengeResponse;
-    
+
     public SearchPlayers( Context c, TableRow[] t, TableRow[] m, Handler h, String s )
     {
         this.context = c;
@@ -54,7 +54,7 @@ public class SearchPlayers extends Thread
         this.handler = h;
         this.search = s;
     }
-    
+
     public void run()
     {
         searchPlayers(search);
@@ -90,15 +90,15 @@ public class SearchPlayers extends Thread
 
         ServerRecord[] serverList = database.getAllServers();
         database.close();
-        
+
         for( ServerRecord sr : serverList )
-        {            
+        {
             try
             {
                 serverURL = sr.getServerName();
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
-                
+
                 String header = new String();
                 String name = new String();
 
@@ -128,7 +128,7 @@ public class SearchPlayers extends Thread
                 {
                     Log.e(TAG, "getChallangeResponse(): Socket is not connected");
                     socket.close();
-                    
+
                     throw new SocketNotConnectedException();
                 }
 
@@ -137,12 +137,12 @@ public class SearchPlayers extends Thread
                 socket.receive(packetIn);
 
                 challengeResponse = Arrays.copyOf(bufferIn, packetIn.getLength());
-                
+
                 if( challengeResponse == null )
                 {
-                    if( ! socket.isClosed() )
+                    if( !socket.isClosed() )
                         socket.close();
-                    
+
                     throw new NullResponseException();
                 }
 
@@ -160,7 +160,7 @@ public class SearchPlayers extends Thread
                 socket.receive(packetIn);
 
                 packetData = Arrays.copyOf(bufferIn, packetIn.getLength());
-                
+
                 ArrayList<String> packets = new ArrayList<String>();
 
                 // Store the response data in a string
@@ -229,11 +229,11 @@ public class SearchPlayers extends Thread
 
                 if( numplayers == 0 )
                     continue;
-                
+
                 for( int i = 0; i < packets.size(); i++ )
                 {
                     String thisPacket = packets.get(i);
-                    
+
                     byte[] bytes = thisPacket.getBytes("ISO8859_1");
 
                     byteNum = 0;
@@ -248,7 +248,7 @@ public class SearchPlayers extends Thread
 
                         while( bytes[byteNum] != 0x00 )
                             name += (char)bytes[byteNum++];
-                        
+
                         byteNum++;
 
                         /*
@@ -294,7 +294,7 @@ public class SearchPlayers extends Thread
 
                 for( StackTraceElement x : ste )
                     Log.w(TAG, "    " + x.toString());
-                
+
                 String message = new String();
 
                 message += context.getText(R.string.msg_no_response);

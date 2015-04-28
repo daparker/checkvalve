@@ -39,11 +39,11 @@ along with the CheckValve source code.  If not, see
             android:layout_height="wrap_content"
             android:background="#262626"
             android:gravity="center"
-            android:paddingBottom="5dip"
-            android:paddingTop="10dip"
+            android:paddingBottom="5dp"
+            android:paddingTop="10dp"
             android:text="@string/title_server_info"
             android:textColor="#FFFFFF"
-            android:textSize="18.0sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/status_bar"
@@ -51,11 +51,11 @@ along with the CheckValve source code.  If not, see
             android:layout_height="wrap_content"
             android:background="#262626"
             android:gravity="left"
-            android:paddingBottom="5dip"
-            android:paddingTop="0dip"
+            android:paddingBottom="5dp"
+            android:paddingTop="0dp"
             android:text=""
             android:textColor="#FFFFFF"
-            android:textSize="12.0sp" />
+            android:textSize="12sp" />
 
         <TableLayout
             android:id="@+id/message_table"

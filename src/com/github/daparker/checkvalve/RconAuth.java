@@ -19,9 +19,15 @@
 
 package com.github.daparker.checkvalve;
 
+import java.util.concurrent.TimeoutException;
+
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
+import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
+import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
@@ -29,7 +35,6 @@ public class RconAuth implements Runnable
 {
     private Handler handler;
     private String password;
-    private int status;
     private SourceServer ssrv;
     private GoldSrcServer gsrv;
     private Object obj;
@@ -39,7 +44,6 @@ public class RconAuth implements Runnable
     /**
      * Class for authenticating RCON.
      * 
-     * @param x The context to use
      * @param p The RCON password to use
      * @param s The SourceServer on which to execute the command
      * @param h The Handler to use
@@ -48,14 +52,12 @@ public class RconAuth implements Runnable
     {
         this.password = p;
         this.ssrv = s;
-        this.status = 0;
         this.handler = h;
     }
 
     /**
      * Class for authenticating RCON.
      * 
-     * @param x The context to use
      * @param p The RCON password to use
      * @param g The GoldSrcServer on which to execute the command
      * @param h The Handler to use
@@ -64,17 +66,17 @@ public class RconAuth implements Runnable
     {
         this.password = p;
         this.gsrv = g;
-        this.status = 0;
         this.handler = h;
     }
 
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        
         Message msg = new Message();
-        status = 0;
+        int status = 0;
 
-        rconAuthenticate();
+        status = rconAuthenticate();
 
         msg.what = status;
 
@@ -84,7 +86,7 @@ public class RconAuth implements Runnable
         this.handler.sendMessage(msg);
     }
 
-    public void rconAuthenticate()
+    public int rconAuthenticate()
     {
         try
         {
@@ -99,12 +101,38 @@ public class RconAuth implements Runnable
                 ssrv.rconAuth(password);
                 obj = ssrv;
             }
+            
+            return 0;
+        }
+        catch( RCONNoAuthException e )
+        {
+            return 1;
+        }
+        catch( RCONBanException e )
+        {
+            return 2;
+        }
+        catch( SteamCondenserException e )
+        {
+            return 3;
+        }
+        catch( TimeoutException e )
+        {
+            return 4;
         }
         catch( Exception e )
         {
-            Log.w(TAG, "Caught exception: " + e.toString());
-            status = 1;
+            Log.w(TAG, "rconAuthenticate(): Caught exception: " + e.toString());
+            Log.w(TAG, "Stack trace:");
+            
+            StackTraceElement[] ste = e.getStackTrace();
+            
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
+            
             obj = e;
+            
+            return 5;
         }
     }
 }

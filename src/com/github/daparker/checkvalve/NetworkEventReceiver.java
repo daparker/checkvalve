@@ -46,12 +46,13 @@ public class NetworkEventReceiver implements Runnable
     private int event;
 
     /**
-     * Construct a new instance of the NetworkEventReceiver class. <p> This class implements a
-     * <tt>BroadcastReceiver</tt> listening for network events, and sends messages to the caller via a <tt>Handler</tt>
-     * when events occur. </p> <p>
+     * Construct a new instance of the NetworkEventReceiver class.
+     * 
+     * This class implements a <tt>BroadcastReceiver</tt> listening for network events,
+     * and sends messages to the caller via a <tt>Handler</tt> when events occur.
      * 
      * @param c The context to use
-     * @param h The handler to use </p>
+     * @param h The handler to use
      */
     public NetworkEventReceiver( Context c, Handler h )
     {
@@ -177,6 +178,14 @@ public class NetworkEventReceiver implements Runnable
         }
         catch( Exception e )
         {
+            StackTraceElement[] ste = e.getStackTrace();
+
+            Log.w(TAG, "run(): Caught an exception: " + e.toString());
+            Log.w(TAG, "Stack trace:");
+
+            for( int i = 0; i < ste.length; i++ )
+                Log.w(TAG, "    " + ste[i].toString());
+
             unregisterReceiver();
             handler.sendEmptyMessage(-2);
             Log.i(TAG, "Shutting down network event receiver thread.");
@@ -203,6 +212,14 @@ public class NetworkEventReceiver implements Runnable
             }
             catch( Exception e )
             {
+                StackTraceElement[] ste = e.getStackTrace();
+
+                Log.w(TAG, "registerReceiver(): Caught an exception: " + e.toString());
+                Log.w(TAG, "Stack trace:");
+
+                for( int i = 0; i < ste.length; i++ )
+                    Log.w(TAG, "    " + ste[i].toString());
+
                 Log.w(TAG, "Failed to register broadcast receiver.");
             }
         }
@@ -223,6 +240,14 @@ public class NetworkEventReceiver implements Runnable
             }
             catch( Exception e )
             {
+                StackTraceElement[] ste = e.getStackTrace();
+
+                Log.w(TAG, "unregisterReceiver(): Caught an exception: " + e.toString());
+                Log.w(TAG, "Stack trace:");
+
+                for( int i = 0; i < ste.length; i++ )
+                    Log.w(TAG, "    " + ste[i].toString());
+
                 Log.w(TAG, "Failed to unregister broadcast receiver.");
             }
         }
@@ -249,8 +274,8 @@ public class NetworkEventReceiver implements Runnable
     }
 
     /**
-     * Shuts down the NetworkEventReceiver. <p> This method simply calls the <tt>interrupt()<tt> method on the
-     * NetworkEventReceiver object's thread. </p>
+     * Shuts down the NetworkEventReceiver. This method simply calls the <tt>interrupt()<tt>
+     * method on the NetworkEventReceiver object's thread.
      */
     public void shutDown()
     {

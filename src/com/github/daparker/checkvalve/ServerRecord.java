@@ -26,28 +26,25 @@ public class ServerRecord
 {
     private String name;
     private String rcon;
-    
     private int port;
     private int timeout;
     private int listpos;
-    
     private long rowId;
 
     /**
      * Construct a new instance of the ServerRecord class.
-     * <p>
+     * 
      * @param s The IP address or URL of this server
      * @param r The RCON password for this server
      * @param p The listen port of this server
      * @param t The query timeout for this server
      * @param l The position of this server within the server list
      * @param i The unique row ID of this server within the database
-     * </p>
      */
     public ServerRecord( String s, String r, int p, int t, int l, long i )
     {
         this.name = s;
-        this.rcon = r; 
+        this.rcon = r;
         this.port = p;
         this.timeout = t;
         this.listpos = l;
@@ -58,7 +55,7 @@ public class ServerRecord
     {
         return this.name;
     }
-    
+
     public String getServerRCONPassword()
     {
         return this.rcon;
@@ -78,12 +75,12 @@ public class ServerRecord
     {
         return this.listpos;
     }
-    
+
     public long getServerRowID()
     {
         return this.rowId;
     }
-    
+
     public void setServerName( String s )
     {
         this.name = s;
@@ -93,7 +90,7 @@ public class ServerRecord
     {
         this.rcon = r;
     }
-    
+
     public void setServerPort( int p )
     {
         this.port = p;
@@ -103,12 +100,12 @@ public class ServerRecord
     {
         this.timeout = t;
     }
-    
+
     public void setServerListPosition( int l )
     {
         this.listpos = l;
     }
-    
+
     public void setServerRowID( long i )
     {
         this.rowId = i;

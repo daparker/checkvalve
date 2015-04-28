@@ -35,7 +35,7 @@ public class ChatMessage
     public String message;
 
     /**
-     * Object which holds the data parsed from a chat message sent by the Chat Relay. <p>
+     * Object which holds the data parsed from a chat message sent by the Chat Relay.
      * 
      * @param proto The Chat Relay protocol version used by the message packet
      * @param stflag Whether or not this is a say_team message (0x00 = say, 0x01 = say_team)
@@ -45,7 +45,7 @@ public class ChatMessage
      * @param tstamp The original timestamp included in the message
      * @param pname The name of the player who sent the message
      * @param pteam The team of the player who sent the message
-     * @param msg The text of the message </p>
+     * @param msg The text of the message
      */
     public ChatMessage(
             byte proto, byte stflag, int epoch, String gsip, String gsport, String tstamp, String pname, String pteam,

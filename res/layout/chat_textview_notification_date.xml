@@ -25,4 +25,4 @@ along with the CheckValve source code.  If not, see
     android:gravity="right"
     android:text=""
     android:textColor="#000000"
-    android:textSize="12.0sp" />
+    android:textSize="12sp" />

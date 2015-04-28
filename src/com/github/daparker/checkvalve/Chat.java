@@ -66,15 +66,15 @@ public class Chat implements Runnable
     private static Handler handler;
 
     /**
-     * Construct a new instance of the Chat class. <p> This class implements a CheckValve Chat Relay client. </p> <p>
+     * Construct a new instance of the Chat class.  This class implements a CheckValve Chat Relay client.
      * 
      * @param crIP The URL or IP address of the Chat Relay
      * @param crPort The client listen port of the Chat Relay
      * @param crPassword The password for the Chat Relay
      * @param gsIP The URL or IP address of the game server from which you want chat messages
      * @param gsPort The listen port of the game server from which you want chat messages
-     * @param h The handler to use </p> <p>
-     * @throws UnknownHostException </p>
+     * @param h The handler to use
+     * @throws UnknownHostException
      */
     public Chat( String crIP, String crPort, String crPassword, String gsIP, String gsPort, Handler h )
             throws UnknownHostException
@@ -114,7 +114,7 @@ public class Chat implements Runnable
         {
             if( s != null )
             {
-                if( !s.isClosed() )
+                if( ! s.isClosed() )
                 {
                     try
                     {
@@ -137,9 +137,10 @@ public class Chat implements Runnable
     }
 
     /**
-     * Establishes a client connection to the Chat Relay and then listens for incoming data. <p> <b>This method should
-     * not be explicitly called. It is started when the <tt>start()</tt> method is called on the Chat object or its
-     * thread.</b>
+     * Establishes a client connection to the Chat Relay and then listens for incoming data.
+     * <p>
+     * <b>This method should not be explicitly called. It is started when the <tt>start()</tt> method is called on the
+     * Chat object or its thread.</b>
      * 
      * @throws Exception
      */
@@ -152,7 +153,7 @@ public class Chat implements Runnable
         final byte PTYPE_CONNECTION_FAILURE = (byte)0x03;
         final byte PTYPE_CONNECTION_SUCCESS = (byte)0x04;
         final byte PTYPE_MESSAGE_DATA = (byte)0x05;
-        
+
         int i = 0;
         int pos = 0;
         int end = 0;
@@ -247,6 +248,7 @@ public class Chat implements Runnable
             else
             {
                 Log.w(TAG, "Unexpected packet type 0x" + String.format("%s", Byte.toString(responseType)) + ".");
+                Log.d(TAG, "runChatRelayClient(): Sending -1 to handler.");
                 handler.sendEmptyMessage(-1);
                 return;
             }
@@ -267,6 +269,7 @@ public class Chat implements Runnable
 
         if( !s.isConnected() )
         {
+            Log.d(TAG, "runChatRelayClient(): Socket is not connected; socket=" + s.toString());
             handler.sendEmptyMessage(-1);
             return;
         }
@@ -289,6 +292,11 @@ public class Chat implements Runnable
                 Log.w(TAG, "Timed out while waiting for next packet.");
                 continue;
             }
+            catch( SocketException se )
+            {
+                Log.d(TAG, "Caught a socket exception.");
+                return;
+            }
 
             // Make sure the header is valid
             if( (packetHeader = dataBuffer.getInt()) != PACKET_HEADER )
@@ -306,7 +314,7 @@ public class Chat implements Runnable
             // No need to do anything if this is a heartbeat
             if( responseType == PTYPE_HEARTBEAT )
             {
-                handler.sendEmptyMessage(0);
+                //handler.sendEmptyMessage(1);
                 continue;
             }
 
@@ -339,8 +347,6 @@ public class Chat implements Runnable
                 Log.w(TAG, "Timed out while reading packet data.");
                 continue;
             }
-
-            Log.d(TAG, dataBuffer.toString());
 
             switch( responseType )
             {
@@ -392,8 +398,11 @@ public class Chat implements Runnable
     }
 
     /**
-     * Shuts down the Chat Relay client. <p> This method closes the network socket and then calls <tt>interrupt()<tt> on
-     * the Chat object's thread. </p>
+     * Shuts down the Chat Relay client.
+     * <p>
+     * This method closes the network socket and then calls <tt>interrupt()<tt> on
+     * the Chat object's thread.
+     * </p>
      */
     public void shutDown()
     {
@@ -418,7 +427,7 @@ public class Chat implements Runnable
             Log.w(TAG, "Stack trace:");
 
             for( int i = 0; i < ste.length; i++ )
-                Log.e(TAG, "    " + ste[i].toString());
+                Log.w(TAG, "    " + ste[i].toString());
 
             handler.sendEmptyMessage(-2);
         }

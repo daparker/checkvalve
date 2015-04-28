@@ -38,13 +38,13 @@ along with the CheckValve source code.  If not, see
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="15dip"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:paddingTop="10dip"
+            android:paddingBottom="15dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
             android:text="@string/title_search_results"
             android:textColor="#FFFFFF"
-            android:textSize="18.0sp" />
+            android:textSize="18sp" />
 
         <TableLayout
             android:id="@+id/message_table"
@@ -57,7 +57,7 @@ along with the CheckValve source code.  If not, see
             android:id="@+id/search_results_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dip"
+            android:paddingTop="10dp"
             android:shrinkColumns="0" >
         </TableLayout>
     </LinearLayout>

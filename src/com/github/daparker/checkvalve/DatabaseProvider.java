@@ -35,7 +35,7 @@ import android.util.Log;
  */
 public class DatabaseProvider extends SQLiteOpenHelper
 {
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -85,15 +85,15 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
                     + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
                     + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
+                    + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
                     + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
                     + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
                     + SETTINGS_DEFAULT_RELAY_HOST + " TEXT NOT NULL DEFAULT '', "
                     + SETTINGS_DEFAULT_RELAY_PORT + " INTEGER NOT NULL DEFAULT 23456, "
                     + SETTINGS_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT ''"
                     + ");";
-    
+
     private static final Object[] lock = new Object[0];
-    
 
     /**
      * Construct a new instance of the DatabaseProvider class.
@@ -108,7 +108,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
     public DatabaseProvider( Context context )
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        
+
         /*
         synchronized(lock)
         {
@@ -160,6 +160,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
             values.put(SETTINGS_SHOW_SERVER_PLAYERS, 1);
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
+            values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
             values.put(SETTINGS_DEFAULT_RELAY_HOST, "");
@@ -192,9 +193,9 @@ public class DatabaseProvider extends SQLiteOpenHelper
             {
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
-    
+
                 ContentValues values = new ContentValues();
-    
+
                 Log.i(TAG, "Assembling default values in ContentValues object " + values.toString());
                 values.put(SETTINGS_RCON_WARN_UNSAFE, 1);
                 values.put(SETTINGS_RCON_SHOW_PASSWORDS, 1);
@@ -209,7 +210,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
                 values.put(SETTINGS_DEFAULT_RELAY_HOST, "");
                 values.put(SETTINGS_DEFAULT_RELAY_PORT, 23456);
                 values.put(SETTINGS_DEFAULT_RELAY_PASSWORD, "");
-    
+
                 Log.i(TAG, "Inserting default values");
                 db.insert(TABLE_SETTINGS, null, values);
             }
@@ -217,55 +218,108 @@ public class DatabaseProvider extends SQLiteOpenHelper
             {
                 Log.w(TAG, "Caught an exception while upgrading database:");
                 Log.w(TAG, e.toString());
-    
+
                 StackTraceElement[] ste = e.getStackTrace();
-    
+
                 for( int i = 0; i < ste.length; i++ )
                     Log.e(TAG, "    " + ste[i].toString());
             }
         }
-        
+
         if( oldVersion == 4 )
         {
             try
             {
                 Log.i(TAG, "Updating table " + TABLE_SETTINGS);
-                
+
                 db.execSQL("ALTER TABLE " + TABLE_SETTINGS
                         + " ADD COLUMN " + SETTINGS_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1");
-                
+
                 Log.i(TAG, "Successfully added column '" + SETTINGS_RCON_SHOW_SUGGESTIONS + "'");
             }
             catch( SQLiteException e )
             {
                 Log.w(TAG, "Caught an exception while upgrading database:");
                 Log.w(TAG, e.toString());
-    
+
                 StackTraceElement[] ste = e.getStackTrace();
-    
+
                 for( int i = 0; i < ste.length; i++ )
                     Log.e(TAG, "    " + ste[i].toString());
             }
         }
-        
+
         if( oldVersion == 5 )
         {
             try
             {
                 Log.i(TAG, "Updating table " + TABLE_SETTINGS);
-                
+
                 db.execSQL("ALTER TABLE " + TABLE_SETTINGS
                         + " ADD COLUMN " + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1");
-                
+
                 Log.i(TAG, "Successfully added column '" + SETTINGS_VALIDATE_NEW_SERVERS + "'");
             }
             catch( SQLiteException e )
             {
                 Log.w(TAG, "Caught an exception while upgrading database:");
                 Log.w(TAG, e.toString());
-    
+
                 StackTraceElement[] ste = e.getStackTrace();
-    
+
+                for( int i = 0; i < ste.length; i++ )
+                    Log.e(TAG, "    " + ste[i].toString());
+            }
+        }
+
+        if( oldVersion == 6 )
+        {
+            try
+            {
+                Log.i(TAG, "onUpgrade(): Updating table " + TABLE_SERVERS);
+
+                Cursor c = db.query(
+                        TABLE_SERVERS,
+                        new String[] { SERVERS_ROWID, SERVERS_LISTPOS },
+                        null,
+                        null,
+                        null,
+                        null,
+                        SERVERS_LISTPOS
+                        );
+
+                int count = c.getCount();
+
+                for( int i = 0; i < count; i++ )
+                {
+                    c.moveToPosition(i);
+
+                    long rowId = c.getLong(0);
+                    int oldPos = c.getInt(1);
+                    int newPos = (i + 1);
+
+                    if( oldPos != newPos )
+                    {
+                        ContentValues values = new ContentValues();
+                        values.put(SERVERS_LISTPOS, newPos);
+
+                        Log.i(TAG, "onUpgrade(): Updating server " + rowId + "; changing list position from " + oldPos + " to " + newPos);
+
+                        db.update(TABLE_SERVERS, values, SERVERS_ROWID + " = " + rowId, null);
+                    }
+                }
+
+                c.close();
+
+                Log.i(TAG, "onUpgrade(): Successfully updated server list positions");
+            }
+            catch( SQLiteException e )
+            {
+                Log.w(TAG, "Caught an exception while upgrading database:");
+                Log.w(TAG, e.toString());
+
+                StackTraceElement[] ste = e.getStackTrace();
+
                 for( int i = 0; i < ste.length; i++ )
                     Log.e(TAG, "    " + ste[i].toString());
             }
@@ -275,16 +329,16 @@ public class DatabaseProvider extends SQLiteOpenHelper
     public long getServerCount()
     {
         long result = 0;
-        
-        synchronized(lock)
+
+        synchronized( lock )
         {
-            SQLiteDatabase db = this.getReadableDatabase();            
+            SQLiteDatabase db = this.getReadableDatabase();
             result = DatabaseUtils.queryNumEntries(db, TABLE_SERVERS);
         }
-        
+
         return result;
     }
-    
+
     /**
      * Adds a new server to the database.
      * <p>
@@ -311,7 +365,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
         values.put(SERVERS_LISTPOS, pos);
         values.put(SERVERS_RCON, password);
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getWritableDatabase();
             result = db.insert(TABLE_SERVERS, null, values);
@@ -332,13 +386,73 @@ public class DatabaseProvider extends SQLiteOpenHelper
      */
     public boolean deleteServer( long rowId )
     {
-        boolean result;
-        
-        synchronized(lock) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            result = db.delete(TABLE_SERVERS, SERVERS_ROWID + "=" + rowId, null) > 0;
+        boolean result = false;
+        Cursor c;
+
+        int listPos = getServerListPosition(rowId);
+
+        if( listPos != -1 )
+        {
+            synchronized( lock )
+            {
+                SQLiteDatabase db = this.getWritableDatabase();
+
+                result = db.delete(TABLE_SERVERS, SERVERS_ROWID + "=" + rowId, null) > 0;
+
+                if( result == true )
+                {
+                    c = db.query(
+                            TABLE_SERVERS,
+                            new String[] { SERVERS_ROWID },
+                            SERVERS_LISTPOS + " > " + listPos,
+                            null,
+                            null,
+                            null,
+                            SERVERS_LISTPOS
+                            );
+
+                    while( c.moveToNext() )
+                        this.moveServerUp(c.getLong(0));
+
+                    c.close();
+                }
+            }
         }
-        
+
+        return result;
+    }
+
+    public int getServerListPosition( long rowId )
+    {
+        int result = -1;
+        Cursor c;
+
+        synchronized( lock )
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            c = db.query(
+                    TABLE_SERVERS,
+                    new String[] { SERVERS_LISTPOS },
+                    SERVERS_ROWID + "=" + rowId,
+                    null,
+                    null,
+                    null,
+                    null
+                    );
+
+            if( c != null )
+            {
+                if( c.getCount() > 0 )
+                {
+                    c.moveToFirst();
+                    result = c.getInt(0);
+                }
+
+                c.close();
+            }
+        }
+
         return result;
     }
 
@@ -352,13 +466,13 @@ public class DatabaseProvider extends SQLiteOpenHelper
     public ServerRecord[] getAllServers()
     {
         Cursor c;
-        
+
         ServerRecord[] result = null;
-        
-        synchronized(lock)
+
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getReadableDatabase();
-            
+
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
@@ -373,25 +487,25 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     null,
                     null,
                     SERVERS_LISTPOS
-            );
+                    );
 
             int count = c.getCount();
-            
+
             result = new ServerRecord[count];
-            
+
             for( int i = 0; i < count; i++ )
             {
                 c.moveToPosition(i);
-                
+
                 result[i] = new ServerRecord(
                         c.getString(1),
                         c.getString(5),
                         c.getInt(2),
                         c.getInt(3),
                         c.getInt(4),
-                        c.getLong(0) );
+                        c.getLong(0));
             }
-            
+
             c.close();
         }
 
@@ -413,13 +527,13 @@ public class DatabaseProvider extends SQLiteOpenHelper
     public ServerRecord getServer( long rowId )
     {
         ServerRecord result = null;
-        
+
         Cursor c;
-        
-        synchronized(lock)
+
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getReadableDatabase();
-            
+
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
@@ -434,14 +548,14 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     null,
                     null,
                     null
-            );
+                    );
 
             if( c != null )
             {
                 if( c.getCount() > 0 )
                 {
                     c.moveToFirst();
-                    
+
                     result = new ServerRecord(
                             c.getString(1),
                             c.getString(5),
@@ -449,13 +563,13 @@ public class DatabaseProvider extends SQLiteOpenHelper
                             c.getInt(3),
                             c.getInt(4),
                             c.getLong(0)
-                    );
+                            );
                 }
-                
+
                 c.close();
             }
         }
-        
+
         return result;
     }
 
@@ -476,7 +590,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
     public boolean updateServer( long rowId, String server, int port, int timeout, String password )
     {
         boolean result;
-        
+
         ContentValues values = new ContentValues();
 
         values.put(SERVERS_SERVER, server);
@@ -484,7 +598,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
         values.put(SERVERS_TIMEOUT, timeout);
         values.put(SERVERS_RCON, password);
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getWritableDatabase();
             result = db.update(TABLE_SERVERS, values, SERVERS_ROWID + "=" + rowId, null) > 0;
@@ -504,10 +618,10 @@ public class DatabaseProvider extends SQLiteOpenHelper
     {
         int result = 0;
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getReadableDatabase();
-            
+
             Cursor c = db.query(
                     TABLE_SERVERS,
                     new String[] { SERVERS_LISTPOS },
@@ -516,14 +630,14 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     null,
                     null,
                     SERVERS_LISTPOS + " DESC", "1"
-            );
+                    );
 
             if( c.getCount() > 0 )
             {
                 c.moveToFirst();
                 result = c.getInt(0);
             }
-            
+
             c.close();
         }
 
@@ -549,10 +663,10 @@ public class DatabaseProvider extends SQLiteOpenHelper
         boolean result;
         int r1, r2, r3;
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getWritableDatabase();
-            
+
             c = db.query(
                     TABLE_SERVERS,
                     new String[] { SERVERS_LISTPOS },
@@ -561,8 +675,8 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     null,
                     null,
                     null
-            );
-    
+                    );
+
             if( c.getCount() == 0 )
             {
                 result = false;
@@ -570,42 +684,42 @@ public class DatabaseProvider extends SQLiteOpenHelper
             else
             {
                 c.moveToFirst();
-        
+
                 int oldPos = c.getInt(0);
                 int newPos = oldPos - 1;
-                        
+
                 Log.d(TAG, "moveServerUp(): rowId=" + rowId + "; oldPos=" + oldPos + "; newPos=" + newPos);
-        
-                if( oldPos == 0 )
+
+                if( oldPos == 1 )
                 {
-                    Log.d(TAG, "moveServerUp(): Not moving server because oldPos is 0");
+                    Log.d(TAG, "moveServerUp(): Not moving server because oldPos is 1");
                     result = true;
                 }
                 else
                 {
                     Log.d(TAG, "moveServerUp(): Moving server from position " + oldPos + " to " + newPos);
-                    
+
                     ContentValues cv1 = new ContentValues();
                     ContentValues cv2 = new ContentValues();
                     ContentValues cv3 = new ContentValues();
-            
+
                     cv1.put(SERVERS_LISTPOS, -1);
                     cv2.put(SERVERS_LISTPOS, oldPos);
                     cv3.put(SERVERS_LISTPOS, newPos);
-            
+
                     r1 = db.update(TABLE_SERVERS, cv1, SERVERS_LISTPOS + "=" + oldPos, null);
                     r2 = db.update(TABLE_SERVERS, cv2, SERVERS_LISTPOS + "=" + newPos, null);
                     r3 = db.update(TABLE_SERVERS, cv3, SERVERS_LISTPOS + "= -1", null);
-                    
+
                     Log.d(TAG, "moveServerUp(): r1=" + r1 + "; r2=" + r2 + "; r3=" + r3);
-                    
+
                     result = ((r1 == 1) && (r2 == 1) && (r3 == 1));
                 }
             }
-            
+
             c.close();
         }
-        
+
         return result;
     }
 
@@ -630,11 +744,11 @@ public class DatabaseProvider extends SQLiteOpenHelper
         Cursor c;
         boolean result;
         int r1, r2, r3;
-        
-        synchronized(lock)
+
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getWritableDatabase();
-            
+
             c = db.query(
                     TABLE_SERVERS,
                     new String[] { SERVERS_LISTPOS },
@@ -643,8 +757,8 @@ public class DatabaseProvider extends SQLiteOpenHelper
                     null,
                     null,
                     null
-            );
-    
+                    );
+
             if( c.getCount() == 0 )
             {
                 result = false;
@@ -652,12 +766,12 @@ public class DatabaseProvider extends SQLiteOpenHelper
             else
             {
                 c.moveToFirst();
-        
+
                 int oldPos = c.getInt(0);
                 int newPos = oldPos + 1;
-        
+
                 Log.d(TAG, "moveServerDown(): rowId=" + rowId + "; oldPos=" + oldPos + "; newPos=" + newPos);
-                
+
                 if( oldPos == getLastPosition() )
                 {
                     Log.d(TAG, "moveServerDown(): Not moving server because oldPos is the last position");
@@ -666,28 +780,28 @@ public class DatabaseProvider extends SQLiteOpenHelper
                 else
                 {
                     Log.d(TAG, "moveServerDown(): Moving server from position " + oldPos + " to " + newPos);
-                    
+
                     ContentValues cv1 = new ContentValues();
                     ContentValues cv2 = new ContentValues();
                     ContentValues cv3 = new ContentValues();
-            
+
                     cv1.put(SERVERS_LISTPOS, -1);
                     cv2.put(SERVERS_LISTPOS, oldPos);
                     cv3.put(SERVERS_LISTPOS, newPos);
-            
+
                     r1 = db.update(TABLE_SERVERS, cv1, SERVERS_LISTPOS + "=" + oldPos, null);
                     r2 = db.update(TABLE_SERVERS, cv2, SERVERS_LISTPOS + "=" + newPos, null);
                     r3 = db.update(TABLE_SERVERS, cv3, SERVERS_LISTPOS + "= -1", null);
-            
+
                     Log.d(TAG, "moveServerDown(): r1=" + r1 + "; r2=" + r2 + "; r3=" + r3);
-                    
+
                     result = ((r1 == 1) && (r2 == 1) && (r3 == 1));
                 }
             }
-            
+
             c.close();
         }
-        
+
         return result;
     }
 
@@ -720,17 +834,17 @@ public class DatabaseProvider extends SQLiteOpenHelper
                 SETTINGS_DEFAULT_RELAY_PORT,
                 SETTINGS_DEFAULT_RELAY_PASSWORD };
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getReadableDatabase();
             c = db.query(TABLE_SETTINGS, cols, null, null, null, null, SETTINGS_ROWID);
 
             c.moveToFirst();
-    
+
             for( int i = 0; i < c.getColumnCount(); i++ )
             {
                 column = c.getColumnName(i);
-    
+
                 if( column.equals(SETTINGS_RCON_WARN_UNSAFE) )
                     result.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_RCON_SHOW_PASSWORDS) )
@@ -760,7 +874,7 @@ public class DatabaseProvider extends SQLiteOpenHelper
                 else if( column.equals(SETTINGS_DEFAULT_RELAY_PASSWORD) )
                     result.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, c.getString(i));
             }
-    
+
             c.close();
         }
 
@@ -818,15 +932,15 @@ public class DatabaseProvider extends SQLiteOpenHelper
         values.put(SETTINGS_DEFAULT_RELAY_PORT, defaultRelayPort);
         values.put(SETTINGS_DEFAULT_RELAY_PASSWORD, defaultRelayPswd);
 
-        synchronized(lock)
+        synchronized( lock )
         {
             SQLiteDatabase db = this.getWritableDatabase();
-            
+
             Log.i(TAG, "Updating " + TABLE_SETTINGS + " with ContentValues " + values.toString());
             result = db.update(TABLE_SETTINGS, values, null, null);
             Log.i(TAG, "Updated " + result + " row(s)");
         }
 
-        return (result==0)?false:true;
+        return (result == 0)?false:true;
     }
 }

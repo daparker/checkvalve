@@ -24,77 +24,77 @@ along with the CheckValve source code.  If not, see
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp" >
 
     <TextView
         android:id="@+id/search_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:gravity="center"
-        android:paddingBottom="15dip"
-        android:paddingTop="10dip"
         android:text="@string/title_player_search"
         android:textColor="#FFFFFF"
-        android:textSize="18.0sp" />
+        android:textSize="18sp" />
 
-    <TableLayout
-        android:id="@+id/player_search_table"
+    <TextView
+        android:id="@+id/label_playersearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="15.0dip"
-        android:paddingRight="15.0dip"
-        android:stretchColumns="0" >
+        android:gravity="left|center_vertical"
+        android:singleLine="true"
+        android:text="@string/label_playersearch"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
-        <TableRow>
-
-            <TextView
-                android:id="@+id/label_playersearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
-                android:singleLine="true"
-                android:text="@string/label_playersearch"
-                android:textSize="12.0sp"
-                android:textStyle="bold" />
-        </TableRow>
-
-        <TableRow>
-
-            <EditText
-                android:id="@+id/field_playersearch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
-                android:singleLine="true"
-                android:inputType="text"
-                android:text=""
-                android:textSize="14.0sp" />
-        </TableRow>
-    </TableLayout>
-
-    <TableLayout
-        android:id="@+id/buttonTable"
+    <EditText
+        android:id="@+id/field_playersearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:shrinkColumns="1" >
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="left|center_vertical"
+        android:inputType="text"
+        android:singleLine="true"
+        android:text=""
+        android:textColorHighlight="@color/steam_blue"
+        android:textSize="14sp" />
 
-        <TableRow
-            android:gravity="center_horizontal"
-            android:paddingTop="10dip" >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
 
-            <Button
-                android:id="@+id/search_button"
-                android:gravity="center_horizontal|center_vertical"
-                android:text="@string/button_search"
-                android:width="100.0sp" />
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/button_cancel" />
 
-            <Button
-                android:id="@+id/cancel_button"
-                android:gravity="center_horizontal|center_vertical"
-                android:text="@string/button_cancel"
-                android:width="100.0sp" />
-        </TableRow>
-    </TableLayout>
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/button_search" />
+    </LinearLayout>
 
 </LinearLayout>

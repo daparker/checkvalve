@@ -45,28 +45,29 @@ public class ChallengeResponseQuery implements Runnable
         this.rowId = rowId;
         this.handler = handler;
     }
-    
+
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        status = 0;
         
+        status = 0;
+
         getChallengeResponse();
 
         if( handler != null )
         {
             Bundle bundle = new Bundle();
             Message msg = new Message();
-            
+
             bundle.putLong(Values.EXTRA_ROW_ID, this.rowId);
             bundle.putByteArray(Values.EXTRA_CHALLENGE_RESPONSE, this.challengeResponse);
-            
+
             msg.obj = bundle;
             msg.what = status;
-            
+
             if( challengeResponse == null )
                 Log.w(TAG, "run(): Challenge response is null");
-            
+
             handler.sendMessage(msg);
         }
     }
@@ -116,7 +117,7 @@ public class ChallengeResponseQuery implements Runnable
 
             // Close the socket
             socket.close();
-            
+
             // Store the challenge response in a byte array
             challengeResponse = new byte[packetIn.getLength()];
 
@@ -124,7 +125,7 @@ public class ChallengeResponseQuery implements Runnable
                 challengeResponse[i] = bufferIn[i];
 
             status = 0;
-            
+
             Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + challengeResponse.toString() + "; status=" + status);
         }
         catch( Exception e )
@@ -136,11 +137,11 @@ public class ChallengeResponseQuery implements Runnable
 
             for( int i = 0; i < ste.length; i++ )
                 Log.w(TAG, "    " + ste[i].toString());
-            
+
             challengeResponse = null;
             status = 1;
         }
-        
+
         return;
     }
 }

@@ -31,6 +31,7 @@ along with the CheckValve source code.  If not, see
     <string name="button_cancel">Cancel</string>
     <string name="button_connect">Connect</string>
     <string name="button_delete">Delete</string>
+    <string name="button_dismiss">Dismiss</string>
     <string name="button_edit">Edit</string>
     <string name="button_move_down">Down</string>
     <string name="button_move_up">Up</string>
@@ -60,6 +61,7 @@ along with the CheckValve source code.  If not, see
     <string name="label_tags">Tags:</string>
     <string name="label_timeout">Timeout (in seconds):</string>
     <string name="menu_about">About CheckValve</string>
+    <string name="menu_add_server">Add Server</string>
     <string name="menu_back">Back</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_clear_console">Clear Console</string>
@@ -85,6 +87,7 @@ along with the CheckValve source code.  If not, see
     <string name="msg_connection_error">A connection error has occurred.</string>
     <string name="msg_connection_lost">The network connection has been lost.</string>
     <string name="msg_db_failure">A database error has occurred.</string>
+    <string name="msg_delete_server">Are you sure you want to delete this server?</string>
     <string name="msg_empty_fields">Please complete all required fields.</string>
     <string name="msg_empty_rcon_command">Please enter a command.</string>
     <string name="msg_empty_rcon_password">You must supply an RCON password.</string>
@@ -139,7 +142,7 @@ along with the CheckValve source code.  If not, see
     <string name="title_add_new_server">Add New Server</string>
     <string name="title_chat_console">Chat Viewer</string>
     <string name="title_chat_relay_details">Chat Relay Details</string>
-    <string name="title_confirm_delete">Delete This Server?</string>
+    <string name="title_confirm_delete">Confirm Delete</string>
     <string name="title_confirm_unsafe_command">Unsafe Command</string>
     <string name="title_edit_server">Edit Server Information</string>
     <string name="title_manage_servers">Manage Servers</string>

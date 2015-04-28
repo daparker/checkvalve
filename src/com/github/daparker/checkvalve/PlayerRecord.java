@@ -31,15 +31,14 @@ public class PlayerRecord implements Parcelable
     private String time;
     private long kills;
     private int index;
-    
+
     /**
      * Construct a new instance of the PlayerRecord class.
-     * <p>
+     * 
      * @param name The player's name
      * @param time How long the player has been connected (HH:MM:SS)
      * @param kills The number of kills for the player
      * @param index The index number of the player in the A2S_PLAYER response
-     * </p>
      */
     public PlayerRecord( String name, String time, long kills, int index )
     {
@@ -53,7 +52,7 @@ public class PlayerRecord implements Parcelable
     {
         return this.name;
     }
-    
+
     public String getTime()
     {
         return this.time;
@@ -63,7 +62,7 @@ public class PlayerRecord implements Parcelable
     {
         return this.kills;
     }
-    
+
     public int getIndex()
     {
         return this.index;
@@ -78,44 +77,44 @@ public class PlayerRecord implements Parcelable
     {
         this.time = t;
     }
-    
+
     public void setKills( long k )
     {
         this.kills = k;
     }
-    
+
     public void setIndex( int i )
     {
         this.index = i;
     }
-    
+
     public int describeContents()
     {
         return 0;
     }
-    
-    public void writeToParcel(Parcel dest, int flags)
+
+    public void writeToParcel( Parcel dest, int flags )
     {
         dest.writeString(this.name);
         dest.writeString(this.time);
         dest.writeLong(this.kills);
         dest.writeInt(this.index);
     }
-    
+
     public static final Parcelable.Creator<PlayerRecord> CREATOR = new Parcelable.Creator<PlayerRecord>()
     {
-        public PlayerRecord createFromParcel(Parcel in)
+        public PlayerRecord createFromParcel( Parcel in )
         {
             return new PlayerRecord(in);
         }
 
-        public PlayerRecord[] newArray(int size)
+        public PlayerRecord[] newArray( int size )
         {
             return new PlayerRecord[size];
         }
     };
 
-    private PlayerRecord(Parcel in)
+    private PlayerRecord( Parcel in )
     {
         name = in.readString();
         time = in.readString();

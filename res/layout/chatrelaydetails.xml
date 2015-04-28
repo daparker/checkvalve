@@ -31,29 +31,29 @@ along with the CheckValve source code.  If not, see
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingTop="10dp"
+        android:orientation="vertical"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:orientation="vertical" >
+        android:paddingTop="10dp" >
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
             android:text="@string/title_chat_relay_details"
             android:textColor="#FFFFFF"
-            android:textSize="18.0sp" />
+            android:textSize="18sp" />
 
         <TableLayout
             android:id="@+id/chat_relay_details_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
             android:stretchColumns="0" >
 
             <TableRow>
@@ -62,12 +62,12 @@ along with the CheckValve source code.  If not, see
                     android:id="@+id/label_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="left|center_vertical"
                     android:singleLine="true"
                     android:text="@string/label_server"
-                    android:textSize="12.0sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </TableRow>
 
@@ -78,10 +78,10 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:singleLine="true"
                     android:inputType="text"
+                    android:singleLine="true"
                     android:text=""
-                    android:textSize="14.0sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow>
@@ -91,10 +91,10 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10.0dip"
+                    android:paddingTop="10dp"
                     android:singleLine="true"
                     android:text="@string/label_port"
-                    android:textSize="12.0sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </TableRow>
 
@@ -108,7 +108,7 @@ along with the CheckValve source code.  If not, see
                     android:inputType="number"
                     android:singleLine="true"
                     android:text="@string/default_chat_relay_port"
-                    android:textSize="14.0sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow>
@@ -118,10 +118,10 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10.0dip"
+                    android:paddingTop="10dp"
                     android:singleLine="true"
                     android:text="@string/label_chat_relay_password"
-                    android:textSize="12.0sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </TableRow>
 
@@ -132,37 +132,38 @@ along with the CheckValve source code.  If not, see
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:inputType="text"
+                    android:inputType="textVisiblePassword"
                     android:singleLine="true"
                     android:text=""
-                    android:textSize="14.0sp" />
+                    android:textSize="14sp" />
             </TableRow>
         </TableLayout>
-       
+
         <LinearLayout
             android:id="@+id/buttonTable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
             android:orientation="horizontal" >
-            
+
             <Button
                 android:id="@+id/cancelButton"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:gravity="center"
                 android:text="@string/button_cancel" />
-            
+
             <Button
                 android:id="@+id/connectButton"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:gravity="center"
                 android:text="@string/button_connect" />
-
-        </LinearLayout>    
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>

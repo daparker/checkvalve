@@ -25,58 +25,57 @@ package com.github.daparker.checkvalve;
 public class Values
 {
     // Engine types
-    protected static final int ENGINE_SOURCE = 0;
-    protected static final int ENGINE_GOLDSRC = 1;
+    public static final int ENGINE_SOURCE = 0;
+    public static final int ENGINE_GOLDSRC = 1;
 
     // Activity codes
-    protected static final int ACTIVITY_ABOUT = 2;
-    protected static final int ACTIVITY_ADD_NEW_SERVER = 3;
-    protected static final int ACTIVITY_CHAT = 4;
-    protected static final int ACTIVITY_CHAT_RELAY_DETAILS_DIALOG = 5;
-    protected static final int ACTIVITY_CONFIRM_DELETE = 6;
-    protected static final int ACTIVITY_MANAGE_SERVERS = 7;
-    protected static final int ACTIVITY_RCON = 8;
-    protected static final int ACTIVITY_RCON_PASSWORD_DIALOG = 9;
-    protected static final int ACTIVITY_SHOW_PLAYERS = 10;
-    protected static final int ACTIVITY_UPDATE_SERVER = 11;
-    protected static final int ACTIVITY_CONFIRM_UNSAFE_COMMAND = 12;
-    protected static final int ACTIVITY_SETTINGS = 13;
+    public static final int ACTIVITY_ABOUT = 2;
+    public static final int ACTIVITY_ADD_NEW_SERVER = 3;
+    public static final int ACTIVITY_CHAT = 4;
+    public static final int ACTIVITY_CHAT_RELAY_DETAILS_DIALOG = 5;
+    public static final int ACTIVITY_CONFIRM_DELETE = 6;
+    public static final int ACTIVITY_MANAGE_SERVERS = 7;
+    public static final int ACTIVITY_RCON = 8;
+    public static final int ACTIVITY_RCON_PASSWORD_DIALOG = 9;
+    public static final int ACTIVITY_SHOW_PLAYERS = 10;
+    public static final int ACTIVITY_UPDATE_SERVER = 11;
+    public static final int ACTIVITY_CONFIRM_UNSAFE_COMMAND = 12;
+    public static final int ACTIVITY_SETTINGS = 13;
 
     // Intent extra names
-    protected static final String EXTRA_ROW_ID = "rowId";
-    protected static final String EXTRA_SERVER = "server";
-    protected static final String EXTRA_PORT = "port";
-    protected static final String EXTRA_TIMEOUT = "timeout";
-    protected static final String EXTRA_PASSWORD = "password";
-    protected static final String EXTRA_CHALLENGE_RESPONSE = "challengeResponse";
-    protected static final String EXTRA_SEARCH = "search";
-    protected static final String EXTRA_PLAYER_LIST = "playerList";
-    protected static final String EXTRA_MESSAGE_LIST = "messageList";
+    public static final String EXTRA_ROW_ID = "rowId";
+    public static final String EXTRA_SERVER = "server";
+    public static final String EXTRA_PORT = "port";
+    public static final String EXTRA_TIMEOUT = "timeout";
+    public static final String EXTRA_PASSWORD = "password";
+    public static final String EXTRA_CHALLENGE_RESPONSE = "challengeResponse";
+    public static final String EXTRA_SEARCH = "search";
+    public static final String EXTRA_PLAYER_LIST = "playerList";
+    public static final String EXTRA_MESSAGE_LIST = "messageList";
 
     // Bundle keys
-    protected static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
-    protected static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
-    protected static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
-    protected static final String SETTING_SHOW_SERVER_IP = "showServerIP";
-    protected static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
-    protected static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
-    protected static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
-    protected static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
-    protected static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
-    protected static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
-    protected static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
-    protected static final String SETTING_DEFAULT_RELAY_PORT = "defaultRelayPort";
-    protected static final String SETTING_DEFAULT_RELAY_PASSWORD = "defaultRelayPassword";
-    protected static final String SETTING_VALIDATE_NEW_SERVERS = "validateNewServers";
+    public static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
+    public static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
+    public static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
+    public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
+    public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
+    public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
+    public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
+    public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
+    public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
+    public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
+    public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
+    public static final String SETTING_DEFAULT_RELAY_PORT = "defaultRelayPort";
+    public static final String SETTING_DEFAULT_RELAY_PASSWORD = "defaultRelayPassword";
+    public static final String SETTING_VALIDATE_NEW_SERVERS = "validateNewServers";
 
     // TextView tag values
-    protected static final String TAG_SERVER_NAME = "serverName";
-    protected static final String TAG_SERVER_IP = "serverIP";
-    protected static final String TAG_SERVER_GAME = "serverGame";
-    protected static final String TAG_SERVER_MAP = "serverMap";
-    protected static final String TAG_SERVER_PLAYERS = "serverPlayers";
-    protected static final String TAG_SERVER_TAGS = "serverTags";
-    protected static final String TAG_PLAYER_INFO = "playerInfo";
-    protected static final String TAG_MESSAGE_INFO = "messageInfo";
-    
+    public static final String TAG_SERVER_NAME = "serverName";
+    public static final String TAG_SERVER_IP = "serverIP";
+    public static final String TAG_SERVER_GAME = "serverGame";
+    public static final String TAG_SERVER_MAP = "serverMap";
+    public static final String TAG_SERVER_PLAYERS = "serverPlayers";
+    public static final String TAG_SERVER_TAGS = "serverTags";
+    public static final String TAG_PLAYER_INFO = "playerInfo";
+    public static final String TAG_MESSAGE_INFO = "messageInfo";
 }

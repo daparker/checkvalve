@@ -20,7 +20,9 @@
 package com.github.daparker.checkvalve;
 
 import java.util.ArrayList;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,7 +43,9 @@ import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import com.github.daparker.checkvalve.R;
 
 public class CheckValve extends Activity
@@ -59,19 +63,20 @@ public class CheckValve extends Activity
 
     private long selectedServerRowId;
 
+    @SuppressLint("InlinedApi")
     @Override
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
-
         Log.i(TAG, "Starting CheckValve.");
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.main);
 
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
-        
+
         selectedServerRowId = 0;
         server_info_table = (TableLayout)findViewById(R.id.server_info_table);
         message_table = (TableLayout)findViewById(R.id.message_table);
@@ -80,14 +85,14 @@ public class CheckValve extends Activity
         getSettings();
         queryServers();
     }
-    
+
     @Override
     public void onResume()
     {
         super.onResume();
 
         selectedServerRowId = 0;
-        
+
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
     }
@@ -100,12 +105,19 @@ public class CheckValve extends Activity
         // Dismiss the progress dialog to avoid a leaked window
         if( p != null )
             p.dismiss();
-        
+
         if( database != null )
         {
             database.close();
             database = null;
         }
+    }
+
+    @Override
+    public void onConfigurationChanged( Configuration newConfig )
+    {
+        super.onConfigurationChanged(newConfig);
+        return;
     }
 
     @Override
@@ -125,21 +137,21 @@ public class CheckValve extends Activity
                 // "Quit" option was selected
                 quit();
                 break;
-                
+
             case R.id.new_server:
                 // "Add New Server" option was selected
                 addNewServer();
                 break;
-                
+
             case R.id.manage_servers:
                 // "Manage Server List" option was selected
                 if( database.getServerCount() == 0 )
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
                 else
                     manageServers();
-                
+
                 break;
-                
+
             case R.id.player_search:
                 // "Player Search" option was selected
                 if( database.getServerCount() == 0 )
@@ -148,22 +160,22 @@ public class CheckValve extends Activity
                     playerSearch();
 
                 break;
-                
+
             case R.id.refresh:
                 // "Refresh" option was selected
                 queryServers();
                 break;
-                
+
             case R.id.about:
                 // "About" option was selected
                 about();
                 break;
-                
+
             case R.id.settings:
                 // "About" option was selected
                 settings();
                 break;
-                
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -232,7 +244,7 @@ public class CheckValve extends Activity
     {
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
-        
+
         switch( request )
         {
             case Values.ACTIVITY_RCON:
@@ -240,14 +252,14 @@ public class CheckValve extends Activity
             case Values.ACTIVITY_ABOUT:
             case Values.ACTIVITY_SHOW_PLAYERS:
                 break;
-                
+
             case Values.ACTIVITY_ADD_NEW_SERVER:
             case Values.ACTIVITY_MANAGE_SERVERS:
             case Values.ACTIVITY_UPDATE_SERVER:
             case Values.ACTIVITY_CONFIRM_DELETE:
                 if( result == 1 ) queryServers();
                 break;
-            
+
             case Values.ACTIVITY_SETTINGS:
                 if( result == -1 )
                 {
@@ -319,7 +331,7 @@ public class CheckValve extends Activity
         message_table.removeAllViews();
 
         int count = (int)database.getServerCount();
-        
+
         if( count == 0 )
         {
             addNewServer();
@@ -328,11 +340,11 @@ public class CheckValve extends Activity
         {
             // Show the progress dialog
             p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
-    
+
             // Define the TableRow arrays to hold the display data
             tableRows = new TableRow[count][6];
             messageRows = new TableRow[count];
-    
+
             // Run the server queries in a separate thread
             new Thread(new ServerQuery(CheckValve.this, tableRows, messageRows, progressHandler)).start();
         }
@@ -413,7 +425,7 @@ public class CheckValve extends Activity
             p.dismiss();
         }
     };
-    
+
     public void refreshView()
     {
         String tag = new String();
@@ -448,35 +460,34 @@ public class CheckValve extends Activity
 
     public void quit()
     {
-        // Finish this activity
         finish();
     }
 
     public void addNewServer()
     {
         Intent addNewServerIntent = new Intent();
-        addNewServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AddNewServer");
+        addNewServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AddServerActivity");
         startActivityForResult(addNewServerIntent, Values.ACTIVITY_ADD_NEW_SERVER);
     }
 
     public void manageServers()
     {
         Intent manageServersIntent = new Intent();
-        manageServersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ManageServers");
+        manageServersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ManageServersActivity");
         startActivityForResult(manageServersIntent, Values.ACTIVITY_MANAGE_SERVERS);
     }
 
-    public void showPlayers( long rowId )
-    {        
-        ServerRecord sr = database.getServer(rowId);
+    public void showPlayers( final long rowId )
+    {
+        final ServerRecord sr = database.getServer(rowId);
         final String server = sr.getServerName();
         final int port = sr.getServerPort();
         final int timeout = sr.getServerTimeout();
-        
+
         final Handler playerQueryHandler = new Handler()
         {
             @SuppressWarnings("unchecked")
-            public void handleMessage(Message msg)
+            public void handleMessage( Message msg )
             {
                 p.dismiss();
 
@@ -493,14 +504,14 @@ public class CheckValve extends Activity
                     if( msg.obj != null )
                     {
                         ArrayList<PlayerRecord> playerList = (ArrayList<PlayerRecord>)msg.obj;
-                        
+
                         Intent showPlayersIntent = new Intent();
-                        showPlayersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ShowPlayersUI");
+                        showPlayersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ShowPlayersActivity");
                         showPlayersIntent.putParcelableArrayListExtra(Values.EXTRA_PLAYER_LIST, playerList);
                         startActivityForResult(showPlayersIntent, Values.ACTIVITY_SHOW_PLAYERS);
                     }
                     else
-                    {                        
+                    {
                         Log.d(TAG, "handleMessage(): Object 'msg.obj' is null");
                         UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                         finish();
@@ -508,13 +519,13 @@ public class CheckValve extends Activity
                 }
             }
         };
-        
+
         final Handler challengeResponseHandler = new Handler()
         {
             public void handleMessage( Message msg )
             {
                 Log.d(TAG, "handleMessage(): msg=" + msg.toString());
-                
+
                 if( msg.what != 0 )
                 {
                     p.dismiss();
@@ -524,9 +535,8 @@ public class CheckValve extends Activity
                 else
                 {
                     Bundle b = (Bundle)msg.obj;
-                    long rowId = b.getLong(Values.EXTRA_ROW_ID);
                     byte[] challengeResponse = b.getByteArray(Values.EXTRA_CHALLENGE_RESPONSE);
-                
+
                     if( challengeResponse == null )
                     {
                         p.dismiss();
@@ -542,7 +552,7 @@ public class CheckValve extends Activity
                 }
             }
         };
-        
+
         p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
         new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
@@ -551,19 +561,19 @@ public class CheckValve extends Activity
     public void playerSearch()
     {
         Intent playerSearchIntent = new Intent();
-        playerSearchIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.PlayerSearch");
+        playerSearchIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.PlayerSearchActivity");
         startActivity(playerSearchIntent);
     }
 
-    public void updateServer( long rowId )
+    public void updateServer( final long rowId )
     {
         Intent updateServerIntent = new Intent();
-        updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.UpdateServer");
+        updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.EditServerActivity");
         updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
         startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
     }
 
-    public void moveServerUp( long rowId )
+    public void moveServerUp( final long rowId )
     {
         if( database.moveServerUp(rowId) )
             queryServers();
@@ -571,7 +581,7 @@ public class CheckValve extends Activity
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
     }
 
-    public void moveServerDown( long rowId )
+    public void moveServerDown( final long rowId )
     {
         if( database.moveServerDown(rowId) )
             queryServers();
@@ -579,25 +589,63 @@ public class CheckValve extends Activity
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
     }
 
-    public void deleteServer( long rowId )
+    @SuppressLint("InlinedApi")
+    public void deleteServer( final long rowId )
     {
-        Intent confirmDeleteIntent = new Intent();
-        confirmDeleteIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ConfirmDelete");
-        confirmDeleteIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
-        startActivityForResult(confirmDeleteIntent, Values.ACTIVITY_CONFIRM_DELETE);
+        AlertDialog.Builder alertDialogBuilder;
+
+        if( android.os.Build.VERSION.SDK_INT >= 11 )
+            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this, AlertDialog.THEME_HOLO_DARK);
+        else
+            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this);
+
+        alertDialogBuilder.setTitle(R.string.title_confirm_delete);
+        alertDialogBuilder.setMessage(R.string.msg_delete_server);
+        alertDialogBuilder.setCancelable(false);
+
+        alertDialogBuilder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
+            public void onClick( DialogInterface dialog, int id )
+            {
+                /*
+                 *  "Delete" button was clicked
+                 */
+                if( database.deleteServer(rowId) )
+                {
+                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_server_deleted);
+                    queryServers();
+                }
+                else
+                {
+                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
+                }
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+            public void onClick( DialogInterface dialog, int id )
+            {
+                /*
+                 * "Cancel" button was clicked
+                 */
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
-    public void rcon( long rowId )
+    public void rcon( final long rowId )
     {
         ServerRecord sr = database.getServer(rowId);
-        
+
         String s = sr.getServerName();
         String r = sr.getServerRCONPassword();
         int p = sr.getServerPort();
         int t = sr.getServerTimeout();
-        
+
         Intent rconIntent = new Intent();
-        rconIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconUI");
+        rconIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconActivity");
         rconIntent.putExtra(Values.EXTRA_SERVER, s);
         rconIntent.putExtra(Values.EXTRA_PORT, p);
         rconIntent.putExtra(Values.EXTRA_TIMEOUT, t);
@@ -605,17 +653,17 @@ public class CheckValve extends Activity
         startActivityForResult(rconIntent, Values.ACTIVITY_RCON);
     }
 
-    public void chat( long rowId )
+    public void chat( final long rowId )
     {
         ServerRecord sr = database.getServer(rowId);
-        
+
         String s = sr.getServerName();
         String r = sr.getServerRCONPassword();
         int p = sr.getServerPort();
         int t = sr.getServerTimeout();
-        
+
         Intent chatIntent = new Intent();
-        chatIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ChatUI");
+        chatIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ChatViewerActivity");
         chatIntent.putExtra(Values.EXTRA_SERVER, s);
         chatIntent.putExtra(Values.EXTRA_PORT, p);
         chatIntent.putExtra(Values.EXTRA_TIMEOUT, t);
@@ -626,14 +674,14 @@ public class CheckValve extends Activity
     public void about()
     {
         Intent aboutIntent = new Intent();
-        aboutIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.About");
+        aboutIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AboutActivity");
         startActivityForResult(aboutIntent, Values.ACTIVITY_ABOUT);
     }
 
     public void settings()
     {
         Intent settingsIntent = new Intent();
-        settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.Settings");
+        settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.SettingsActivity");
         startActivityForResult(settingsIntent, Values.ACTIVITY_SETTINGS);
     }
 }

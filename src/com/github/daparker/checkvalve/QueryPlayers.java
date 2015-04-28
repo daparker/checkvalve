@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class QueryPlayers implements Runnable
 {
     private static final String TAG = QueryPlayers.class.getSimpleName();
-    
+
     private int status;
     private long rowId;
     private byte[] challengeResponse;
@@ -44,22 +44,23 @@ public class QueryPlayers implements Runnable
         this.challengeResponse = challengeResponse;
         this.handler = handler;
     }
-    
+
     public void run()
     {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        
         status = 0;
-
         Message msg = new Message();
-        
+
         ArrayList<PlayerRecord> players = queryPlayers();
-        
+
         if( players != null )
             msg.obj = players;
-        
+
         msg.what = status;
         handler.sendMessage(msg);
     }
-    
+
     public ArrayList<PlayerRecord> queryPlayers()
     {
         DatabaseProvider database = new DatabaseProvider(this.context);
@@ -72,7 +73,7 @@ public class QueryPlayers implements Runnable
 
         // Player array to be returned
         ArrayList<PlayerRecord> playerList = null;
-        
+
         // Byte buffers for packet data
         byte[] bufferOut;
         byte[] bufferIn;
@@ -86,11 +87,11 @@ public class QueryPlayers implements Runnable
         int byteNum = 0;
         int serverPort = 0;
         int serverTimeout = 0;
-        
+
         serverURL = sr.getServerName();
         serverPort = sr.getServerPort();
         serverTimeout = sr.getServerTimeout();
-        
+
         String header = new String();
         String name = new String();
         String totaltime = new String();
@@ -104,7 +105,7 @@ public class QueryPlayers implements Runnable
 
         long kills = 0;
         float time = 0;
-        
+
         // Integer variables
         try
         {
@@ -125,9 +126,9 @@ public class QueryPlayers implements Runnable
             socket.connect(InetAddress.getByName(serverURL), serverPort);
 
             // Show an error if the connection attempt failed
-            if( ! socket.isConnected() )
+            if( !socket.isConnected() )
             {
-                if( ! socket.isClosed() ) socket.close();
+                if( !socket.isClosed() ) socket.close();
                 throw new SocketException();
             }
 
@@ -214,7 +215,7 @@ public class QueryPlayers implements Runnable
 
             // Initialize the return array once we know how many elements we need
             playerList = new ArrayList<PlayerRecord>();
-            
+
             for( int i = 0; i < numpackets; i++ )
             {
                 String thisPacket = packets[i];
@@ -260,13 +261,13 @@ public class QueryPlayers implements Runnable
                     playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                 }
             }
-            
+
             return playerList;
         }
         catch( Exception e )
         {
             status = -1;
-            
+
             Log.w(TAG, "queryPlayers(): Caught an exception:");
             Log.w(TAG, e.toString());
 
@@ -274,7 +275,7 @@ public class QueryPlayers implements Runnable
 
             for( int i = 0; i < ste.length; i++ )
                 Log.e(TAG, "    " + ste[i].toString());
-            
+
             return null;
         }
     }

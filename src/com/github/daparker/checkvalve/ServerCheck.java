@@ -35,13 +35,24 @@ public class ServerCheck implements Runnable
     private static final String TAG = ServerCheck.class.getSimpleName();
 
     /**
-     * Construct a new instance of the ServerCheck class. <p> Calling <tt>start()</tt> on this instance will cause it to
-     * connect to the specified host and port, and perform an A2S_INFO query to confirm it is an HLDS/SRCDS listen
-     * server. This class was implemented in CheckValve 2.0.0 to get these sorts of checks off of the main UI thread.
-     * </p> <p> One of the following will be sent to the handler as an <b>int</b>: <ul> <b>0</b> (The query was
-     * successful)<br /> <b>1</b> (Encountered UnknownHostException)<br /> <b>2</b> (Encountered SocketException)<br />
-     * <b>3</b> (Encountered UnsupportedEncodingException)<br /> <b>4</b> (Encountered IOException)<br /> <b>5</b>
-     * (Encountered some other exception)<br /> </ul> </p> <p>
+     * Construct a new instance of the ServerCheck class.
+     * <p>
+     * Calling <tt>start()</tt> on this instance will cause it to connect to the specified host and port, and perform an
+     * A2S_INFO query to confirm it is an HLDS/SRCDS listen server. This class was implemented in CheckValve 2.0.0 to
+     * get these sorts of checks off of the main UI thread.
+     * </p>
+     * <p>
+     * One of the following will be sent to the handler as an <b>int</b>:
+     * <ul>
+     * <b>0</b> (The query was successful)<br />
+     * <b>1</b> (Encountered UnknownHostException)<br />
+     * <b>2</b> (Encountered SocketException)<br />
+     * <b>3</b> (Encountered UnsupportedEncodingException)<br />
+     * <b>4</b> (Encountered IOException)<br />
+     * <b>5</b> (Encountered some other exception)<br />
+     * </ul>
+     * </p>
+     * <p>
      * 
      * @param server The URL or IP address of the server to be queried
      * @param port The port of the server to be queried

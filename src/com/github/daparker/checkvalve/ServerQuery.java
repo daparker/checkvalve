@@ -20,7 +20,6 @@
 package com.github.daparker.checkvalve;
 
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
@@ -29,11 +28,7 @@ import android.widget.TableRow.LayoutParams;
 import android.content.Context;
 import android.graphics.Typeface;
 import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import com.github.daparker.checkvalve.R;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
 
 public class ServerQuery implements Runnable
 {
@@ -42,25 +37,17 @@ public class ServerQuery implements Runnable
     private Context context;
     private TableRow[][] tableRows;
     private TableRow[] messageRows;
-    private String server;
     private int status;
-    private int port;
-    private int timeout;
-    private short engineType;
-    private SourceServer ssrv;
-    private GoldSrcServer gsrv;
-    private short[] engine;
-    private Object obj;
 
     private static final String TAG = ServerQuery.class.getSimpleName();
 
     /**
-     * Construct a new instance of the ServerQuery class for collecting server information. <p>
+     * Construct a new instance of the ServerQuery class for collecting server information.
      * 
      * @param c The context to use
      * @param t The TableRow array in which server information will be stored
      * @param m The TableRow array in which error messages will be stored
-     * @param h The Handler to use </p>
+     * @param h The Handler to use
      */
     public ServerQuery( Context c, TableRow[][] t, TableRow[] m, Handler h )
     {
@@ -71,87 +58,17 @@ public class ServerQuery implements Runnable
         this.handler = h;
     }
 
-    /**
-     * Construct a new instance of the ServerQuery class to determine a server's engine. <p>
-     * 
-     * @param c The context to use
-     * @param s The IP address or URL of the server
-     * @param p The listen port of the server
-     * @param t The timeout for the server query (in milliseconds)
-     * @param e The array in which to store the result (0 = Source, 1 = GoldSource)
-     * @param h The handler to use </p>
-     */
-    public ServerQuery( Context c, String s, int p, int t, short[] e, Handler h )
-    {
-        this.server = s;
-        this.port = p;
-        this.timeout = t;
-        this.engine = e;
-        this.context = c;
-        this.status = 0;
-        this.handler = h;
-    }
-
-    /**
-     * Construct a new instance of the ServerQuery class to determine a server's engine <p>
-     * 
-     * @param c The context to use
-     * @param s The IP address or URL of the server
-     * @param p The listen port of the server
-     * @param t The timeout for the server query (in milliseconds)
-     * @param e The array in which to store the result (0 = Source, 1 = GoldSource) </p>
-     */
-    public ServerQuery( Context c, String s, int p, int t, short[] e )
-    {
-        this.server = s;
-        this.port = p;
-        this.timeout = t;
-        this.engine = e;
-        this.context = c;
-    }
-
-    public ServerQuery( Context c, String s, int p, int t )
-    {
-        this.server = s;
-        this.port = p;
-        this.timeout = t;
-        this.context = c;
-    }
-    
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         status = 0;
 
-        if( tableRows != null )
-        {
-            Log.d(TAG, "Calling queryServers()");
-            queryServers();
-        }
-        else if( engine != null )
-        {
-            Log.d(TAG, "Calling getServerEngine()");
-            getServerEngine();
-        }
-        else if( server != null )
-        {
-            Log.d(TAG, "Calling getServerEngine()");
-        }
-        else
-        {
-            status = -1;
-        }
+        Log.d(TAG, "Calling queryServers()");
+        queryServers();
 
         if( handler != null )
-        {
-            Message msg = new Message();
-            msg.what = status;
-
-            if( obj != null ) msg.obj = obj;
-
-            this.handler.sendMessage(msg);
-        }
+            this.handler.sendEmptyMessage(status);
     }
 
     public void queryServers()
@@ -160,7 +77,7 @@ public class ServerQuery implements Runnable
         DatabaseProvider database = new DatabaseProvider(context);
         ServerRecord[] serverList = database.getAllServers();
         database.close();
-        
+
         // Allocate the TableRow array
         if( tableRows == null ) tableRows = new TableRow[serverList.length][6];
 
@@ -191,7 +108,7 @@ public class ServerQuery implements Runnable
         for( int i = 0; i < serverList.length; i++ )
         {
             ServerRecord sr = serverList[i];
-            
+
             try
             {
                 socket = new DatagramSocket();
@@ -210,7 +127,7 @@ public class ServerQuery implements Runnable
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
                 serverListPos = sr.getServerListPosition();
-                
+
                 // A2S_INFO query string
                 String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
 
@@ -281,8 +198,7 @@ public class ServerQuery implements Runnable
 
                 byteNum++;
 
-                // If we're not at the end of the array then get the additional
-                // data
+                // If we're not at the end of the array then get the additional data
                 if( byteNum < bufferIn.length )
                 {
                     // This byte is the Extra Data Flag (EDF)
@@ -509,156 +425,5 @@ public class ServerQuery implements Runnable
 
             status++;
         }
-    }
-
-    public void getServerEngine()
-    {
-        int appId = 0;
-        int byteNum = 0;
-        int firstByte = 0;
-        int secondByte = 0;
-
-        engine[0] = 0;
-
-        try
-        {
-            socket = new DatagramSocket();
-
-            // A2S_INFO query string
-            String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
-
-            socket.setSoTimeout(timeout * 1000);
-
-            // Byte buffers for packet data
-            byte[] bufferOut = queryString.getBytes("ISO8859_1");
-            byte[] bufferIn = new byte[1400];
-
-            // UDP datagram packets
-            DatagramPacket packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            DatagramPacket packetIn = new DatagramPacket(bufferIn, bufferIn.length);
-
-            // Connect to the remote server
-            socket.connect(InetAddress.getByName(server), port);
-
-            // Show an error if the connection attempt failed
-            if( !socket.isConnected() ) throw new Exception();
-
-            // Send the query string to the server
-            socket.send(packetOut);
-
-            // Receive the response packet from the server
-            socket.receive(packetIn);
-
-            // Start at byte 6 in the response data
-            byteNum = 6;
-
-            // Skip all data before the app ID
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            // Get the old Steam application ID
-            firstByte = (int)(bufferIn[byteNum] & 0xff);
-            secondByte = (int)(bufferIn[byteNum + 1] & 0xff);
-            appId = firstByte | (secondByte << 8);
-
-            // If the app ID is less than 200 then the engine is assumed to be GoldSource,
-            // but we'll check for the 64-bit game ID later and use that if possible since
-            // it's more accurate
-            if( appId < 200 ) engineType = 1;
-
-            // Skip the next 9 bytes
-            byteNum += 9;
-
-            // Skip the game version string
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            // If we're not at the end of the array then get the additional data
-            if( byteNum < bufferIn.length )
-            {
-                // This byte is the Extra Data Flag (EDF)
-                int EDF = (int)bufferIn[byteNum];
-                byteNum++;
-
-                // Skip the port number if included
-                if( (EDF & 0x80) > 0 ) byteNum += 2;
-
-                // Skip the SteamID if included
-                if( (EDF & 0x10) > 0 ) byteNum += 8;
-
-                // Skip SourceTV information if included
-                if( (EDF & 0x40) > 0 )
-                {
-                    byteNum += 2;
-
-                    while( bufferIn[byteNum] != 0x00 )
-                        byteNum++;
-
-                    byteNum++;
-                }
-
-                // Skip the server tags (sv_tags) if included
-                if( (EDF & 0x20) > 0 )
-                {
-                    while( bufferIn[byteNum] != 0 )
-                        byteNum++;
-
-                    byteNum++;
-                }
-
-                // Get the 64-bit game ID if it's included
-                if( (EDF & 0x01) > 0 )
-                {
-                    // Get the app ID from the lowest 24 bits of the game ID
-                    appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn, byteNum, 3).put((byte)0x00).getInt(0);
-
-                    // Use this app ID to determine the engine
-                    engineType = (short)((appId < 200)?1:0);
-                }
-            }
-
-            socket.close();
-
-            engine[0] = engineType;
-            status = engineType;
-
-            if( engineType == Values.ENGINE_GOLDSRC )
-            {
-                gsrv = new GoldSrcServer(InetAddress.getByName(server), port);
-                obj = gsrv;
-            }
-            else
-            {
-                ssrv = new SourceServer(InetAddress.getByName(server), port);
-                obj = ssrv;
-            }
-        }
-        // Handle a socket timeout
-        catch( Exception e )
-        {
-            status = -1;
-            obj = e;
-        }
-
-        return;
     }
 }

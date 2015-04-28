@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/settings_master_layout"
     android:layout_width="match_parent"
@@ -52,7 +72,7 @@
         android:paddingTop="10dp"
         android:text="@string/title_settings"
         android:textColor="#FFFFFF"
-        android:textSize="18.0sp" />
+        android:textSize="18sp" />
 
     <ScrollView
         android:id="@+id/settings_scrollview"
@@ -84,7 +104,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_general_options"
-                    android:textSize="14.0sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TableRow
@@ -100,7 +120,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_rcon_show_passwords"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_rcon_show_passwords"
@@ -124,7 +144,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_validate_new_servers"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_validate_new_servers"
@@ -153,7 +173,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_server_information"
-                    android:textSize="14.0sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TableRow
@@ -169,7 +189,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_show_server_ip"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_servers_show_ip"
@@ -193,7 +213,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_show_game_info"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_servers_show_game"
@@ -217,7 +237,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_show_map_name"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_servers_show_map"
@@ -241,7 +261,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_show_players"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_servers_show_players"
@@ -265,7 +285,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_show_server_tags"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_servers_show_tags"
@@ -294,7 +314,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_rcon"
-                    android:textSize="14.0sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TableRow
@@ -310,32 +330,10 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_rcon_warn_unsafe_command"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <CheckBox
                         android:id="@+id/checkbox_rcon_warn_unsafe_command"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:onClick="settingCheckboxHandler"
-                        android:padding="10dp" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/label_rcon_show_suggestions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="start|center_vertical"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:text="@string/settings_rcon_show_suggestions"
-                        android:textSize="14.0sp" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_rcon_show_suggestions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
@@ -348,18 +346,18 @@
                     android:layout_height="wrap_content" >
 
                     <TextView
-                        android:id="@+id/label_rcon_show_passwords"
+                        android:id="@+id/label_rcon_show_suggestions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="false"
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
-                        android:text="@string/settings_rcon_show_passwords"
-                        android:textSize="14.0sp" />
+                        android:text="@string/settings_rcon_show_suggestions"
+                        android:textSize="14sp" />
 
                     <CheckBox
-                        android:id="@+id/checkbox_rcon_show_passwords"
+                        android:id="@+id/checkbox_rcon_show_suggestions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"
@@ -385,7 +383,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_query_options"
-                    android:textSize="14.0sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TableRow
@@ -401,7 +399,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_default_query_port"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/field_default_query_port"
@@ -410,7 +408,7 @@
                         android:focusable="true"
                         android:inputType="number"
                         android:maxLength="5"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
                 </TableRow>
 
                 <TableRow
@@ -426,7 +424,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_default_query_timeout"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/field_default_query_timeout"
@@ -434,7 +432,7 @@
                         android:layout_height="wrap_content"
                         android:focusable="true"
                         android:inputType="number"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
                 </TableRow>
             </TableLayout>
 
@@ -455,7 +453,7 @@
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="@string/settings_header_chat_relay_options"
-                    android:textSize="14.0sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TableRow
@@ -471,7 +469,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_default_chat_relay_host"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/field_default_relay_host"
@@ -479,7 +477,7 @@
                         android:layout_height="wrap_content"
                         android:focusable="true"
                         android:inputType="text"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
                 </TableRow>
 
                 <TableRow
@@ -495,7 +493,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_default_chat_relay_port"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/field_default_relay_port"
@@ -504,7 +502,7 @@
                         android:focusable="true"
                         android:inputType="number"
                         android:maxLength="5"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
                 </TableRow>
 
                 <TableRow
@@ -520,7 +518,7 @@
                         android:padding="10dp"
                         android:singleLine="false"
                         android:text="@string/settings_default_chat_relay_password"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/field_default_relay_password"
@@ -528,7 +526,7 @@
                         android:layout_height="wrap_content"
                         android:focusable="true"
                         android:inputType="textPassword"
-                        android:textSize="14.0sp" />
+                        android:textSize="14sp" />
                 </TableRow>
             </TableLayout>
         </LinearLayout>

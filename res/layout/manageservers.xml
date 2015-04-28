@@ -46,7 +46,7 @@ along with the CheckValve source code.  If not, see
             android:paddingRight="20dp"
             android:text="@string/button_x"
             android:textColor="#ffffff"
-            android:textSize="24.0sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/manage_servers_title"
@@ -59,7 +59,7 @@ along with the CheckValve source code.  If not, see
             android:paddingTop="10dp"
             android:text="@string/title_manage_servers"
             android:textColor="#FFFFFF"
-            android:textSize="18.0sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <ScrollView
@@ -81,7 +81,7 @@ along with the CheckValve source code.  If not, see
                 android:id="@+id/serverTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
+                android:animateLayoutChanges="false"
                 android:shrinkColumns="0"
                 android:stretchColumns="1" >
             </TableLayout>

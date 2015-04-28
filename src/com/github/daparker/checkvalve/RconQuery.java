@@ -40,8 +40,7 @@ public class RconQuery implements Runnable
     /**
      * Class for executing commands via RCON.
      * 
-     * @param x The context to use
-     * @param p The RCON password to use
+     * @param c The command to execute
      * @param s The SourceServer on which to execute the command
      * @param h The Handler to use
      */
@@ -55,8 +54,7 @@ public class RconQuery implements Runnable
     /**
      * Class for executing commands via RCON.
      * 
-     * @param x The context to use
-     * @param p The RCON password to use
+     * @param c The command to execute
      * @param g The GoldSrcServer on which to execute the command
      * @param h The Handler to use
      */
@@ -70,6 +68,7 @@ public class RconQuery implements Runnable
     public void run()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
         Message msg = new Message();
         status = 0;
 
@@ -81,9 +80,8 @@ public class RconQuery implements Runnable
             msg.obj = obj;
         else
             msg.obj = response;
-        
-        this.handler.sendMessage(msg);
 
+        this.handler.sendMessage(msg);
     }
 
     public void getRconResponse()

@@ -21,97 +21,89 @@ along with the CheckValve source code.  If not, see
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.daparker.checkvalve"
+    android:installLocation="auto"
     android:versionCode="9"
-    android:versionName="2.0.0beta1"
-    android:installLocation="auto">
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19"/>
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:allowBackup="true">
+    android:versionName="2.0.0beta1" >
 
-        <activity android:name="com.github.daparker.checkvalve.CheckValve"
-            android:label="@string/app_name"
-            android:configChanges="orientation|keyboard|keyboardHidden">
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@style/checkvalveTheme" >
+        <activity
+            android:name="com.github.daparker.checkvalve.CheckValve"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity class="ConfirmDelete"
-            android:name="com.github.daparker.checkvalve.ConfirmDelete"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="ConfirmUnsafeCommand"
-            android:name="com.github.daparker.checkvalve.ConfirmUnsafeCommand"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="AddNewServer"
-            android:name="com.github.daparker.checkvalve.AddNewServer"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="MessageBox"
-            android:name="com.github.daparker.checkvalve.MessageBox"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="ManageServers"
-            android:name="com.github.daparker.checkvalve.ManageServers"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar" />
-
-        <activity class="UpdateServer"
-            android:name="com.github.daparker.checkvalve.UpdateServer"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="ShowPlayersUI"
-            android:name="com.github.daparker.checkvalve.ShowPlayersUI"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="PlayerSearch"
-            android:name="com.github.daparker.checkvalve.PlayerSearch"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="SearchPlayersUI"
-            android:name="com.github.daparker.checkvalve.SearchPlayersUI"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar" />
-
-        <activity class="RconUI"
-            android:name="com.github.daparker.checkvalve.RconUI"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar" />
-
-        <activity class="RconPassword"
-            android:name="com.github.daparker.checkvalve.RconPassword"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="About"
-            android:name="com.github.daparker.checkvalve.About"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <activity class="ChatUI"
-            android:name="com.github.daparker.checkvalve.ChatUI"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar" />
-
-        <activity class="ChatRelayDetails"
-            android:name="com.github.daparker.checkvalve.ChatRelayDetails"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.Dialog" />
-        
-        <activity class="Settings"
-            android:name="com.github.daparker.checkvalve.Settings"
-            android:configChanges="orientation|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar" />
-
+        <activity
+            android:name="com.github.daparker.checkvalve.AddServerActivity"
+            class="AddServerActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ManageServersActivity"
+            class="ManageServersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.EditServerActivity"
+            class="EditServerActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ShowPlayersActivity"
+            class="ShowPlayersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.PlayerSearchActivity"
+            class="PlayerSearchActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.SearchPlayersActivity"
+            class="SearchPlayersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RconActivity"
+            class="RconActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RconPasswordActivity"
+            class="RconPasswordActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.AboutActivity"
+            class="AboutActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ChatViewerActivity"
+            class="ChatActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ChatRelayDetailsActivity"
+            class="ChatRelayDetailsActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.SettingsActivity"
+            class="SettingsActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
     </application>
+
 </manifest>
