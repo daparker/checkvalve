@@ -455,7 +455,7 @@ along with the CheckValve source code.  If not, see
                     android:text="@string/settings_header_chat_relay_options"
                     android:textSize="14sp"
                     android:textStyle="bold" />
-
+                
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >

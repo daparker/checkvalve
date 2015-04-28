@@ -49,10 +49,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-
 import java.net.*;
 import java.text.SimpleDateFormat;
-
 import com.github.daparker.checkvalve.R;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
@@ -301,8 +299,8 @@ public class ChatViewerActivity extends Activity
 
                         StackTraceElement[] ste = e.getStackTrace();
 
-                        for( int i = 0; i < ste.length; i++ )
-                            Log.e(TAG, "    " + ste[i].toString());
+                        for( StackTraceElement x : ste )
+                            Log.e(TAG, "    " + x.toString());
                     }
 
                     break;
@@ -524,7 +522,6 @@ public class ChatViewerActivity extends Activity
         }
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         this.setContentView(R.layout.chatui);
 
         Intent thisIntent = getIntent();
@@ -556,8 +553,8 @@ public class ChatViewerActivity extends Activity
 
             StackTraceElement[] ste = e.getStackTrace();
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.w(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
 
             finish();
         }
@@ -597,7 +594,6 @@ public class ChatViewerActivity extends Activity
 
         say_button = (Button)findViewById(R.id.say_button);
         say_button.setOnClickListener(sayButtonListener);
-        //say_button.setEnabled(false);
 
         receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
 

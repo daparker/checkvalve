@@ -183,8 +183,8 @@ public class NetworkEventReceiver implements Runnable
             Log.w(TAG, "run(): Caught an exception: " + e.toString());
             Log.w(TAG, "Stack trace:");
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.w(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
 
             unregisterReceiver();
             handler.sendEmptyMessage(-2);
@@ -217,8 +217,8 @@ public class NetworkEventReceiver implements Runnable
                 Log.w(TAG, "registerReceiver(): Caught an exception: " + e.toString());
                 Log.w(TAG, "Stack trace:");
 
-                for( int i = 0; i < ste.length; i++ )
-                    Log.w(TAG, "    " + ste[i].toString());
+                for( StackTraceElement x : ste )
+                    Log.w(TAG, "    " + x.toString());
 
                 Log.w(TAG, "Failed to register broadcast receiver.");
             }
@@ -245,8 +245,8 @@ public class NetworkEventReceiver implements Runnable
                 Log.w(TAG, "unregisterReceiver(): Caught an exception: " + e.toString());
                 Log.w(TAG, "Stack trace:");
 
-                for( int i = 0; i < ste.length; i++ )
-                    Log.w(TAG, "    " + ste[i].toString());
+                for( StackTraceElement x : ste )
+                    Log.w(TAG, "    " + x.toString());
 
                 Log.w(TAG, "Failed to unregister broadcast receiver.");
             }

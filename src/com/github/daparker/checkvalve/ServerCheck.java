@@ -125,8 +125,8 @@ public class ServerCheck implements Runnable
             Log.w(TAG, "Caught an exception: " + e.toString());
             Log.w(TAG, "Stack trace:");
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.e(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.e(TAG, "    " + x.toString());
 
             status = 5;
         }

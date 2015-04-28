@@ -135,8 +135,8 @@ public class ChallengeResponseQuery implements Runnable
 
             StackTraceElement[] ste = e.getStackTrace();
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.w(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
 
             challengeResponse = null;
             status = 1;

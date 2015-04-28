@@ -177,8 +177,8 @@ public class DatabaseProvider extends SQLiteOpenHelper
 
             StackTraceElement[] ste = e.getStackTrace();
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.e(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.e(TAG, "    " + x.toString());
         }
     }
 
@@ -221,8 +221,8 @@ public class DatabaseProvider extends SQLiteOpenHelper
 
                 StackTraceElement[] ste = e.getStackTrace();
 
-                for( int i = 0; i < ste.length; i++ )
-                    Log.e(TAG, "    " + ste[i].toString());
+                for( StackTraceElement x : ste )
+                    Log.e(TAG, "    " + x.toString());
             }
         }
 

@@ -103,8 +103,8 @@ public class Chat implements Runnable
             Log.i(TAG, this.toString() + " caught an exception: " + e.toString());
             Log.i(TAG, "Stack trace:");
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.i(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.i(TAG, "    " + x.toString());
 
             Log.i(TAG, "Chat Relay client thread is shutting down.");
             handler.sendEmptyMessage(-2);
@@ -128,8 +128,8 @@ public class Chat implements Runnable
 
                         StackTraceElement[] ste = ioe.getStackTrace();
 
-                        for( int i = 0; i < ste.length; i++ )
-                            Log.e(TAG, "    " + ste[i].toString());
+                        for( StackTraceElement x : ste )
+                            Log.e(TAG, "    " + x.toString());
                     }
                 }
             }
@@ -260,8 +260,8 @@ public class Chat implements Runnable
 
             StackTraceElement[] ste = e.getStackTrace();
 
-            for( i = 0; i < ste.length; i++ )
-                Log.e(TAG, ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.e(TAG, x.toString());
 
             handler.sendEmptyMessage(-1);
             return;
@@ -426,8 +426,8 @@ public class Chat implements Runnable
             Log.w(TAG, "Caught an exception while closing socket: " + e.toString());
             Log.w(TAG, "Stack trace:");
 
-            for( int i = 0; i < ste.length; i++ )
-                Log.w(TAG, "    " + ste[i].toString());
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
 
             handler.sendEmptyMessage(-2);
         }
