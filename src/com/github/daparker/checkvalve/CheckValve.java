@@ -206,6 +206,10 @@ public class CheckValve extends Activity
                 // "RCON" option was selected
                 rcon(id);
                 break;
+            case R.id.view_chat:
+                // "View Chat" option was selected
+                chat(id);
+                break;
             case R.id.show_players:
                 // "Show Players" option was selected
                 showPlayers(id);
@@ -214,21 +218,9 @@ public class CheckValve extends Activity
                 // "Edit Server" option was selected
                 updateServer(id);
                 break;
-            case R.id.move_up:
-                // "Move Up" option was selected
-                moveServerUp(id);
-                break;
-            case R.id.move_down:
-                // "Move Down" option was selected
-                moveServerDown(id);
-                break;
             case R.id.delete_server:
                 // "Delete Server" option was selected
                 deleteServer(id);
-                break;
-            case R.id.view_chat:
-                // "View Chat" option was selected
-                chat(id);
                 break;
             case R.id.cancel:
                 // "Cancel" option was selected
@@ -571,22 +563,6 @@ public class CheckValve extends Activity
         updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.EditServerActivity");
         updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
         startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
-    }
-
-    public void moveServerUp( final long rowId )
-    {
-        if( database.moveServerUp(rowId) )
-            queryServers();
-        else
-            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
-    }
-
-    public void moveServerDown( final long rowId )
-    {
-        if( database.moveServerDown(rowId) )
-            queryServers();
-        else
-            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
     }
 
     @SuppressLint("InlinedApi")
