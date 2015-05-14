@@ -24,17 +24,17 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 - Redesigned UI elements
   - Added X buttons to dismiss the *Manage Server List* and *Player List* Activities
   - Added a button to the *About CheckValve* Activity
-  - Updated the *Manage Server List* screen sdo it looks better and is easier to use
+  - Updated the *Manage Server List* screen so it looks better and is easier to use
   - Moved the *Cancel* button to the left side on any screen which has it, to be compliant with the [Android design guidelines](http://developer.android.com/design/building-blocks/dialogs.html) for dialogs and action buttons
     - **Note:** Dialogs which use the built-in `AlertDialog` class will have the *Cancel* button on the right under old Android versions prior to 11.
   - Easier navigation on several dialog screens
 - Removed unused code, classes, layouts, and string entires
 - Added the `Values` class to standardize constants used throughout the app
 - Added `ACCESS_NETWORK_STATE` permission requirement for monitoring the network state while using the Chat Viewer
-- Added options in *Settings* to show/hide server attributes in the *Server Information*
 
 
 **New Features**
+- Added a checkbox to show/hide RCON passwords on the *Add New Server*, *Edit Server Information*, and *RCON Password* dialogs
 - View chat
   - Requires a [CheckValve Chat Relay](https://github.com/daparker/checkvalve-chat-relay)
   - View in-game player chat messages in real time
