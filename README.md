@@ -6,6 +6,8 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
 **Bug Fixes**
 - Added better exception handling
 - Fixed a few possible crashes due to database cursors being mishandled
+- Trailing spaces in server URLs will no longer cause Unknown Host errors
+- Fixed errors when moving servers up or down in the list if other servers have been deleted
 
 
 **Code Changes**
@@ -18,12 +20,18 @@ CheckValve 2.0 is currently under development.  This version of CheckValve inclu
   - Cursors are only used within methods of the `DatabaseProvider` class
   - SQLite queries are now wrapped in `synchronized()` blocks
 - Eliminated the custom `MessageBox` class in favor of using standard `Toast` messages
-- Redesigned some UI elements
-  - The *Manage Server List* screen looks better and is easier to use
+- Eliminated the custom `ConfirmDelete` class in favor of using standard `AlertDialog` messages
+- Redesigned UI elements
+  - Added X buttons to dismiss the *Manage Server List* and *Player List* Activities
+  - Added a button to the *About CheckValve* Activity
+  - Updated the *Manage Server List* screen sdo it looks better and is easier to use
   - Moved the *Cancel* button to the left side on any screen which has it, to be compliant with the [Android design guidelines](http://developer.android.com/design/building-blocks/dialogs.html) for dialogs and action buttons
-    - **Note:** Dialogs which use the built-in `AlertDialog` class will have the *Cancel* button on the right under old Android versions (prior to 11).
+    - **Note:** Dialogs which use the built-in `AlertDialog` class will have the *Cancel* button on the right under old Android versions prior to 11.
   - Easier navigation on several dialog screens
 - Removed unused code, classes, layouts, and string entires
+- Added the `Values` class to standardize constants used throughout the app
+- Added `ACCESS_NETWORK_STATE` permission requirement for monitoring the network state while using the Chat Viewer
+- Added options in *Settings* to show/hide server attributes in the *Server Information*
 
 
 **New Features**

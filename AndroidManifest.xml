@@ -23,7 +23,7 @@ along with the CheckValve source code.  If not, see
     package="com.github.daparker.checkvalve"
     android:installLocation="auto"
     android:versionCode="9"
-    android:versionName="2.0.0beta1" >
+    android:versionName="2.0.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
