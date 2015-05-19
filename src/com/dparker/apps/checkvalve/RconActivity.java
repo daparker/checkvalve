@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -227,10 +228,17 @@ public class RconActivity extends Activity {
 
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
-
-        this.setResult(1);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        
         this.setContentView(R.layout.rcon);
+        this.setResult(1);
 
         Intent thisIntent = getIntent();
 

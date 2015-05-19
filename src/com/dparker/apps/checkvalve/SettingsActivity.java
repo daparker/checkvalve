@@ -20,10 +20,8 @@
 package com.dparker.apps.checkvalve;
 
 import java.io.File;
-
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -32,10 +30,10 @@ import android.widget.TextView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-
 import com.dparker.apps.checkvalve.R;
 
 public class SettingsActivity extends Activity {
@@ -131,9 +129,16 @@ public class SettingsActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        this.setResult(1);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        
         this.setContentView(R.layout.settings);
+        this.setResult(1);
 
         if( database == null )
             database = new DatabaseProvider(SettingsActivity.this);

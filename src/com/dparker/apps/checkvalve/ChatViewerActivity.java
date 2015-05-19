@@ -33,6 +33,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -49,11 +50,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-
 import java.io.File;
 import java.net.*;
 import java.text.SimpleDateFormat;
-
 import com.dparker.apps.checkvalve.R;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
@@ -501,7 +500,14 @@ public class ChatViewerActivity extends Activity {
             StrictMode.setThreadPolicy(policy);
         }
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        
         this.setContentView(R.layout.chatui);
 
         Intent thisIntent = getIntent();

@@ -39,10 +39,11 @@ import android.view.MenuInflater;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewConfiguration;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -68,7 +69,13 @@ public class CheckValve extends Activity {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "Starting CheckValve.");
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         setContentView(R.layout.main);
 

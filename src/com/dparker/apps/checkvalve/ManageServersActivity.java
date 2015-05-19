@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
@@ -156,7 +157,13 @@ public class ManageServersActivity extends Activity {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         thisIntent = this.getIntent();
         setResult(0, thisIntent);
