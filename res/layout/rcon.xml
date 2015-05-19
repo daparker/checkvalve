@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -23,7 +23,7 @@ along with the CheckValve source code.  If not, see
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#262626"
+    android:background="@color/steam_gray"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -31,43 +31,33 @@ along with the CheckValve source code.  If not, see
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#262626"
-        android:paddingBottom="5.0dp"
-        android:paddingTop="5.0dp" >
+        android:background="@color/steam_gray"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
 
         <Button
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/field_command"
             android:layout_alignParentRight="true"
             android:gravity="center_horizontal|center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="@string/button_send" />
 
-<!--
-        <EditText
-            android:id="@+id/field_command"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/send_button"
-            android:gravity="left|center_vertical"
-            android:inputType="text"
-            android:singleLine="true"
-            android:text=""
-            android:textSize="14.0sp" />
--->
-
         <AutoCompleteTextView
-            android:id="@+id/field_command"
+            android:id="@id/field_command"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/send_button"
-            android:gravity="left|center_vertical"
+            android:dropDownSelector="@color/steam_blue"
+            android:gravity="start|center_vertical"
             android:inputType="text"
             android:singleLine="true"
             android:text=""
-            android:textSize="14.0sp" />
+            android:textSize="20sp" />
     </RelativeLayout>
 
     <TextView
@@ -77,11 +67,11 @@ along with the CheckValve source code.  If not, see
         android:layout_alignParentTop="true"
         android:background="#262626"
         android:gravity="center"
-        android:paddingBottom="5.0dp"
+        android:paddingBottom="5dp"
         android:paddingTop="10dp"
         android:text="@string/title_rcon_console"
         android:textColor="#FFFFFF"
-        android:textSize="20.0sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/rcon_console"
@@ -90,13 +80,13 @@ along with the CheckValve source code.  If not, see
         android:layout_above="@id/command_table"
         android:layout_below="@id/title"
         android:background="#000000"
-        android:gravity="left"
-        android:paddingBottom="5.0dp"
-        android:paddingTop="5.0dp"
+        android:gravity="start"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         android:scrollbars="horizontal|vertical"
         android:text=""
         android:textColor="#FFFFFF"
-        android:textSize="9.0sp"
+        android:textSize="9sp"
         android:typeface="monospace" />
 
     <TextView
@@ -107,12 +97,12 @@ along with the CheckValve source code.  If not, see
         android:layout_centerHorizontal="true"
         android:background="#262626"
         android:gravity="center_vertical|center_horizontal"
-        android:paddingBottom="5.0dp"
-        android:paddingLeft="10.0dp"
-        android:paddingRight="10.0dp"
-        android:paddingTop="5.0dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
         android:text="@string/msg_rcon_sending"
         android:textColor="#FFFFFF"
-        android:textSize="14.0sp" />
+        android:textSize="14sp" />
 
 </RelativeLayout>
