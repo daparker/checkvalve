@@ -88,7 +88,14 @@ public class RconQuery implements Runnable {
                 response = gsrv.rconExec(command);
         }
         catch( Exception e ) {
-            Log.w(TAG, "Caught exception: " + e.toString());
+            Log.w(TAG, "Caught an exception:");
+            Log.w(TAG, e.toString());
+
+            StackTraceElement[] ste = e.getStackTrace();
+
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
+            
             status = 1;
             obj = e;
         }
