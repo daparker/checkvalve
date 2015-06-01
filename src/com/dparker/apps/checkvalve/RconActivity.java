@@ -51,6 +51,8 @@ import android.content.res.Resources;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import com.dparker.apps.checkvalve.R;
+import com.github.daparker.checkvalve.CheckValve;
+import com.github.daparker.checkvalve.Values;
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
@@ -75,7 +77,6 @@ public class RconActivity extends Activity {
     private String server;
     private int port;
     private int timeout;
-    private short[] engine;
     private boolean rconIsAuthenticated;
 
     private SourceServer s;
@@ -126,12 +127,15 @@ public class RconActivity extends Activity {
                     Log.d(TAG, "Message object string = " + msg.obj.toString());
                     Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
                 case Values.ENGINE_GOLDSRC:
+                    Log.i(TAG, "Server engine is GoldSrc.");
                     g = (GoldSrcServer)msg.obj;
                     break;
                 case Values.ENGINE_SOURCE:
+                    Log.i(TAG, "Server engine is Source.");
                     s = (SourceServer)msg.obj;
                     break;
                 default:
+                    Log.w(TAG, "Unhandled value from engine query: " + msg.what);
                     UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
                     break;
             }
@@ -191,7 +195,7 @@ public class RconActivity extends Activity {
                     break;
                 case 0:
                     rconIsAuthenticated = true;
-                    if( engine[0] == Values.ENGINE_GOLDSRC )
+                    if( g!= null )
                         g = (GoldSrcServer)msg.obj;
                     else
                         s = (SourceServer)msg.obj;
@@ -246,7 +250,6 @@ public class RconActivity extends Activity {
         port = thisIntent.getIntExtra(Values.EXTRA_PORT, 27015);
         timeout = thisIntent.getIntExtra(Values.EXTRA_TIMEOUT, 2);
         password = thisIntent.getStringExtra(Values.EXTRA_PASSWORD);
-        engine = new short[1];
         rconIsAuthenticated = false;
 
         fade_in = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_in);
@@ -277,7 +280,10 @@ public class RconActivity extends Activity {
         else
             field_command.setThreshold(1000);
 
-        unsafeCommands = res.getStringArray(R.array.unsafe_commands);
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) == true )
+            unsafeCommands = res.getStringArray(R.array.unsafe_commands);
+        else
+            unsafeCommands = null;
 
         getServerType();
     }
@@ -334,14 +340,16 @@ public class RconActivity extends Activity {
     }
 
     public void sendCommand( boolean force ) {
-        if( !force ) {
-            // Get the bare command without any arguments
-            String bareCommand = (command.indexOf(" ") != -1)?command.substring(0, command.indexOf(" ")):command;
-
-            if( Arrays.asList(unsafeCommands).contains(bareCommand) ) {
-                // Show a warning and force user acknowledgment
-                confirmUnsafeCommand();
-                return;
+        if( unsafeCommands != null ) {
+            if( !force ) {
+                // Get the bare command without any arguments
+                String bareCommand = (command.indexOf(" ") != -1)?command.substring(0, command.indexOf(" ")):command;
+    
+                if( Arrays.asList(unsafeCommands).contains(bareCommand) ) {
+                    // Show a warning and force user acknowledgment
+                    confirmUnsafeCommand();
+                    return;
+                }
             }
         }
 
@@ -349,7 +357,7 @@ public class RconActivity extends Activity {
 
         runFadeInAnimation(RconActivity.this, sending);
 
-        if( engine[0] == Values.ENGINE_GOLDSRC )
+        if( g != null )
             new Thread(new RconQuery(command, g, popUpHandler)).start();
         else
             new Thread(new RconQuery(command, s, popUpHandler)).start();
@@ -385,7 +393,7 @@ public class RconActivity extends Activity {
     public void rconAuthenticate() {
         p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_rcon_verifying_password), true, false);
 
-        if( engine[0] == Values.ENGINE_GOLDSRC )
+        if( g != null )
             new Thread(new RconAuth(password, g, rconAuthHandler)).start();
         else
             new Thread(new RconAuth(password, s, rconAuthHandler)).start();
@@ -401,7 +409,7 @@ public class RconActivity extends Activity {
 
     public void getPassword() {
         Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
+        rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
