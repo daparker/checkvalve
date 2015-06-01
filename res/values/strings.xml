@@ -26,7 +26,7 @@ along with the CheckValve source code.  If not, see
     <string name="app_link">http://sites.google.com/site/checkvalveapp/</string>
     <string name="app_name">CheckValve</string>
     <string name="app_notes">CheckValve makes use of the Steam Condenser library: https://github.com/koraktor/steam-condenser/</string>
-    <string name="app_version">Version 2.0.0</string>
+    <string name="app_version">Version 2.0.2</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_connect">Connect</string>
