@@ -51,8 +51,6 @@ import android.content.res.Resources;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import com.dparker.apps.checkvalve.R;
-import com.github.daparker.checkvalve.CheckValve;
-import com.github.daparker.checkvalve.Values;
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
@@ -409,7 +407,7 @@ public class RconActivity extends Activity {
 
     public void getPassword() {
         Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
+        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
