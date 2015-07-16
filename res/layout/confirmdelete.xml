@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:gravity="center"
+    android:id="@+id/parentLayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <TextView  
+    android:id="@+id/title"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:textSize="20.0dip"
+	android:textColor="#FFFFFF"
+	android:paddingTop="10dip"
+	android:paddingBottom="15dip"
+	android:gravity="center"
+    android:text="@string/title_confirm_delete"
+    />
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/buttonTable"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="1"
+    android:gravity="center_horizontal"
+	>
+	<TableRow android:gravity="center_horizontal" android:paddingTop="10dip">
+	<Button
+		android:id="@+id/deleteButton"
+		android:text="@string/button_delete"
+    	android:width="100.0sp"
+    	android:gravity="center_horizontal|center_vertical"
+   	/>
+   	<Button
+		android:id="@+id/cancelButton"
+		android:text="@string/button_cancel"
+    	android:width="100.0sp"
+    	android:gravity="center_horizontal|center_vertical"
+   	/>
+</TableRow>
+</TableLayout>
+</LinearLayout>

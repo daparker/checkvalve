@@ -20,14 +20,12 @@ along with the CheckValve source code.  If not, see
 -->
 
 <resources>
-
-    <color name="red">#FFFF0000</color>
-    <color name="green">#FF00FF00</color>
-    <color name="blue">#FF0000FF</color>
-    <color name="steam_gray">#FF262626</color>
-    <color name="steam_blue">#FF547CAA</color>
-    <color name="translucent_red">#7FFF0000</color>
-    <color name="translucent_green">#7F00FF00</color>
-    <color name="translucent_blue">#7F0000FF</color>
-
+	<color name="red">#FFFF0000</color>
+	<color name="green">#FF00FF00</color>
+	<color name="blue">#FF0000FF</color>
+	<color name="steam_gray">#FF262626</color>
+	<color name="steam_blue">#FF547CAA</color>
+	<color name="translucent_red">#7FFF0000</color>
+	<color name="translucent_green">#7F00FF00</color>
+	<color name="translucent_blue">#7F0000FF</color>
 </resources>

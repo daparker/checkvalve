@@ -19,28 +19,17 @@ along with the CheckValve source code.  If not,
 see <http://www.gnu.org/licenses/>.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item
-        android:id="@+id/new_server"
-        android:title="@string/menu_new_server"/>
-    <item
-        android:id="@+id/refresh"
-        android:title="@string/menu_refresh"/>
-    <item
-        android:id="@+id/manage_servers"
-        android:title="@string/menu_manage_servers"/>
-    <item
-        android:id="@+id/player_search"
-        android:title="@string/menu_player_search"/>
-    <item
-        android:id="@+id/about"
-        android:title="@string/menu_about"/>
-    <item
-        android:id="@+id/settings"
-        android:title="@string/menu_settings"/>
-    <item
-        android:id="@+id/quit"
-        android:title="@string/menu_quit"/>
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/new_server"
+          android:title="@string/menu_new_server" />
+<item android:id="@+id/refresh"
+          android:title="@string/menu_refresh" />
+<item android:id="@+id/manage_servers"
+          android:title="@string/menu_manage_servers" />
+<item android:id="@+id/player_search"
+          android:title="@string/menu_player_search" />
+<item android:id="@+id/about"
+          android:title="@string/menu_about" />
+<item android:id="@+id/quit"
+          android:title="@string/menu_quit" />
 </menu>

@@ -19,10 +19,7 @@
 
 package com.dparker.apps.checkvalve;
 
-import java.util.ArrayList;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,7 +28,6 @@ import android.widget.TextView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,590 +35,518 @@ import android.view.MenuInflater;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
+import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
-import android.view.Window;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
-import com.dparker.apps.checkvalve.R;
+import android.database.Cursor;
 
-public class CheckValve extends Activity {
-    private static final String TAG = CheckValve.class.getSimpleName();
+public class CheckValve extends Activity
+{
+	private ProgressDialog p;
+	private ServerQuery s;
+	private DatabaseProvider database;
+	private Cursor databaseCursor;
+	private TableLayout server_info_table;
+	private TableLayout message_table;
+	private TableRow[][] tableRows;
+	private TableRow[] messageRows;
+	private Context context;
 
-    private ProgressDialog p;
-    private DatabaseProvider database;
-    private TableLayout server_info_table;
-    private TableLayout message_table;
-    private TableRow[][] tableRows;
-    private TableRow[] messageRows;
+	private long selectedServerRowId;
 
-    public static Bundle settings;
+	// Define constants to be used as Intent request codes
+	private static final short ADD_NEW_SERVER = 0;
+	private static final short MANAGE_SERVERS = 1;
+	private static final short UPDATE_SERVER  = 2;
+	private static final short SHOW_PLAYERS   = 3;
+	private static final short CONFIRM_DELETE = 4;
+	private static final short RCON = 5;
+	private static final short ABOUT = 6;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-    private long selectedServerRowId;
+		context = this;
+		
+		database = new DatabaseProvider(this);
+		database.open();
+				
+		selectedServerRowId = 0;
 
-    @SuppressLint("InlinedApi")
-    @Override
-    public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "Starting CheckValve.");
+		setContentView(R.layout.main);
 
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+		server_info_table = (TableLayout)findViewById(R.id.server_info_table);
+		message_table = (TableLayout)findViewById(R.id.message_table);
+		
+		message_table.setVisibility(-1);
 
-        setContentView(R.layout.main);
+       	queryServers();
+	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		
+		selectedServerRowId = 0;
+		
+		// Open the database
+		if( ! database.isOpen() )
+			database.open();
+	}
 
-        if( database == null )
-        	database = new DatabaseProvider(CheckValve.this);
-
-        selectedServerRowId = 0;
-        server_info_table = (TableLayout)findViewById(R.id.server_info_table);
-        message_table = (TableLayout)findViewById(R.id.message_table);
-        message_table.setVisibility(-1);
-        
-        getSettings();
-        queryServers();
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+    	
+		// Close the database
+		if( database.isOpen() )
+		    database.close();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main_menu, menu);
+	    return true;
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		databaseCursor = database.getAllServers();
+		startManagingCursor(databaseCursor);
+		
+	    switch (item.getItemId()) {
+	    	// "Quit" option was selected
+	        case R.id.quit:
+	            quit();
+	            return true;
+	        // "Add New Server" option was selected
+	        case R.id.new_server:
+	        	addNewServer();
+	            return true;
+	        // "Manage Server List" option was selected
+	        case R.id.manage_servers:
+	        	if( databaseCursor.getCount() == 0 )
+	        		showMessage((String)context.getString(R.string.msg_empty_server_list));
+	        	else
+	        		manageServers();
+	            return true;
+	        // "Player Search" option was selected
+	        case R.id.player_search:
+	        	if( databaseCursor.getCount() == 0 )
+	        		showMessage((String)context.getString(R.string.msg_empty_server_list));
+	        	else
+	        		playerSearch();
+	            return true;
+	        // "Refresh" option was selected
+	        case R.id.refresh:
+           		queryServers();
+	            return true;
+		    // "About" option was selected
+	        case R.id.about:
+           		about();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+		super.onCreateContextMenu(menu, v, menuInfo);
+		
+		selectedServerRowId = (long)v.getId();
+		
+		// Inflate the context menu
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.context_menu, menu);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		long id = selectedServerRowId;
+		
+		switch( item.getItemId() )
+		{
+			// "RCON" option was selected
+			case R.id.rcon:
+				rcon(id);
+				return true;
+			// "Show Players" option was selected
+			case R.id.show_players:
+				showPlayers(id);
+				return true;
+			// "Edit Server" option was selected
+			case R.id.edit_server:
+				updateServer(id);
+				return true;
+			// "Move Up" option was selected
+			case R.id.move_up:
+				moveServerUp(id);
+				return true;
+			// "Move Down" option was selected
+			case R.id.move_down:
+				moveServerDown(id);
+				return true;
+			// "Delete Server" option was selected
+			case R.id.delete_server:
+		    	deleteServer(id);
+		    	return true;
+		    // "Cancel" option was selected
+			case R.id.cancel:
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
+	}
+	
+    public void onActivityResult(int request, int result, Intent data)
+    {    	
+    	if( request == ADD_NEW_SERVER )
+    	{
+    		if( result == 1 )
+    			queryServers();
+    	}
+    	else if( request == MANAGE_SERVERS )
+    	{
+    		if( result == 1 )
+    			queryServers();
+    	}
+    	else if( request == UPDATE_SERVER )
+    	{
+    		if( result == 1 )
+    			queryServers();
+    	}
+    	else if( request == SHOW_PLAYERS )
+    	{
+    		switch( result )
+    		{
+    			case -1:
+    				showMessage((String)this.getText(R.string.general_exception));
+    				break;
+    			case -2:
+    				showMessage((String)this.getText(R.string.msg_no_players));
+    				break;
+    			case -3:
+    				showMessage((String)this.getText(R.string.msg_no_players));
+    				break;
+    			default:
+    				break;
+    		}
+    	}
+    	else if( request == CONFIRM_DELETE )
+    	{
+    		if( result == 1 )
+    			queryServers();
+    	}
+    	else if( request == RCON )
+    	{
+    		return;
+    	}
+    	else if( request == ABOUT )
+    	{
+    		return;
+    	}
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        selectedServerRowId = 0;
-
-        if( database == null )
-        	database = new DatabaseProvider(CheckValve.this);
-        
-        getSettings();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        // Dismiss the progress dialog to avoid a leaked window
-        if( p != null ) p.dismiss();
-
-        if( database != null ) {
-            database.close();
-            database = null;
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged( Configuration newConfig ) {
-        super.onConfigurationChanged(newConfig);
-        return;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu ) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected( MenuItem item ) {
-        switch( item.getItemId() ) {
-            case R.id.quit:
-                // "Quit" option was selected
-                quit();
-                break;
-
-            case R.id.new_server:
-                // "Add New Server" option was selected
-                addNewServer();
-                break;
-
-            case R.id.manage_servers:
-                // "Manage Server List" option was selected
-                if( database.getServerCount() == 0 )
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
-                else
-                    manageServers();
-
-                break;
-
-            case R.id.player_search:
-                // "Player Search" option was selected
-                if( database.getServerCount() == 0 )
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
-                else
-                    playerSearch();
-
-                break;
-
-            case R.id.refresh:
-                // "Refresh" option was selected
-                queryServers();
-                break;
-
-            case R.id.about:
-                // "About" option was selected
-                about();
-                break;
-
-            case R.id.settings:
-                // "About" option was selected
-                settings();
-                break;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onCreateContextMenu( ContextMenu menu, View v, ContextMenuInfo menuInfo ) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        selectedServerRowId = (long)v.getId();
-
-        // Inflate the context menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected( MenuItem item ) {
-        long id = selectedServerRowId;
-
-        switch( item.getItemId() ) {
-            case R.id.rcon:
-                // "RCON" option was selected
-                rcon(id);
-                break;
-            case R.id.view_chat:
-                // "View Chat" option was selected
-                chat(id);
-                break;
-            case R.id.show_players:
-                // "Show Players" option was selected
-                showPlayers(id);
-                break;
-            case R.id.edit_server:
-                // "Edit Server" option was selected
-                updateServer(id);
-                break;
-            case R.id.delete_server:
-                // "Delete Server" option was selected
-                deleteServer(id);
-                break;
-            case R.id.cancel:
-                // "Cancel" option was selected
-                break;
-            default:
-                return super.onContextItemSelected(item);
-        }
-
-        return true;
-    }
-
-    public void onActivityResult( int request, int result, Intent data ) {
-        if( database == null ) database = new DatabaseProvider(CheckValve.this);
-
-        switch( request ) {
-            case Values.ACTIVITY_RCON:
-            case Values.ACTIVITY_CHAT:
-            case Values.ACTIVITY_ABOUT:
-            case Values.ACTIVITY_SHOW_PLAYERS:
-                break;
-
-            case Values.ACTIVITY_ADD_NEW_SERVER:
-            case Values.ACTIVITY_MANAGE_SERVERS:
-            case Values.ACTIVITY_UPDATE_SERVER:
-            case Values.ACTIVITY_CONFIRM_DELETE:
-                if( result == 1 ) queryServers();
-                break;
-
-            case Values.ACTIVITY_SETTINGS:
-                if( result == -1 ) {
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
-                }
-                else if( result == 0 ) {
-                    getSettings();
-                    refreshView();
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
+    
     // Define the touch listener for table rows
-    private OnTouchListener tableRowTouchListener = new OnTouchListener() {
-        public boolean onTouch( View v, MotionEvent m ) {
-            int id = v.getId();
-            int action = m.getAction();
-            int count = server_info_table.getChildCount();
-
-            // Set the background color of each row to gray if the touch action is "UP"
-            if( action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL ) {
-                for( int i = 0; i < count; i++ )
-                    if( server_info_table.getChildAt(i).getId() == id )
-                        server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_gray);
-            }
-            // Set the background color of each row to blue if the touch action is "DOWN"
-            else {
-                for( int i = 0; i < count; i++ )
-                    if( server_info_table.getChildAt(i).getId() == id )
-                        server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_blue);
-            }
-
-            return false;
+    private OnTouchListener tableRowTouchListener = new OnTouchListener()
+    {
+    	public boolean onTouch(View v, MotionEvent m)
+    	{    		
+    		int id = v.getId();
+    		int action = m.getAction();
+    		int count = server_info_table.getChildCount();
+    		
+    		// Set the background color of each row to gray if the touch action is "UP"
+    		if( action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL )
+    		{
+	    		for( int i = 0; i < count; i++ )
+	    			if( server_info_table.getChildAt(i).getId() == id )
+	    				server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_gray);
+    		}
+    		// Set the background color of each row to blue if the touch action is "DOWN"
+    		else
+    		{
+	    		for( int i = 0; i < count; i++ )
+	    			if( server_info_table.getChildAt(i).getId() == id )
+	    				server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_blue);
+    		}
+    		    		
+    		return false;
         }
     };
-
+    
     // Define the focus change listener for table rows
-    private OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener() {
-        public void onFocusChange( View v, boolean f ) {
-            int id = v.getId();
-            int count = server_info_table.getChildCount();
-
-            // If any row has focus then set its background color to blue
-            for( int i = 0; i < count; i++ )
-                if( server_info_table.getChildAt(i).getId() == id )
-                    server_info_table.getChildAt(i).setBackgroundResource((f)?R.color.steam_blue:R.color.steam_gray);
+    private OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener()
+    {
+    	public void onFocusChange(View v, boolean f)
+    	{    		
+    		int id = v.getId();
+    		int count = server_info_table.getChildCount();
+    		
+    		// If any row has focus then set its background color to blue
+    		for( int i = 0; i < count; i++ )
+    			if( server_info_table.getChildAt(i).getId() == id )
+    				server_info_table.getChildAt(i).setBackgroundResource((f)?R.color.steam_blue:R.color.steam_gray);
         }
     };
-
-    //@SuppressWarnings("deprecation")
-    public void queryServers() {
+    
+	@SuppressWarnings("deprecation")
+	public void queryServers()
+	{
+        // Make sure the database is open
+		if( ! database.isOpen() )
+			database.open();
+        
         // Clear the server info table
-        server_info_table.setVisibility(-1);
+    	server_info_table.setVisibility(-1);
         server_info_table.removeAllViews();
         server_info_table.setVisibility(1);
 
         // Clear the messages table
         message_table.removeAllViews();
 
-        int count = (int)database.getServerCount();
+        databaseCursor = database.getAllServers();        
+		databaseCursor.moveToFirst();
+		
+		startManagingCursor(databaseCursor);
 
-        if( count == 0 ) {
-            addNewServer();
-        }
-        else {
-            // Show the progress dialog
-            p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
-
-            // Define the TableRow arrays to hold the display data
-            tableRows = new TableRow[count][6];
-            messageRows = new TableRow[count];
-
-            // Run the server queries in a separate thread
-            new Thread(new ServerQuery(CheckValve.this, tableRows, messageRows, progressHandler)).start();
-        }
-    }
-
+		if( databaseCursor.getCount() == 0 )
+		{
+			// Show the "Add New Server" dialog
+			addNewServer();
+		}
+		else
+		{
+			// Show the progress dialog
+			p = ProgressDialog.show(this, "", context.getText(R.string.status_querying_servers), true, false);
+        
+			tableRows = new TableRow[databaseCursor.getCount()][6];
+			messageRows = new TableRow[databaseCursor.getCount()];
+		
+			// Run the server queries in a new thread
+			s = new ServerQuery(context, databaseCursor, tableRows, messageRows, progressHandler);
+			s.start();
+		}
+	}
+    
     // Handler for the server query thread
-    Handler progressHandler = new Handler() {
-        public void handleMessage( Message msg ) {
-            String tag = new String();
-
-            /*
-             * Build and display the messages table if there are errors to be displayed
-             */
-            if( messageRows[0] != null ) {
-                int m = 0;
-
-                while( (m < messageRows.length) && (messageRows[m] != null) )
-                    message_table.addView(messageRows[m++]);
-
-                message_table.setVisibility(1);
-            }
-
-            /*
-             * Build and display the query results table
-             */
-            for( int i = 0; i < tableRows.length; i++ ) {
-                if( tableRows[i] != null ) {
-                    TextView spacer = new TextView(CheckValve.this);
-
+    Handler progressHandler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
+        	/*
+        	 * Build and display the messages table if there are errors
+        	 * to be displayed
+        	 */
+        	if( messageRows[0] != null )
+        	{
+        		int m = 0;
+        		
+        		while( (m < messageRows.length) && (messageRows[m] != null) )
+        			message_table.addView(messageRows[m++]);
+        		
+        		message_table.setVisibility(1);
+        	}
+            
+        	/*
+        	 * Build and display the query results table
+        	 */
+            for( int i = 0; i < tableRows.length; i++ )
+            {
+            	if( tableRows[i] != null )
+            	{
+            		TextView spacer = new TextView(context);
+                	
                     spacer.setId(0);
                     spacer.setText("");
                     spacer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                    spacer.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                    TableRow spacerRow = new TableRow(CheckValve.this);
+                    spacer.setLayoutParams(new LayoutParams(
+                            LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT));
+                    
+                    TableRow spacerRow = new TableRow(context);
                     spacerRow.setId(0);
-                    spacerRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    spacerRow.setLayoutParams(new LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.WRAP_CONTENT));
+                    
                     spacerRow.addView(spacer);
+                    
+    	            registerForContextMenu(tableRows[i][0]);
+    	            registerForContextMenu(tableRows[i][1]);
+    	            registerForContextMenu(tableRows[i][2]);
+    	            registerForContextMenu(tableRows[i][3]);
+    	            registerForContextMenu(tableRows[i][4]);
+    	            registerForContextMenu(tableRows[i][5]);
+    	            
+    	            tableRows[i][0].setOnTouchListener(tableRowTouchListener);
+    	            tableRows[i][1].setOnTouchListener(tableRowTouchListener);
+    	            tableRows[i][2].setOnTouchListener(tableRowTouchListener);
+    	            tableRows[i][3].setOnTouchListener(tableRowTouchListener);
+    	            tableRows[i][4].setOnTouchListener(tableRowTouchListener);
+    	            tableRows[i][5].setOnTouchListener(tableRowTouchListener);
 
-                    tableRows[i][0].setOnFocusChangeListener(tableRowFocusChangeListener);
+    	            tableRows[i][0].setFocusable(true);
+    	            tableRows[i][0].setOnFocusChangeListener(tableRowFocusChangeListener);
 
-                    for( int j = 0; j < tableRows[i].length; j++ ) {
-                        registerForContextMenu(tableRows[i][j]);
-                        tableRows[i][j].setOnTouchListener(tableRowTouchListener);
-                        tableRows[i][j].setFocusable(false);
+    	            tableRows[i][1].setFocusable(false);
+    	            tableRows[i][2].setFocusable(false);
+    	            tableRows[i][3].setFocusable(false);
+    	            tableRows[i][4].setFocusable(false);
+    	            tableRows[i][5].setFocusable(false);
+    	            
+    	            server_info_table.addView(spacerRow, new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+    	            
+    	            server_info_table.addView(tableRows[i][0], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+    	
+    	            server_info_table.addView(tableRows[i][1], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+    	            
+    	            server_info_table.addView(tableRows[i][2], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+    	            
+    	            server_info_table.addView(tableRows[i][3], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+    	            
+    	            server_info_table.addView(tableRows[i][4], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
 
-                        tag = (String)tableRows[i][j].getTag();
-
-                        if( tag.equals(Values.TAG_SERVER_IP) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_GAME) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_MAP) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_PLAYERS) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_TAGS) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
-                    }
-
-                    server_info_table.addView(
-                            spacerRow,
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][0],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][1],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][2],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][3],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][4],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    server_info_table.addView(
-                            tableRows[i][5],
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                }
+    	            server_info_table.addView(tableRows[i][5], new TableLayout.LayoutParams(
+    	                    LayoutParams.MATCH_PARENT,
+    	                    LayoutParams.WRAP_CONTENT));
+            	}
             }
-
+            
             // Dismiss the progress dialog
             p.dismiss();
         }
     };
-
-    public void refreshView() {
-        String tag = new String();
-
-        for( int i = 0; i < server_info_table.getChildCount(); i++ ) {
-            server_info_table.getChildAt(i).setVisibility(View.VISIBLE);
-            tag = (String)server_info_table.getChildAt(i).getTag();
-
-            if( tag != null ) {
-                if( tag.equals(Values.TAG_SERVER_IP) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
-                else if( tag.equals(Values.TAG_SERVER_GAME) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
-                else if( tag.equals(Values.TAG_SERVER_MAP) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
-                else if( tag.equals(Values.TAG_SERVER_PLAYERS) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
-                else if( tag.equals(Values.TAG_SERVER_TAGS) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
-            }
-        }
-
-        server_info_table.invalidate();
+    
+    public void quit()
+    {
+    	// Close the database
+    	if( database.isOpen() )
+    		database.close();
+    	
+    	// Finish this activity
+    	finish();
     }
-
-    public void getSettings() {
-        settings = database.getSettingsAsBundle();
+    
+    public void addNewServer()
+    {
+		Intent addNewServerIntent = new Intent();
+		addNewServerIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.AddNewServer");
+		startActivityForResult(addNewServerIntent, ADD_NEW_SERVER);
     }
-
-    public void quit() {
-        finish();
+    
+	public void manageServers()
+	{
+		Intent manageServersIntent = new Intent();
+		manageServersIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.ManageServers");
+		startActivityForResult(manageServersIntent, MANAGE_SERVERS);
+	}
+    
+	public void showPlayers(long rowId)
+	{
+		Intent showPlayersIntent = new Intent();
+		showPlayersIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.QueryPlayers");
+		showPlayersIntent.putExtra("rowId", rowId);
+		startActivityForResult(showPlayersIntent, SHOW_PLAYERS);
+	}
+	
+    public void playerSearch()
+    {
+		Intent playerSearchIntent = new Intent();
+		playerSearchIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.PlayerSearch");
+		startActivity(playerSearchIntent);
     }
+    
+	public void updateServer(long rowId)
+	{
+		Intent updateServerIntent = new Intent();
+		updateServerIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.UpdateServer");
+		updateServerIntent.putExtra("rowId", rowId);		
+		startActivityForResult(updateServerIntent, UPDATE_SERVER);
+	}
+	
+	public void moveServerUp(long rowId)
+	{
+		if( database.moveServerUp(rowId) )
+			queryServers();
+		else
+			showMessage((String)this.getString(R.string.msg_db_failure));
+	}
 
-    public void addNewServer() {
-        Intent addNewServerIntent = new Intent();
-        addNewServerIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.AddServerActivity");
-        startActivityForResult(addNewServerIntent, Values.ACTIVITY_ADD_NEW_SERVER);
-    }
+	public void moveServerDown(long rowId)
+	{	
+		if( database.moveServerDown(rowId) )
+			queryServers();
+		else
+			showMessage((String)this.getString(R.string.msg_db_failure));
+	}
+	
+	public void deleteServer(long rowId)
+	{
+		Intent confirmDeleteIntent = new Intent();
+		confirmDeleteIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.ConfirmDelete");
+		confirmDeleteIntent.putExtra("rowId", rowId);		
+		startActivityForResult(confirmDeleteIntent, CONFIRM_DELETE);
+	}
+	
+	public void rcon(long rowId)
+	{
+		databaseCursor = database.getServer(rowId);
+		
+		String s = databaseCursor.getString(1);
+		int p = databaseCursor.getInt(2);
+		int t = databaseCursor.getInt(3);
+		String r = databaseCursor.getString(5);
+		
+		Intent rconIntent = new Intent();
+		rconIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.RconUI");
+		rconIntent.putExtra("server", s);
+		rconIntent.putExtra("port", p);
+		rconIntent.putExtra("timeout", t);
+		rconIntent.putExtra("password", r);
+		startActivityForResult(rconIntent, RCON);
+	}
 
-    public void manageServers() {
-        Intent manageServersIntent = new Intent();
-        manageServersIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ManageServersActivity");
-        startActivityForResult(manageServersIntent, Values.ACTIVITY_MANAGE_SERVERS);
-    }
-
-    public void showPlayers( final long rowId ) {
-        final ServerRecord sr = database.getServer(rowId);
-        final String server = sr.getServerName();
-        final int port = sr.getServerPort();
-        final int timeout = sr.getServerTimeout();
-
-        final Handler playerQueryHandler = new Handler() {
-            @SuppressWarnings("unchecked")
-            public void handleMessage( Message msg ) {
-                p.dismiss();
-
-                if( msg.what == -2 ) {
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_no_players);
-                }
-                else if( msg.what == -1 ) {
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
-                }
-                else {
-                    if( msg.obj != null ) {
-                        ArrayList<PlayerRecord> playerList = (ArrayList<PlayerRecord>)msg.obj;
-
-                        Intent showPlayersIntent = new Intent();
-                        showPlayersIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowPlayersActivity");
-                        showPlayersIntent.putParcelableArrayListExtra(Values.EXTRA_PLAYER_LIST, playerList);
-                        startActivityForResult(showPlayersIntent, Values.ACTIVITY_SHOW_PLAYERS);
-                    }
-                    else {
-                        Log.d(TAG, "handleMessage(): Object 'msg.obj' is null");
-                        UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
-                        finish();
-                    }
-                }
-            }
-        };
-
-        final Handler challengeResponseHandler = new Handler() {
-            public void handleMessage( Message msg ) {
-                Log.d(TAG, "handleMessage(): msg=" + msg.toString());
-
-                if( msg.what != 0 ) {
-                    p.dismiss();
-                    Log.d(TAG, "handleMessage(): msg.what=" + msg.what);
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
-                }
-                else {
-                    Bundle b = (Bundle)msg.obj;
-                    byte[] challengeResponse = b.getByteArray(Values.EXTRA_CHALLENGE_RESPONSE);
-
-                    if( challengeResponse == null ) {
-                        p.dismiss();
-                        String message = new String();
-                        message += CheckValve.this.getText(R.string.msg_no_challenge_response);
-                        message += " " + server + ":" + port;
-                        UserVisibleMessage.showMessage(CheckValve.this, message);
-                    }
-                    else {
-                        new Thread(new QueryPlayers(CheckValve.this, rowId, challengeResponse, playerQueryHandler)).start();
-                    }
-                }
-            }
-        };
-
-        p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
-
-        new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
-    }
-
-    public void playerSearch() {
-        Intent playerSearchIntent = new Intent();
-        playerSearchIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.PlayerSearchActivity");
-        startActivity(playerSearchIntent);
-    }
-
-    public void updateServer( final long rowId ) {
-        Intent updateServerIntent = new Intent();
-        updateServerIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.EditServerActivity");
-        updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
-        startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
-    }
-
-    @SuppressLint("InlinedApi")
-    public void deleteServer( final long rowId ) {
-        AlertDialog.Builder alertDialogBuilder;
-
-        if( android.os.Build.VERSION.SDK_INT >= 11 )
-            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this, AlertDialog.THEME_HOLO_DARK);
-        else
-            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this);
-
-        alertDialogBuilder.setTitle(R.string.title_confirm_delete);
-        alertDialogBuilder.setMessage(R.string.msg_delete_server);
-        alertDialogBuilder.setCancelable(false);
-
-        alertDialogBuilder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id ) {
-                /*
-                 *  "Delete" button was clicked
-                 */
-                if( database.deleteServer(rowId) ) {
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_server_deleted);
-                    queryServers();
-                }
-                else {
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
-                }
-            }
-        });
-
-        alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id ) {
-                /*
-                 * "Cancel" button was clicked
-                 */
-                dialog.cancel();
-            }
-        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    public void rcon( final long rowId ) {
-        ServerRecord sr = database.getServer(rowId);
-
-        String s = sr.getServerName();
-        String r = sr.getServerRCONPassword();
-        int p = sr.getServerPort();
-        int t = sr.getServerTimeout();
-
-        Intent rconIntent = new Intent();
-        rconIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconActivity");
-        rconIntent.putExtra(Values.EXTRA_SERVER, s);
-        rconIntent.putExtra(Values.EXTRA_PORT, p);
-        rconIntent.putExtra(Values.EXTRA_TIMEOUT, t);
-        rconIntent.putExtra(Values.EXTRA_PASSWORD, r);
-        startActivityForResult(rconIntent, Values.ACTIVITY_RCON);
-    }
-
-    public void chat( final long rowId ) {
-        ServerRecord sr = database.getServer(rowId);
-
-        String s = sr.getServerName();
-        String r = sr.getServerRCONPassword();
-        int p = sr.getServerPort();
-        int t = sr.getServerTimeout();
-
-        Intent chatIntent = new Intent();
-        chatIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ChatViewerActivity");
-        chatIntent.putExtra(Values.EXTRA_SERVER, s);
-        chatIntent.putExtra(Values.EXTRA_PORT, p);
-        chatIntent.putExtra(Values.EXTRA_TIMEOUT, t);
-        chatIntent.putExtra(Values.EXTRA_PASSWORD, r);
-        startActivityForResult(chatIntent, Values.ACTIVITY_CHAT);
-    }
-
-    public void about() {
-        Intent aboutIntent = new Intent();
-        aboutIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.AboutActivity");
-        startActivityForResult(aboutIntent, Values.ACTIVITY_ABOUT);
-    }
-
-    public void settings() {
-        Intent settingsIntent = new Intent();
-        settingsIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.SettingsActivity");
-        startActivityForResult(settingsIntent, Values.ACTIVITY_SETTINGS);
-    }
+	public void about()
+	{
+		Intent aboutIntent = new Intent();
+		aboutIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.About");
+		startActivityForResult(aboutIntent, ABOUT);
+	}
+	
+	public void showMessage(String msg)
+	{
+		Intent messageBoxIntent = new Intent();
+		messageBoxIntent.setClassName("com.dparker.apps.checkvalve","com.dparker.apps.checkvalve.MessageBox");
+		messageBoxIntent.putExtra("messageText", msg);
+		startActivity(messageBoxIntent);
+	}
 }

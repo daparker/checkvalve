@@ -20,195 +20,157 @@ along with the CheckValve source code.  If not, see
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/addnewserver_scroll_pane"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/scroll_pane"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="#262626"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/addnewserver_parent_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp" >
-
-        <TextView
-            android:id="@+id/addnewserver_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="15dp"
-            android:text="@string/title_add_new_server"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
-
-        <TableLayout
-            android:id="@+id/addnewserver_main_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:stretchColumns="0" >
-
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/label_server"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:singleLine="true"
-                    android:text="@string/label_server"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </TableRow>
-
-            <TableRow>
-
-                <EditText
-                    android:id="@+id/field_server"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:inputType="text"
-                    android:singleLine="true"
-                    android:text=""
-                    android:textSize="14sp" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/label_port"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
-                    android:singleLine="true"
-                    android:text="@string/label_port"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </TableRow>
-
-            <TableRow>
-
-                <EditText
-                    android:id="@+id/field_port"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:inputType="number"
-                    android:singleLine="true"
-                    android:text="@string/default_query_port"
-                    android:textSize="14sp" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/label_timeout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
-                    android:singleLine="true"
-                    android:text="@string/label_timeout"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </TableRow>
-
-            <TableRow>
-
-                <EditText
-                    android:id="@+id/field_timeout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:inputType="number"
-                    android:singleLine="true"
-                    android:text="@string/default_query_timeout"
-                    android:textSize="14sp" />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/label_rcon_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
-                    android:singleLine="true"
-                    android:text="@string/label_rcon_password"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </TableRow>
-
-            <TableRow>
-
-                <EditText
-                    android:id="@+id/field_rcon_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical"
-                    android:inputType="textPassword"
-                    android:singleLine="true"
-                    android:text=""
-                    android:textSize="14sp" />
-            </TableRow>
-        </TableLayout>
-
-        <LinearLayout
-            android:id="@+id/show_password_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingLeft="15dp"
-            android:paddingTop="5dp" >
-
-            <CheckBox
-                android:id="@+id/checkbox_show_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="showPasswordCheckboxHandler"
-                android:text="@string/label_show_password"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/buttonTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingTop="10dp" >
-
-            <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/button_cancel" />
-
-            <Button
-                android:id="@+id/addServerButton"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/button_add" />
-        </LinearLayout>
-    </LinearLayout>
-
+    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:gravity="center"
+    android:id="@+id/parentLayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <TextView  
+    android:id="@+id/title"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:textSize="20.0dip"
+	android:textColor="#FFFFFF"
+	android:paddingTop="10dip"
+	android:paddingBottom="15dip"
+	android:gravity="center"
+    android:text="@string/title_add_new_server"
+    />
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_new_server_table"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="15.0dip"
+    android:paddingRight="15.0dip"
+    android:stretchColumns="0"
+	>
+	<TableRow>
+    <TextView  
+    	android:id="@+id/label_server"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+		android:text="@string/label_server"
+	    android:textSize="12.0dip"
+	    android:textStyle="bold"
+	    android:gravity="left|center_vertical"
+    />
+    </TableRow>
+    <TableRow>
+        <EditText  
+    	android:id="@+id/field_server"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+	  	android:text=""
+	    android:textSize="14.0dip"
+	    android:gravity="left|center_vertical"
+    />
+    </TableRow>
+    <TableRow>
+    <TextView
+	    android:id="@+id/label_port"
+	    android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+	    android:text="@string/label_port"
+	    android:textSize="12.0dip"
+	    android:textStyle="bold"
+	    android:paddingTop="10.0dip"
+	    android:gravity="left|center_vertical"
+	/>
+    </TableRow>
+    <TableRow>
+	<EditText  
+	    android:id="@+id/field_port"
+	    android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+	    android:numeric="integer"
+	    android:text="27015"
+	    android:textSize="14.0dip"
+	    android:gravity="left|center_vertical"
+	/>
+	</TableRow>
+	<TableRow>
+    <TextView  
+    	android:id="@+id/label_timeout"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+		android:text="@string/label_timeout"
+	    android:textSize="12.0dip"
+	    android:textStyle="bold"
+	    android:paddingTop="10.0dip"
+	    android:gravity="left|center_vertical"
+    />
+    </TableRow>
+    <TableRow>
+    <EditText  
+    	android:id="@+id/field_timeout"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+    	android:numeric="integer"
+	  	android:text="2"
+	    android:textSize="14.0dip"
+	    android:gravity="left|center_vertical"
+    />
+    </TableRow>
+    <TableRow>
+    <TextView  
+    	android:id="@+id/label_password"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+		android:text="@string/label_password"
+	    android:textSize="12.0dip"
+	    android:textStyle="bold"
+	    android:paddingTop="10.0dip"
+	    android:gravity="left|center_vertical"
+    />
+    </TableRow>
+    <TableRow>
+    <EditText  
+    	android:id="@+id/field_password"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:singleLine="true"
+	  	android:text=""
+	    android:textSize="14.0dip"
+	    android:gravity="left|center_vertical"
+    />
+	</TableRow>
+</TableLayout>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/buttonTable"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="1"
+    android:gravity="center_horizontal"
+	>
+	<TableRow android:gravity="center_horizontal" android:paddingTop="10dip">
+	<Button
+		android:id="@+id/addServerButton"
+		android:text="@string/button_add"
+    	android:width="100.0sp"
+    	android:gravity="center_horizontal|center_vertical"
+   	/>
+   	<Button
+		android:id="@+id/cancelButton"
+		android:text="@string/button_cancel"
+    	android:width="100.0sp"
+    	android:gravity="center_horizontal|center_vertical"
+   	/>
+</TableRow>
+</TableLayout>
+</LinearLayout>
 </ScrollView>

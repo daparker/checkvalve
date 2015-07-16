@@ -20,95 +20,31 @@ along with the CheckValve source code.  If not, see
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dparker.apps.checkvalve"
-    android:installLocation="auto"
-    android:versionCode="9"
-    android:versionName="2.0.0" >
-
-    <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="19" />
-
-    <uses-permission android:name="android.permission.INTERNET" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
-    </uses-permission>
-
-    <application
-        android:allowBackup="true"
-        android:icon="@drawable/icon"
-        android:label="@string/app_name"
-        android:theme="@style/checkvalveTheme" >
-        <activity
-            android:name="com.dparker.apps.checkvalve.CheckValve"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:label="@string/app_name" >
+      package="com.dparker.apps.checkvalve"
+      android:versionCode="8"
+      android:versionName="1.3.5"
+      android:installLocation="auto">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".CheckValve"
+                  android:label="@string/app_name"
+                  android:configChanges="orientation|keyboard|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.dparker.apps.checkvalve.AddServerActivity"
-            class="AddServerActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.ManageServersActivity"
-            class="ManageServersActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.EditServerActivity"
-            class="EditServerActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.ShowPlayersActivity"
-            class="ShowPlayersActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.PlayerSearchActivity"
-            class="PlayerSearchActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.SearchPlayersActivity"
-            class="SearchPlayersActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.RconActivity"
-            class="RconActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.RconPasswordActivity"
-            class="RconPasswordActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.AboutActivity"
-            class="AboutActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.ChatViewerActivity"
-            class="ChatActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.ChatRelayDetailsActivity"
-            class="ChatRelayDetailsActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.SettingsActivity"
-            class="SettingsActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-        <activity
-            android:name="com.dparker.apps.checkvalve.ShowNoteActivity"
-            class="ShowNoteActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity class="ConfirmDelete" android:name=".ConfirmDelete" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="AddNewServer" android:name=".AddNewServer" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="MessageBox" android:name=".MessageBox" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="ManageServers" android:name=".ManageServers" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.NoTitleBar" />
+        <activity class="UpdateServer" android:name=".UpdateServer" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="QueryPlayers" android:name=".QueryPlayers" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="PlayerSearch" android:name=".PlayerSearch" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="SearchPlayersUI" android:name=".SearchPlayersUI" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.NoTitleBar" />
+        <activity class="RconUI" android:name=".RconUI" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.NoTitleBar" />
+        <activity class="RconPassword" android:name=".RconPassword" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />
+        <activity class="About" android:name=".About" android:configChanges="orientation|keyboard|keyboardHidden" android:theme="@android:style/Theme.Dialog" />      
     </application>
-
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
 </manifest>

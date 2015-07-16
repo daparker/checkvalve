@@ -21,45 +21,45 @@ along with the CheckValve source code.  If not, see
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll_pane"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="#262626"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/parent_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#262626"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="15dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/title_search_results"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
-
-        <TableLayout
-            android:id="@+id/message_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shrinkColumns="0" >
-        </TableLayout>
-
-        <TableLayout
-            android:id="@+id/search_results_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:shrinkColumns="0" >
-        </TableLayout>
-    </LinearLayout>
-
+    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_layout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#262626"
+    >
+    <TextView  
+    android:id="@+id/title"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:textSize="20.0dip"
+	android:textColor="#FFFFFF"
+	android:paddingTop="10dip"
+	android:paddingBottom="15dip"
+	android:paddingLeft="10dip"
+	android:paddingRight="10dip"
+	android:gravity="center"
+    android:text="@string/title_search_results"
+    />
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_table"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="0"
+>
+</TableLayout>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_results_table"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dip"
+    android:shrinkColumns="0"
+>
+</TableLayout>
+</LinearLayout>
 </ScrollView>

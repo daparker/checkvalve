@@ -19,13 +19,9 @@ along with the CheckValve source code.  If not, see
 <http://www.gnu.org/licenses/>.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item
-        android:id="@+id/back"
-        android:title="@string/menu_back"/>
-    <item
-        android:id="@+id/clear_console"
-        android:title="@string/menu_clear_console"/>
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/back"
+          android:title="@string/menu_back" />
+<item android:id="@+id/clear_console"
+          android:title="@string/menu_clear_console" />
 </menu>
