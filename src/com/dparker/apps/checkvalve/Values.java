@@ -56,9 +56,17 @@ public class Values {
     public static final String EXTRA_NOTE_ID = "noteString";
 
     // Bundle keys
+    public static final String SERVER_NAME = "serverName";
+    public static final String SERVER_MAP = "serverMap";
+    public static final String SERVER_GAME = "serverGame";
+    public static final String SERVER_VERSION = "serverVersion";
+    public static final String SERVER_NUM_PLAYERS = "numPlayers";
+    public static final String SERVER_MAX_PLAYERS = "maxPlayers";
+    public static final String SERVER_TAGS = "serverTags";
     public static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
     public static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
     public static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
+    public static final String SETTING_RCON_ENABLE_HISTORY = "rconEnableHistory";
     public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
     public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
@@ -83,7 +91,18 @@ public class Values {
     public static final String TAG_PLAYER_INFO = "playerInfo";
     public static final String TAG_MESSAGE_INFO = "messageInfo";
     
-    // Filenames
+    // File names
     public static final String FILE_HIDE_CHAT_RELAY_NOTE = ".hide_chat_relay_note";
     public static final String FILE_HIDE_CONSOLE_RELAY_NOTE = ".hide_console_relay_note";
+    
+    // Server query values
+    public static final int INT_PACKET_HEADER = 0xFFFFFFFF;
+    public static final int INT_SPLIT_HEADER = 0xFFFFFFFE;
+    public static final byte BYTE_CHALLENGE_RESPONSE = (byte)0x41;
+    public static final byte BYTE_SOURCE_INFO = (byte)0x6D;
+    public static final byte BYTE_GOLDSRC_INFO = (byte)0x49;
+    public static final byte BYTE_A2S_INFO = (byte)0x54;
+    public static final byte BYTE_A2S_PLAYER = (byte)0x55;
+    public static final byte BYTE_A2S_RULES = (byte)0x56;
+    public static final String A2S_INFO_QUERY = "Source Engine Query";
 }
