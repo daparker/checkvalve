@@ -23,7 +23,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -34,13 +33,14 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
     public static final String DATABASE_NAME = "servers_db";
     public static final String TABLE_SERVERS = "servers";
     public static final String TABLE_SETTINGS = "settings";
+    public static final String TABLE_RELAY_HOSTS = "relay_hosts";
     public static final String SERVERS_ROWID = "row_id";
     public static final String SERVERS_SERVER = "server";
     public static final String SERVERS_PORT = "port";
@@ -51,6 +51,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_RCON_WARN_UNSAFE = "rcon_warn_unsafe";
     public static final String SETTINGS_RCON_SHOW_PASSWORDS = "rcon_show_passwords";
     public static final String SETTINGS_RCON_SHOW_SUGGESTIONS = "rcon_show_suggestions";
+    public static final String SETTINGS_RCON_ENABLE_HISTORY = "rcon_enable_history";
     public static final String SETTINGS_SHOW_SERVER_IP = "show_ip";
     public static final String SETTINGS_SHOW_SERVER_MAP = "show_map";
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
@@ -62,6 +63,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_DEFAULT_RELAY_PORT = "default_relay_port";
     public static final String SETTINGS_DEFAULT_RELAY_PASSWORD = "default_relay_password";
     public static final String SETTINGS_VALIDATE_NEW_SERVERS = "validate_new_servers";
+    public static final String RELAY_HOSTS_ROWID = "row_id";
+    public static final String RELAY_HOSTS_HOST = "host";
 
     private static final String CREATE_TABLE_SERVERS = 
             "CREATE TABLE " + TABLE_SERVERS + "(" 
@@ -79,6 +82,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_RCON_WARN_UNSAFE + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_SHOW_PASSWORDS + " INTEGER NOT NULL DEFAULT 0, "
             + SETTINGS_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
@@ -92,6 +96,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT ''"
             + ");";
 
+    private static final String CREATE_TABLE_RELAY_HOSTS =
+            "CREATE TABLE " + TABLE_RELAY_HOSTS + "("
+            + RELAY_HOSTS_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + RELAY_HOSTS_HOST + " TEXT NOT NULL DEFAULT ''"
+            + ");";
+    
     private static final Object[] lock = new Object[0];
 
     /**
@@ -145,6 +155,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_RCON_WARN_UNSAFE, 1);
             values.put(SETTINGS_RCON_SHOW_PASSWORDS, 1);
             values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, 1);
+            values.put(SETTINGS_RCON_ENABLE_HISTORY, 1);
             values.put(SETTINGS_SHOW_SERVER_IP, 1);
             values.put(SETTINGS_SHOW_SERVER_MAP, 1);
             values.put(SETTINGS_SHOW_SERVER_PLAYERS, 1);
@@ -159,6 +170,9 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
             Log.i(TAG, "Inserting default values");
             db.insert(TABLE_SETTINGS, null, values);
+            
+            Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
+            db.execSQL(CREATE_TABLE_RELAY_HOSTS);
         }
         catch( SQLiteException e ) {
             Log.w(TAG, "Caught an exception while creating database:");
@@ -172,16 +186,29 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onDowngrade( SQLiteDatabase db, int oldVersion, int newVersion ) {
+        Log.i(TAG, "Downgrading database from version " + oldVersion + " to " + newVersion);
+    }
+    
+    @Override
     public void onUpgrade( SQLiteDatabase db, int oldVersion, int newVersion ) {
         Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 
         if( oldVersion < 2 ) {
+            /*
+             * Added the RCON password column to the servers table in DB version 2.
+             */
+            
             // Add the rcon_password column to the servers table
             db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_RCON + " TEXT NOT NULL DEFAULT '';");
         }
 
         if( oldVersion < 3 ) {
             try {
+                /*
+                 * Added the settings table in DB version 3.
+                 */
+                
                 // Create the settings table
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
@@ -250,6 +277,44 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 for( StackTraceElement x : ste )
                     Log.e(TAG, "    " + x.toString());
             }
+        }
+        
+        if( oldVersion < 4 ) {
+            try {
+                /*
+                 * Added a setting to enable/disable RCON command history in DB version 4.
+                 */
+                
+                // Add the rcon_enable_history column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_ENABLE_HISTORY + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_RCON_ENABLE_HISTORY, 1);
+
+                Log.i(TAG, "Setting " + SETTINGS_RCON_ENABLE_HISTORY + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:");
+                Log.w(TAG, e.toString());
+
+                StackTraceElement[] ste = e.getStackTrace();
+
+                for( StackTraceElement x : ste )
+                    Log.e(TAG, "    " + x.toString());
+            }
+        }
+        
+        if( oldVersion < 5 ) {
+            /*
+             * Added the relay_hosts table in DB version 5.
+             */
+            
+            // Add the relay_hosts table
+            Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
+            db.execSQL(CREATE_TABLE_RELAY_HOSTS);
         }
     }
 
@@ -363,7 +428,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     /**
      * Queries the database for all server information.
      * 
-     * @return A <tt>ServerRecord array</tt> containing the results of the query.
+     * @return A <tt>ServerRecord[]</tt> array containing the results of the query.
      */
     public ServerRecord[] getAllServers() {
         Cursor c;
@@ -407,8 +472,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * Queries the database for the specified server's data.
      * 
      * @param rowId The database row which contains the server's data
-     * @return A <tt>Cursor</tt> containing the results of the query.
-     * @throws SQLException
+     * @return A <tt>ServerRecord</tt> containing the results of the query.
      */
     public ServerRecord getServer( long rowId ) {
         ServerRecord result = null;
@@ -580,7 +644,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * </p>
      * @param rowId The database row which contains the server's data
      * @return A boolean value indicating whether or not the operation was successful.
-     * @see com.dparker.apps.checkvalve.DatabaseProvider#getLastPosition()
+     * @see com.github.daparker.checkvalve.DatabaseProvider#getLastPosition()
      */
     public boolean moveServerDown( long rowId ) {
         Cursor c;
@@ -655,6 +719,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_RCON_WARN_UNSAFE,
                 SETTINGS_RCON_SHOW_PASSWORDS,
                 SETTINGS_RCON_SHOW_SUGGESTIONS,
+                SETTINGS_RCON_ENABLE_HISTORY,
                 SETTINGS_SHOW_SERVER_IP,
                 SETTINGS_SHOW_SERVER_MAP,
                 SETTINGS_SHOW_SERVER_PLAYERS,
@@ -682,6 +747,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_RCON_SHOW_SUGGESTIONS) )
                     result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_RCON_ENABLE_HISTORY) )
+                    result.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
@@ -726,6 +793,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int warnUnsafe = (settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, true))?1:0;
         int showPwds = (settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, true))?1:0;
         int showSuggest = (settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, true))?1:0;
+        int enableHistory = (settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
@@ -746,6 +814,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_WARN_UNSAFE, warnUnsafe);
         values.put(SETTINGS_RCON_SHOW_PASSWORDS, showPwds);
         values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, showSuggest);
+        values.put(SETTINGS_RCON_ENABLE_HISTORY, enableHistory);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
@@ -767,5 +836,80 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         }
 
         return (result == 0)?false:true;
+    }
+    
+    /**
+     * Add a Chat Relay host to the database.
+     * 
+     * @param host The IP address or URL to be added.
+     * @return A boolean value indicating whether or not the update was successful.
+     */
+    public boolean putRelayHost( String host ) {
+        if( host.length() == 0 ) {
+            Log.d(TAG, "putRelayHost(): Host parameter was an empty string; returning false.");
+            return false;
+        }
+        
+        long result;
+        
+        ContentValues values = new ContentValues();
+        values.put(RELAY_HOSTS_HOST, host);
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            Log.i(TAG, "Inserting row into " + TABLE_RELAY_HOSTS + " with ContentValues " + values.toString());
+            result = db.insert(TABLE_RELAY_HOSTS, null, values);
+            Log.i(TAG, "Inserted row ID = " + result);
+        }
+
+        return (result < 0)?false:true;
+    }
+    
+    /**
+     * Queries the database for the saved Chat Relay hosts.
+     * 
+     * @return A <tt>String[]</tt> array containing the results of the query.
+     */
+    public String[] getRelayHosts() {
+        String[] result = null;
+
+        Cursor c;
+
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            c = db.query(
+                    TABLE_RELAY_HOSTS,
+                    new String[] { RELAY_HOSTS_HOST },
+                    null,
+                    null,
+                    null,
+                    null,
+                    RELAY_HOSTS_ROWID);
+
+            int count = c.getCount();
+
+            result = new String[count];
+
+            for( int i = 0; i < count; i++ ) {
+                c.moveToPosition(i);
+                result[i] = c.getString(0);
+            }
+
+            c.close();
+        }
+
+        return result;
+    }
+    
+    /**
+     * Deletes all saved Chat Relay hosts from the database.
+     */
+    public void deleteRelayHosts() {
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete(TABLE_RELAY_HOSTS, null, null);
+        }
     }
 }
