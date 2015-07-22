@@ -22,9 +22,11 @@ package com.dparker.apps.checkvalve;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.TextView;
 import com.dparker.apps.checkvalve.R;
 
 public class AboutActivity extends Activity {
@@ -45,7 +47,10 @@ public class AboutActivity extends Activity {
         this.setResult(0);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.about);
-
+        
+        TextView app_support = (TextView)this.findViewById(R.id.app_support);
+        app_support.setMovementMethod(LinkMovementMethod.getInstance());
+        
         this.findViewById(R.id.dismiss_button).setOnClickListener(dismissButtonListener);
     }
 
