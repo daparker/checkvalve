@@ -42,6 +42,7 @@ public class SettingsActivity extends Activity {
     private boolean rconShowPasswords;
     private boolean rconWarnUnsafeCommand;
     private boolean rconShowSuggestions;
+    private boolean rconEnableHistory;
     private boolean showServerIP;
     private boolean showServerGameInfo;
     private boolean showServerMapName;
@@ -54,6 +55,7 @@ public class SettingsActivity extends Activity {
     private CheckBox checkbox_rcon_show_passwords;
     private CheckBox checkbox_rcon_warn_unsafe_command;
     private CheckBox checkbox_rcon_show_suggestions;
+    private CheckBox checkbox_rcon_enable_history;
     private CheckBox checkbox_show_server_ip;
     private CheckBox checkbox_show_server_game_info;
     private CheckBox checkbox_show_server_map_name;
@@ -66,6 +68,7 @@ public class SettingsActivity extends Activity {
     private EditText field_default_relay_port;
     private EditText field_default_relay_password;
     private TextView reset_do_not_show;
+    private TextView clear_saved_relays;
 
     private DatabaseProvider database;
 
@@ -83,24 +86,35 @@ public class SettingsActivity extends Activity {
     };
     
     private OnTouchListener resetTouchListener = new OnTouchListener() {
-    	public boolean onTouch( View v, MotionEvent m ) {
-    		if( m.getAction() == MotionEvent.ACTION_DOWN ) {
-    			/*
-    			 * Delete marker files for 'do not show' settings
-    			 */
-    			
+        public boolean onTouch( View v, MotionEvent m ) {
+            if( m.getAction() == MotionEvent.ACTION_DOWN ) {
+                /*
+                 * Delete marker files for 'do not show' settings
+                 */
+                	
                 File filesDir = SettingsActivity.this.getFilesDir();
                 File f1 = new File(filesDir, Values.FILE_HIDE_CHAT_RELAY_NOTE);
-		    	File f2 = new File(filesDir, Values.FILE_HIDE_CONSOLE_RELAY_NOTE);
-		    	
-		    	f1.delete();
-		    	f2.delete();
-		    	
-		    	UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_options_reset);
-    		}
-	    	
-	    	return false;
-    	}
+                File f2 = new File(filesDir, Values.FILE_HIDE_CONSOLE_RELAY_NOTE);
+                		    	
+                f1.delete();
+                f2.delete();
+                		    	
+                UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_options_reset);
+            }
+            	    	
+            return false;
+        }
+    };
+    
+    private OnTouchListener clearSavedRelaysTouchListener = new OnTouchListener() {
+        public boolean onTouch( View v, MotionEvent m ) {
+            if( m.getAction() == MotionEvent.ACTION_DOWN ) {
+                database.deleteRelayHosts();
+                UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_cleared_relay_list);
+            }
+            
+            return false;
+        }
     };
     
     private OnClickListener saveButtonListener = new OnClickListener() {
@@ -156,6 +170,7 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
         checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
         checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.checkbox_rcon_show_suggestions);
+        checkbox_rcon_enable_history = (CheckBox)findViewById(R.id.checkbox_rcon_enable_history);
         checkbox_show_server_ip = (CheckBox)findViewById(R.id.checkbox_servers_show_ip);
         checkbox_show_server_game_info = (CheckBox)findViewById(R.id.checkbox_servers_show_game);
         checkbox_show_server_map_name = (CheckBox)findViewById(R.id.checkbox_servers_show_map);
@@ -170,6 +185,9 @@ public class SettingsActivity extends Activity {
 
         reset_do_not_show = (TextView)findViewById(R.id.reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
+        
+        clear_saved_relays = (TextView)findViewById(R.id.clear_saved_relays);
+        clear_saved_relays.setOnTouchListener(clearSavedRelaysTouchListener);
         
         cancelButton.requestFocus();
 
@@ -208,6 +226,7 @@ public class SettingsActivity extends Activity {
         rconShowPasswords = b.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS);
         rconWarnUnsafeCommand = b.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
         rconShowSuggestions = b.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS);
+        rconEnableHistory = b.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
         showServerIP = b.getBoolean(Values.SETTING_SHOW_SERVER_IP);
         showServerGameInfo = b.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO);
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
@@ -218,6 +237,7 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
         checkbox_rcon_warn_unsafe_command.setChecked(rconWarnUnsafeCommand);
         checkbox_rcon_show_suggestions.setChecked(rconShowSuggestions);
+        checkbox_rcon_enable_history.setChecked(rconEnableHistory);
         checkbox_show_server_ip.setChecked(showServerIP);
         checkbox_show_server_game_info.setChecked(showServerGameInfo);
         checkbox_show_server_map_name.setChecked(showServerMapName);
@@ -246,6 +266,9 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.checkbox_rcon_show_suggestions:
                 rconShowSuggestions = checked;
+                break;
+            case R.id.checkbox_rcon_enable_history:
+                rconEnableHistory = checked;
                 break;
             case R.id.checkbox_servers_show_ip:
                 showServerIP = checked;
@@ -304,6 +327,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, rconShowPasswords);
             b.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, rconWarnUnsafeCommand);
             b.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, rconShowSuggestions);
+            b.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, rconEnableHistory);
             b.putBoolean(Values.SETTING_SHOW_SERVER_IP, showServerIP);
             b.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, showServerGameInfo);
             b.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, showServerMapName);
