@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -39,17 +39,17 @@ import android.view.MenuInflater;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewConfiguration;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import com.github.daparker.checkvalve.R;
 
-public class CheckValve extends Activity
-{
+public class CheckValve extends Activity {
     private static final String TAG = CheckValve.class.getSimpleName();
 
     private ProgressDialog p;
@@ -65,74 +65,73 @@ public class CheckValve extends Activity
 
     @SuppressLint("InlinedApi")
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "Starting CheckValve.");
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         setContentView(R.layout.main);
 
         if( database == null )
-            database = new DatabaseProvider(CheckValve.this);
+        	database = new DatabaseProvider(CheckValve.this);
 
         selectedServerRowId = 0;
         server_info_table = (TableLayout)findViewById(R.id.server_info_table);
         message_table = (TableLayout)findViewById(R.id.message_table);
         message_table.setVisibility(-1);
-
+        
         getSettings();
         queryServers();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         selectedServerRowId = 0;
 
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
+        
+        getSettings();
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
 
         // Dismiss the progress dialog to avoid a leaked window
-        if( p != null )
-            p.dismiss();
+        if( p != null ) p.dismiss();
 
-        if( database != null )
-        {
+        if( database != null ) {
             database.close();
             database = null;
         }
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
-        switch( item.getItemId() )
-        {
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        switch( item.getItemId() ) {
             case R.id.quit:
                 // "Quit" option was selected
                 quit();
@@ -184,8 +183,7 @@ public class CheckValve extends Activity
     }
 
     @Override
-    public void onCreateContextMenu( ContextMenu menu, View v, ContextMenuInfo menuInfo )
-    {
+    public void onCreateContextMenu( ContextMenu menu, View v, ContextMenuInfo menuInfo ) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         selectedServerRowId = (long)v.getId();
@@ -196,12 +194,10 @@ public class CheckValve extends Activity
     }
 
     @Override
-    public boolean onContextItemSelected( MenuItem item )
-    {
+    public boolean onContextItemSelected( MenuItem item ) {
         long id = selectedServerRowId;
 
-        switch( item.getItemId() )
-        {
+        switch( item.getItemId() ) {
             case R.id.rcon:
                 // "RCON" option was selected
                 rcon(id);
@@ -232,13 +228,10 @@ public class CheckValve extends Activity
         return true;
     }
 
-    public void onActivityResult( int request, int result, Intent data )
-    {
-        if( database == null )
-            database = new DatabaseProvider(CheckValve.this);
+    public void onActivityResult( int request, int result, Intent data ) {
+        if( database == null ) database = new DatabaseProvider(CheckValve.this);
 
-        switch( request )
-        {
+        switch( request ) {
             case Values.ACTIVITY_RCON:
             case Values.ACTIVITY_CHAT:
             case Values.ACTIVITY_ABOUT:
@@ -253,12 +246,10 @@ public class CheckValve extends Activity
                 break;
 
             case Values.ACTIVITY_SETTINGS:
-                if( result == -1 )
-                {
+                if( result == -1 ) {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
                 }
-                else if( result == 0 )
-                {
+                else if( result == 0 ) {
                     getSettings();
                     refreshView();
                 }
@@ -269,24 +260,20 @@ public class CheckValve extends Activity
     }
 
     // Define the touch listener for table rows
-    private OnTouchListener tableRowTouchListener = new OnTouchListener()
-    {
-        public boolean onTouch( View v, MotionEvent m )
-        {
+    private OnTouchListener tableRowTouchListener = new OnTouchListener() {
+        public boolean onTouch( View v, MotionEvent m ) {
             int id = v.getId();
             int action = m.getAction();
             int count = server_info_table.getChildCount();
 
             // Set the background color of each row to gray if the touch action is "UP"
-            if( action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL )
-            {
+            if( action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL ) {
                 for( int i = 0; i < count; i++ )
                     if( server_info_table.getChildAt(i).getId() == id )
                         server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_gray);
             }
             // Set the background color of each row to blue if the touch action is "DOWN"
-            else
-            {
+            else {
                 for( int i = 0; i < count; i++ )
                     if( server_info_table.getChildAt(i).getId() == id )
                         server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_blue);
@@ -297,10 +284,8 @@ public class CheckValve extends Activity
     };
 
     // Define the focus change listener for table rows
-    private OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener()
-    {
-        public void onFocusChange( View v, boolean f )
-        {
+    private OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener() {
+        public void onFocusChange( View v, boolean f ) {
             int id = v.getId();
             int count = server_info_table.getChildCount();
 
@@ -312,8 +297,7 @@ public class CheckValve extends Activity
     };
 
     //@SuppressWarnings("deprecation")
-    public void queryServers()
-    {
+    public void queryServers() {
         // Clear the server info table
         server_info_table.setVisibility(-1);
         server_info_table.removeAllViews();
@@ -324,12 +308,10 @@ public class CheckValve extends Activity
 
         int count = (int)database.getServerCount();
 
-        if( count == 0 )
-        {
+        if( count == 0 ) {
             addNewServer();
         }
-        else
-        {
+        else {
             // Show the progress dialog
             p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
@@ -343,17 +325,21 @@ public class CheckValve extends Activity
     }
 
     // Handler for the server query thread
-    Handler progressHandler = new Handler()
-    {
-        public void handleMessage( Message msg )
-        {
+    Handler progressHandler = new Handler() {
+        public void handleMessage( Message msg ) {
+            // A negative "what" code indicates the server query thread failed
+            if( msg.what < 0 ) {
+                p.dismiss();
+                UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
+                return;
+            }
+            
             String tag = new String();
 
             /*
              * Build and display the messages table if there are errors to be displayed
              */
-            if( messageRows[0] != null )
-            {
+            if( messageRows[0] != null ) {
                 int m = 0;
 
                 while( (m < messageRows.length) && (messageRows[m] != null) )
@@ -365,10 +351,8 @@ public class CheckValve extends Activity
             /*
              * Build and display the query results table
              */
-            for( int i = 0; i < tableRows.length; i++ )
-            {
-                if( tableRows[i] != null )
-                {
+            for( int i = 0; i < tableRows.length; i++ ) {
+                if( tableRows[i] != null ) {
                     TextView spacer = new TextView(CheckValve.this);
 
                     spacer.setId(0);
@@ -383,8 +367,7 @@ public class CheckValve extends Activity
 
                     tableRows[i][0].setOnFocusChangeListener(tableRowFocusChangeListener);
 
-                    for( int j = 0; j < tableRows[i].length; j++ )
-                    {
+                    for( int j = 0; j < tableRows[i].length; j++ ) {
                         registerForContextMenu(tableRows[i][j]);
                         tableRows[i][j].setOnTouchListener(tableRowTouchListener);
                         tableRows[i][j].setFocusable(false);
@@ -403,13 +386,34 @@ public class CheckValve extends Activity
                             tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
                     }
 
-                    server_info_table.addView(spacerRow, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][0], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][1], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][2], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][3], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][4], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    server_info_table.addView(tableRows[i][5], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    server_info_table.addView(
+                            spacerRow,
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][0],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][1],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][2],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][3],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][4],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
+                            tableRows[i][5],
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
                 }
             }
 
@@ -418,17 +422,14 @@ public class CheckValve extends Activity
         }
     };
 
-    public void refreshView()
-    {
+    public void refreshView() {
         String tag = new String();
 
-        for( int i = 0; i < server_info_table.getChildCount(); i++ )
-        {
+        for( int i = 0; i < server_info_table.getChildCount(); i++ ) {
             server_info_table.getChildAt(i).setVisibility(View.VISIBLE);
             tag = (String)server_info_table.getChildAt(i).getTag();
 
-            if( tag != null )
-            {
+            if( tag != null ) {
                 if( tag.equals(Values.TAG_SERVER_IP) )
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_GAME) )
@@ -445,56 +446,45 @@ public class CheckValve extends Activity
         server_info_table.invalidate();
     }
 
-    public void getSettings()
-    {
+    public void getSettings() {
         settings = database.getSettingsAsBundle();
     }
 
-    public void quit()
-    {
+    public void quit() {
         finish();
     }
 
-    public void addNewServer()
-    {
+    public void addNewServer() {
         Intent addNewServerIntent = new Intent();
         addNewServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AddServerActivity");
         startActivityForResult(addNewServerIntent, Values.ACTIVITY_ADD_NEW_SERVER);
     }
 
-    public void manageServers()
-    {
+    public void manageServers() {
         Intent manageServersIntent = new Intent();
         manageServersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ManageServersActivity");
         startActivityForResult(manageServersIntent, Values.ACTIVITY_MANAGE_SERVERS);
     }
 
-    public void showPlayers( final long rowId )
-    {
+    public void showPlayers( final long rowId ) {
         final ServerRecord sr = database.getServer(rowId);
         final String server = sr.getServerName();
         final int port = sr.getServerPort();
         final int timeout = sr.getServerTimeout();
 
-        final Handler playerQueryHandler = new Handler()
-        {
+        final Handler playerQueryHandler = new Handler() {
             @SuppressWarnings("unchecked")
-            public void handleMessage( Message msg )
-            {
+            public void handleMessage( Message msg ) {
                 p.dismiss();
 
-                if( msg.what == -2 )
-                {
+                if( msg.what == -2 ) {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_no_players);
                 }
-                else if( msg.what == -1 )
-                {
+                else if( msg.what == -1 ) {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                 }
-                else
-                {
-                    if( msg.obj != null )
-                    {
+                else {
+                    if( msg.obj != null ) {
                         ArrayList<PlayerRecord> playerList = (ArrayList<PlayerRecord>)msg.obj;
 
                         Intent showPlayersIntent = new Intent();
@@ -502,8 +492,7 @@ public class CheckValve extends Activity
                         showPlayersIntent.putParcelableArrayListExtra(Values.EXTRA_PLAYER_LIST, playerList);
                         startActivityForResult(showPlayersIntent, Values.ACTIVITY_SHOW_PLAYERS);
                     }
-                    else
-                    {
+                    else {
                         Log.d(TAG, "handleMessage(): Object 'msg.obj' is null");
                         UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                         finish();
@@ -512,33 +501,27 @@ public class CheckValve extends Activity
             }
         };
 
-        final Handler challengeResponseHandler = new Handler()
-        {
-            public void handleMessage( Message msg )
-            {
+        final Handler challengeResponseHandler = new Handler() {
+            public void handleMessage( Message msg ) {
                 Log.d(TAG, "handleMessage(): msg=" + msg.toString());
 
-                if( msg.what != 0 )
-                {
+                if( msg.what != 0 ) {
                     p.dismiss();
                     Log.d(TAG, "handleMessage(): msg.what=" + msg.what);
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                 }
-                else
-                {
+                else {
                     Bundle b = (Bundle)msg.obj;
                     byte[] challengeResponse = b.getByteArray(Values.EXTRA_CHALLENGE_RESPONSE);
 
-                    if( challengeResponse == null )
-                    {
+                    if( challengeResponse == null ) {
                         p.dismiss();
                         String message = new String();
                         message += CheckValve.this.getText(R.string.msg_no_challenge_response);
                         message += " " + server + ":" + port;
                         UserVisibleMessage.showMessage(CheckValve.this, message);
                     }
-                    else
-                    {
+                    else {
                         new Thread(new QueryPlayers(CheckValve.this, rowId, challengeResponse, playerQueryHandler)).start();
                     }
                 }
@@ -550,15 +533,13 @@ public class CheckValve extends Activity
         new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
     }
 
-    public void playerSearch()
-    {
+    public void playerSearch() {
         Intent playerSearchIntent = new Intent();
         playerSearchIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.PlayerSearchActivity");
         startActivity(playerSearchIntent);
     }
 
-    public void updateServer( final long rowId )
-    {
+    public void updateServer( final long rowId ) {
         Intent updateServerIntent = new Intent();
         updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.EditServerActivity");
         updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
@@ -566,8 +547,7 @@ public class CheckValve extends Activity
     }
 
     @SuppressLint("InlinedApi")
-    public void deleteServer( final long rowId )
-    {
+    public void deleteServer( final long rowId ) {
         AlertDialog.Builder alertDialogBuilder;
 
         if( android.os.Build.VERSION.SDK_INT >= 11 )
@@ -580,26 +560,22 @@ public class CheckValve extends Activity
         alertDialogBuilder.setCancelable(false);
 
         alertDialogBuilder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id )
-            {
+            public void onClick( DialogInterface dialog, int id ) {
                 /*
                  *  "Delete" button was clicked
                  */
-                if( database.deleteServer(rowId) )
-                {
+                if( database.deleteServer(rowId) ) {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_server_deleted);
                     queryServers();
                 }
-                else
-                {
+                else {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
                 }
             }
         });
 
         alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id )
-            {
+            public void onClick( DialogInterface dialog, int id ) {
                 /*
                  * "Cancel" button was clicked
                  */
@@ -611,8 +587,7 @@ public class CheckValve extends Activity
         alertDialog.show();
     }
 
-    public void rcon( final long rowId )
-    {
+    public void rcon( final long rowId ) {
         ServerRecord sr = database.getServer(rowId);
 
         String s = sr.getServerName();
@@ -629,8 +604,7 @@ public class CheckValve extends Activity
         startActivityForResult(rconIntent, Values.ACTIVITY_RCON);
     }
 
-    public void chat( final long rowId )
-    {
+    public void chat( final long rowId ) {
         ServerRecord sr = database.getServer(rowId);
 
         String s = sr.getServerName();
@@ -647,15 +621,13 @@ public class CheckValve extends Activity
         startActivityForResult(chatIntent, Values.ACTIVITY_CHAT);
     }
 
-    public void about()
-    {
+    public void about() {
         Intent aboutIntent = new Intent();
         aboutIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AboutActivity");
         startActivityForResult(aboutIntent, Values.ACTIVITY_ABOUT);
     }
 
-    public void settings()
-    {
+    public void settings() {
         Intent settingsIntent = new Intent();
         settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.SettingsActivity");
         startActivityForResult(settingsIntent, Values.ACTIVITY_SETTINGS);

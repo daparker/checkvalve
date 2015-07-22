@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -24,9 +24,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-public class ChallengeResponseQuery implements Runnable
-{
+public class ChallengeResponseQuery implements Runnable {
     private Handler handler;
     private String server;
     private int status;
@@ -37,8 +38,7 @@ public class ChallengeResponseQuery implements Runnable
 
     private static final String TAG = ChallengeResponseQuery.class.getSimpleName();
 
-    public ChallengeResponseQuery( String server, int port, int timeout, long rowId, Handler handler )
-    {
+    public ChallengeResponseQuery( String server, int port, int timeout, long rowId, Handler handler ) {
         this.server = server;
         this.port = port;
         this.timeout = timeout;
@@ -46,16 +46,14 @@ public class ChallengeResponseQuery implements Runnable
         this.handler = handler;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         status = 0;
 
         getChallengeResponse();
 
-        if( handler != null )
-        {
+        if( handler != null ) {
             Bundle bundle = new Bundle();
             Message msg = new Message();
 
@@ -65,46 +63,40 @@ public class ChallengeResponseQuery implements Runnable
             msg.obj = bundle;
             msg.what = status;
 
-            if( challengeResponse == null )
-                Log.w(TAG, "run(): Challenge response is null");
+            if( challengeResponse == null ) Log.w(TAG, "run(): Challenge response is null");
 
             handler.sendMessage(msg);
         }
     }
 
-    public void getChallengeResponse()
-    {
-        DatagramSocket socket;
-
-        DatagramPacket packetOut;
-        DatagramPacket packetIn;
-
-        byte[] bufferOut;
-        byte[] bufferIn;
-
-        try
-        {
+    public void getChallengeResponse() {
+        try {
+            // Byte arrays for packet data
+            byte[] arrayIn = new byte[9];
+            byte[] arrayOut = new byte[9];
+            
+            ByteBuffer bufferOut = ByteBuffer.wrap(arrayOut);
+            bufferOut.order(ByteOrder.BIG_ENDIAN);
+            
             // Use A2S_PLAYER query string with 0xFFFFFFFF to get the challenge number
-            String queryString = "\u00FF\u00FF\u00FF\u00FF\u0055\u00FF\u00FF\u00FF\u00FF";
-
-            // Byte buffers for packet data
-            bufferOut = queryString.getBytes("ISO8859_1");
-            bufferIn = new byte[1400];
+            bufferOut.putInt(Values.INT_PACKET_HEADER);
+            bufferOut.put(Values.BYTE_A2S_PLAYER);
+            bufferOut.putInt(Values.INT_PACKET_HEADER);
+            bufferOut.flip();
 
             // UDP datagram packets
-            packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            packetIn = new DatagramPacket(bufferIn, bufferIn.length);
+            DatagramPacket packetOut = new DatagramPacket(arrayOut, arrayOut.length);
+            DatagramPacket packetIn = new DatagramPacket(arrayIn, arrayIn.length);
 
             // Create a socket for querying the server
-            socket = new DatagramSocket();
+            DatagramSocket socket = new DatagramSocket();
             socket.setSoTimeout(timeout * 1000);
 
             // Connect to the remote server
             socket.connect(InetAddress.getByName(server), port);
 
             // Return null if the connection attempt failed
-            if( !socket.isConnected() )
-            {
+            if( !socket.isConnected() ) {
                 Log.e(TAG, "getChallangeResponse(): Socket is not connected");
                 socket.close();
                 status = 1;
@@ -117,19 +109,16 @@ public class ChallengeResponseQuery implements Runnable
 
             // Close the socket
             socket.close();
-
+            
             // Store the challenge response in a byte array
-            challengeResponse = new byte[packetIn.getLength()];
+            challengeResponse = packetIn.getData();
+            
+            Log.d(TAG, "Received packet contains " + packetIn.getLength() + " bytes");
+            Log.d(TAG, "Challenge response contains " + challengeResponse.length + " bytes");
 
-            for( int i = 0; i < packetIn.getLength(); i++ )
-                challengeResponse[i] = bufferIn[i];
-
-            status = 0;
-
-            Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + challengeResponse.toString() + "; status=" + status);
+            Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + ByteBuffer.wrap(challengeResponse).getInt(5) + "; status=" + status);
         }
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             Log.w(TAG, "getChallengeResponse(): Caught an exception:");
             Log.w(TAG, e.toString());
 

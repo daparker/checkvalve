@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -30,26 +30,23 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-
 import com.github.daparker.checkvalve.R;
 
-public class ManageServersActivity extends Activity
-{
+public class ManageServersActivity extends Activity {
     private DatabaseProvider database;
     private TableLayout server_table;
     private Intent thisIntent;
     private Button x_button;
 
-    private OnClickListener xButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener xButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "X" button was clicked
              */
@@ -58,10 +55,8 @@ public class ManageServersActivity extends Activity
         }
     };
 
-    private OnClickListener editButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener editButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Edit" button was clicked
              */
@@ -71,11 +66,9 @@ public class ManageServersActivity extends Activity
         }
     };
 
-    private OnClickListener deleteButtonListener = new OnClickListener()
-    {
+    private OnClickListener deleteButtonListener = new OnClickListener() {
         @SuppressLint("InlinedApi")
-        public void onClick( View v )
-        {
+        public void onClick( View v ) {
             /*
              * "Delete" button was clicked
              */
@@ -94,27 +87,23 @@ public class ManageServersActivity extends Activity
             alertDialogBuilder.setCancelable(false);
 
             alertDialogBuilder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
-                public void onClick( DialogInterface dialog, int id )
-                {
+                public void onClick( DialogInterface dialog, int id ) {
                     /*
                      *  "Delete" button was clicked
                      */
-                    if( database.deleteServer(rowId) )
-                    {
+                    if( database.deleteServer(rowId) ) {
                         setResult(1, thisIntent);
                         showServerList();
                         UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_server_deleted);
                     }
-                    else
-                    {
+                    else {
                         UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
                     }
                 }
             });
 
             alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                public void onClick( DialogInterface dialog, int id )
-                {
+                public void onClick( DialogInterface dialog, int id ) {
                     /*
                      * "Cancel" button was clicked
                      */
@@ -128,57 +117,53 @@ public class ManageServersActivity extends Activity
         }
     };
 
-    private OnClickListener moveUpButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener moveUpButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Move Up" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
 
-            if( database.moveServerUp(rowId) )
-            {
+            if( database.moveServerUp(rowId) ) {
                 setResult(1, thisIntent);
                 showServerList();
             }
-            else
-            {
+            else {
                 UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
             }
         }
     };
 
-    private OnClickListener moveDownButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener moveDownButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Move Down" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
             long rowId = (long)v.getId();
 
-            if( database.moveServerDown(rowId) )
-            {
+            if( database.moveServerDown(rowId) ) {
                 setResult(1, thisIntent);
                 showServerList();
             }
-            else
-            {
+            else {
                 UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
             }
         }
     };
 
-    @SuppressLint("InlinedApi")
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         thisIntent = this.getIntent();
         setResult(0, thisIntent);
@@ -196,8 +181,7 @@ public class ManageServersActivity extends Activity
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         if( database == null )
@@ -205,33 +189,27 @@ public class ManageServersActivity extends Activity
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
 
-        if( database != null )
-        {
+        if( database != null ) {
             database.close();
             database = null;
         }
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
-    public void onActivityResult( int request, int result, Intent data )
-    {
-        if( database == null )
-            database = new DatabaseProvider(ManageServersActivity.this);
+    public void onActivityResult( int request, int result, Intent data ) {
+        if( database == null ) database = new DatabaseProvider(ManageServersActivity.this);
 
-        if( request == Values.ACTIVITY_UPDATE_SERVER 
-        		|| request == Values.ACTIVITY_CONFIRM_DELETE
-        		|| request == Values.ACTIVITY_ADD_NEW_SERVER )
-        {
+        if( request == Values.ACTIVITY_UPDATE_SERVER
+                || request == Values.ACTIVITY_CONFIRM_DELETE
+                || request == Values.ACTIVITY_ADD_NEW_SERVER ) {
             if( result == 1 )
                 setResult(1, thisIntent);
 
@@ -242,31 +220,27 @@ public class ManageServersActivity extends Activity
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.manageservers_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
-        switch( item.getItemId() )
-        {
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        switch( item.getItemId() ) {
             case R.id.back:
                 finish();
                 return true;
             case R.id.add_server:
-            	addNewServer();
-            	return true;
+                addNewServer();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-    
-    public void showServerList()
-    {
+
+    public void showServerList() {
         ServerRecord[] serverList = database.getAllServers();
 
         server_table.removeAllViews();
@@ -274,8 +248,7 @@ public class ManageServersActivity extends Activity
         /*
          * Loop through the servers in the database
          */
-        for( int i = 0; i < serverList.length; i++ )
-        {
+        for( int i = 0; i < serverList.length; i++ ) {
             ServerRecord sr = serverList[i];
 
             String server = sr.getServerName();
@@ -325,16 +298,14 @@ public class ManageServersActivity extends Activity
         }
     }
 
-    public void updateServer( long rowId )
-    {
+    public void updateServer( long rowId ) {
         Intent updateServerIntent = new Intent();
         updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.EditServerActivity");
-        updateServerIntent.putExtra("rowId", rowId);
+        updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
         startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
     }
-    
-    public void addNewServer()
-    {
+
+    public void addNewServer() {
         Intent addNewServerIntent = new Intent();
         addNewServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AddServerActivity");
         startActivityForResult(addNewServerIntent, Values.ACTIVITY_ADD_NEW_SERVER);

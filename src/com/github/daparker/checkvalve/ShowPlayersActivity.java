@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -36,8 +36,7 @@ import android.widget.TextView;
 import android.widget.TableRow.LayoutParams;
 import com.github.daparker.checkvalve.R;
 
-public class ShowPlayersActivity extends Activity
-{
+public class ShowPlayersActivity extends Activity {
     private static final String TAG = ShowPlayersActivity.class.getSimpleName();
 
     private DatabaseProvider database;
@@ -46,8 +45,7 @@ public class ShowPlayersActivity extends Activity
     ArrayList<PlayerRecord> playerList;
 
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
         this.setResult(0);
@@ -68,8 +66,7 @@ public class ShowPlayersActivity extends Activity
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         if( database == null )
@@ -77,28 +74,23 @@ public class ShowPlayersActivity extends Activity
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
-        if( database != null )
-        {
+        if( database != null ) {
             database.close();
             database = null;
         }
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
-    private OnClickListener xButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener xButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "X" button was clicked
              */
@@ -107,10 +99,8 @@ public class ShowPlayersActivity extends Activity
         }
     };
 
-    private void showPlayers()
-    {
-        for( int i = 0; i < playerList.size(); i++ )
-        {
+    private void showPlayers() {
+        for( int i = 0; i < playerList.size(); i++ ) {
             PlayerRecord pr = playerList.get(i);
 
             TableRow row = new TableRow(ShowPlayersActivity.this);

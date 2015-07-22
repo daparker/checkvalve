@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -31,16 +31,13 @@ import android.content.Context;
 import android.content.Intent;
 import com.github.daparker.checkvalve.R;
 
-public class PlayerSearchActivity extends Activity
-{
+public class PlayerSearchActivity extends Activity {
     private EditText field_playersearch;
     private Button search_button;
     private Button cancel_button;
 
-    private OnClickListener searchButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener searchButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Search" button was clicked
              */
@@ -53,22 +50,18 @@ public class PlayerSearchActivity extends Activity
 
             int search_string_len = field_playersearch.getText().toString().length();
 
-            if( search_string_len == 0 )
-            {
+            if( search_string_len == 0 ) {
                 UserVisibleMessage.showMessage(PlayerSearchActivity.this, R.string.msg_empty_fields);
             }
-            else
-            {
+            else {
                 String search = field_playersearch.getText().toString();
                 searchPlayers(search);
             }
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener cancelButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Cancel" button was clicked
              */
@@ -78,8 +71,7 @@ public class PlayerSearchActivity extends Activity
     };
 
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -95,22 +87,19 @@ public class PlayerSearchActivity extends Activity
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
     }
 
-    public void searchPlayers( String s )
-    {
+    public void searchPlayers( String s ) {
         Intent searchPlayersIntent = new Intent();
         searchPlayersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.SearchPlayersActivity");
-        searchPlayersIntent.putExtra("search", s);
+        searchPlayersIntent.putExtra(Values.EXTRA_SEARCH, s);
         startActivity(searchPlayersIntent);
     }
 }

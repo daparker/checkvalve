@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -38,8 +38,7 @@ import com.github.daparker.checkvalve.R;
 /*
  * Define the AddNewServer class
  */
-public class AddServerActivity extends Activity
-{
+public class AddServerActivity extends Activity {
     private static final String TAG = AddServerActivity.class.getSimpleName();
 
     private DatabaseProvider database;
@@ -53,10 +52,8 @@ public class AddServerActivity extends Activity
     private EditText field_timeout;
     private EditText field_rcon_password;
 
-    private OnClickListener addButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener addButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Add" button was clicked
              */
@@ -66,35 +63,28 @@ public class AddServerActivity extends Activity
             int timeout_len = field_timeout.getText().toString().length();
             int password_len = field_rcon_password.length();
 
-            if( (server_len == 0) || (port_len == 0) || (timeout_len == 0) )
-            {
+            if( (server_len == 0) || (port_len == 0) || (timeout_len == 0) ) {
                 UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_empty_fields);
             }
-            else
-            {
-                final String server = field_server.getText().toString();
-                final int port = Integer.parseInt(field_port.getText().toString());
-                final int timeout = Integer.parseInt(field_timeout.getText().toString());
-                final String password = (password_len > 0)?field_rcon_password.getText().toString():"";
+            else {
+                final String server = field_server.getText().toString().trim();
+                final int port = Integer.parseInt(field_port.getText().toString().trim());
+                final int timeout = Integer.parseInt(field_timeout.getText().toString().trim());
+                final String password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
 
-                Handler checkServerHandler = new Handler()
-                {
+                Handler checkServerHandler = new Handler() {
                     String errorMsg = "";
 
-                    public void handleMessage( Message msg )
-                    {
+                    public void handleMessage( Message msg ) {
                         if( p.isShowing() ) p.dismiss();
 
-                        switch( msg.what )
-                        {
+                        switch( msg.what ) {
                             case 0:
-                                if( (database.insertServer(server, port, timeout, password)) > -1 )
-                                {
+                                if( (database.insertServer(server, port, timeout, password)) > -1 ) {
                                     UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                                     setResult(1);
                                 }
-                                else
-                                {
+                                else {
                                     errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                                     errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
                                     Log.w(TAG, errorMsg);
@@ -124,23 +114,19 @@ public class AddServerActivity extends Activity
                     }
                 };
 
-                if( CheckValve.settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS) == true )
-                {
+                if( CheckValve.settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS) == true ) {
                     // Show the progress dialog
                     p = ProgressDialog.show(AddServerActivity.this, "", AddServerActivity.this.getText(R.string.status_verifying_server), true, false);
 
                     // Run the server query in a separate thread
                     new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
                 }
-                else
-                {
-                    if( (database.insertServer(server, port, timeout, password)) > -1 )
-                    {
+                else {
+                    if( (database.insertServer(server, port, timeout, password)) > -1 ) {
                         UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                         setResult(1);
                     }
-                    else
-                    {
+                    else {
                         String errorMsg = new String();
                         errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                         errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
@@ -155,10 +141,8 @@ public class AddServerActivity extends Activity
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener cancelButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Cancel" button was clicked
              */
@@ -168,16 +152,14 @@ public class AddServerActivity extends Activity
     };
 
     @Override
-    protected void onCreate( Bundle savedInstanceState )
-    {
+    protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
         this.setResult(0);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.addnewserver);
 
-        if( database == null )
-            database = new DatabaseProvider(AddServerActivity.this);
+        if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
 
         addButton = (Button)findViewById(R.id.addServerButton);
         addButton.setOnClickListener(addButtonListener);
@@ -193,33 +175,28 @@ public class AddServerActivity extends Activity
         field_port.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_timeout.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
 
-        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
-        {
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
             ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
-        else
-        {
+        else {
             ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
-        if( database != null )
-        {
+        if( database != null ) {
             database.close();
             database = null;
         }
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         addButton = (Button)findViewById(R.id.addServerButton);
@@ -228,19 +205,16 @@ public class AddServerActivity extends Activity
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        if( database == null )
-            database = new DatabaseProvider(AddServerActivity.this);
+        if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
-    public void showPasswordCheckboxHandler( View view )
-    {
+    public void showPasswordCheckboxHandler( View view ) {
         boolean checked = ((CheckBox)view).isChecked();
 
         if( checked )

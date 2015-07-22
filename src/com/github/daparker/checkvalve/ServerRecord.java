@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -22,8 +22,7 @@ package com.github.daparker.checkvalve;
 /*
  * Define the ServerRecord class
  */
-public class ServerRecord
-{
+public class ServerRecord {
     private String name;
     private String rcon;
     private int port;
@@ -41,8 +40,7 @@ public class ServerRecord
      * @param l The position of this server within the server list
      * @param i The unique row ID of this server within the database
      */
-    public ServerRecord( String s, String r, int p, int t, int l, long i )
-    {
+    public ServerRecord( String s, String r, int p, int t, int l, long i ) {
         this.name = s;
         this.rcon = r;
         this.port = p;
@@ -51,63 +49,51 @@ public class ServerRecord
         this.rowId = i;
     }
 
-    public String getServerName()
-    {
+    public String getServerName() {
         return this.name;
     }
 
-    public String getServerRCONPassword()
-    {
+    public String getServerRCONPassword() {
         return this.rcon;
     }
 
-    public int getServerPort()
-    {
+    public int getServerPort() {
         return this.port;
     }
 
-    public int getServerTimeout()
-    {
+    public int getServerTimeout() {
         return this.timeout;
     }
 
-    public int getServerListPosition()
-    {
+    public int getServerListPosition() {
         return this.listpos;
     }
 
-    public long getServerRowID()
-    {
+    public long getServerRowID() {
         return this.rowId;
     }
 
-    public void setServerName( String s )
-    {
+    public void setServerName( String s ) {
         this.name = s;
     }
 
-    public void setServerRCONPassword( String r )
-    {
+    public void setServerRCONPassword( String r ) {
         this.rcon = r;
     }
 
-    public void setServerPort( int p )
-    {
+    public void setServerPort( int p ) {
         this.port = p;
     }
 
-    public void setServerTimeout( int t )
-    {
+    public void setServerTimeout( int t ) {
         this.timeout = t;
     }
 
-    public void setServerListPosition( int l )
-    {
+    public void setServerListPosition( int l ) {
         this.listpos = l;
     }
 
-    public void setServerRowID( long i )
-    {
+    public void setServerRowID( long i ) {
         this.rowId = i;
     }
 }

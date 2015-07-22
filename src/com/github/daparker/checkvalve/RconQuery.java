@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -25,8 +25,7 @@ import android.util.Log;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
-public class RconQuery implements Runnable
-{
+public class RconQuery implements Runnable {
     private Handler handler;
     private String response;
     private String command;
@@ -44,8 +43,7 @@ public class RconQuery implements Runnable
      * @param s The SourceServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconQuery( String c, SourceServer s, Handler h )
-    {
+    public RconQuery( String c, SourceServer s, Handler h ) {
         this.command = c;
         this.ssrv = s;
         this.handler = h;
@@ -58,17 +56,21 @@ public class RconQuery implements Runnable
      * @param g The GoldSrcServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconQuery( String c, GoldSrcServer g, Handler h )
-    {
+    public RconQuery( String c, GoldSrcServer g, Handler h ) {
         this.command = c;
         this.gsrv = g;
         this.handler = h;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
+        Log.d(TAG, "command [toString=" + command.toString() + "][hashCode=" + command.hashCode() + "]");
+        Log.d(TAG, "handler [toString=" + handler.toString() + "][hashCode=" + handler.hashCode() + "]");
+        
+        if( ssrv != null ) Log.d(TAG, "ssrv [toString=" + ssrv.toString() + "][hashCode=" + ssrv.hashCode() + "]");
+        if( gsrv != null ) Log.d(TAG, "gsrv [toString=" + gsrv.toString() + "][hashCode=" + gsrv.hashCode() + "]");
+        
         Message msg = new Message();
         status = 0;
 
@@ -84,18 +86,22 @@ public class RconQuery implements Runnable
         this.handler.sendMessage(msg);
     }
 
-    public void getRconResponse()
-    {
-        try
-        {
+    public void getRconResponse() {
+        try {
             if( ssrv != null )
                 response = ssrv.rconExec(command);
             else
                 response = gsrv.rconExec(command);
         }
-        catch( Exception e )
-        {
-            Log.w(TAG, "Caught exception: " + e.toString());
+        catch( Exception e ) {
+            Log.w(TAG, "Caught an exception:");
+            Log.w(TAG, e.toString());
+
+            StackTraceElement[] ste = e.getStackTrace();
+
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
+            
             status = 1;
             obj = e;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -22,17 +22,16 @@ package com.github.daparker.checkvalve;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.TextView;
 import com.github.daparker.checkvalve.R;
 
-public class AboutActivity extends Activity
-{
-    final OnClickListener dismissButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+public class AboutActivity extends Activity {
+    final OnClickListener dismissButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * Dismiss button was clicked
              */
@@ -42,33 +41,32 @@ public class AboutActivity extends Activity
     };
 
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
-        
+
         this.setResult(0);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.about);
-
+        
+        TextView app_support = (TextView)this.findViewById(R.id.app_support);
+        app_support.setMovementMethod(LinkMovementMethod.getInstance());
+        
         this.findViewById(R.id.dismiss_button).setOnClickListener(dismissButtonListener);
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         finish();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }

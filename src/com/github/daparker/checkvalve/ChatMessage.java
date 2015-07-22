@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -22,8 +22,7 @@ package com.github.daparker.checkvalve;
 /*
  * Define the ChatMessage class
  */
-public class ChatMessage
-{
+public class ChatMessage {
     public byte protocolVersion;
     public byte sayTeamFlag;
     public int serverTimestamp;
@@ -47,10 +46,9 @@ public class ChatMessage
      * @param pteam The team of the player who sent the message
      * @param msg The text of the message
      */
-    public ChatMessage(
-            byte proto, byte stflag, int epoch, String gsip, String gsport, String tstamp, String pname, String pteam,
-            String msg )
-    {
+    public ChatMessage( byte proto, byte stflag, int epoch,
+            String gsip, String gsport, String tstamp,
+            String pname, String pteam, String msg ) {
         this.protocolVersion = proto;
         this.sayTeamFlag = stflag;
         this.serverTimestamp = epoch;

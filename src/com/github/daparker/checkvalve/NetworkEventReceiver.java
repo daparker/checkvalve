@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -32,8 +32,7 @@ import android.util.Log;
  * This class implements a <tt>BroadcastReceiver</tt> listening for network events, and sends messages to the caller via
  * a <tt>Handler</tt> when events occur.
  */
-public class NetworkEventReceiver implements Runnable
-{
+public class NetworkEventReceiver implements Runnable {
     private static final String TAG = "NetworkEventReceiver";
 
     private boolean registered;
@@ -48,21 +47,19 @@ public class NetworkEventReceiver implements Runnable
     /**
      * Construct a new instance of the NetworkEventReceiver class.
      * 
-     * This class implements a <tt>BroadcastReceiver</tt> listening for network events,
-     * and sends messages to the caller via a <tt>Handler</tt> when events occur.
+     * This class implements a <tt>BroadcastReceiver</tt> listening for network events, and sends messages to the caller
+     * via a <tt>Handler</tt> when events occur.
      * 
      * @param c The context to use
      * @param h The handler to use
      */
-    public NetworkEventReceiver( Context c, Handler h )
-    {
+    public NetworkEventReceiver( Context c, Handler h ) {
         this.context = c;
         this.handler = h;
         this.event = 0;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         registered = false;
@@ -72,38 +69,30 @@ public class NetworkEventReceiver implements Runnable
 
         Log.i(TAG, "Starting network event receiver.");
 
-        try
-        {
-            receiver = new BroadcastReceiver()
-            {
+        try {
+            receiver = new BroadcastReceiver() {
                 @Override
-                public void onReceive( Context x, Intent i )
-                {
+                public void onReceive( Context x, Intent i ) {
                     Log.i(TAG, "A network event has been received (event #" + event + ").");
 
                     // Determine whether connectivity has been completely lost
-                    if( i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false) )
-                    {
+                    if( i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false) ) {
                         Log.w(TAG, "Network connectivity has been lost.");
                         handler.sendEmptyMessage(-1);
                         connected = false;
                     }
-                    else
-                    {
+                    else {
                         ConnectivityManager c = (ConnectivityManager)x.getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo n = c.getActiveNetworkInfo();
 
-                        if( n == null )
-                        {
+                        if( n == null ) {
                             Log.d(TAG, "ConnectivityManager.getActiveNetworkInfo() is null.");
                             Log.d(TAG, "No active network connections exist.");
                         }
-                        else
-                        {
+                        else {
                             String state = "";
 
-                            switch( n.getState() )
-                            {
+                            switch( n.getState() ) {
                                 case CONNECTING:
                                     state = "Connecting";
                                     connected = false;
@@ -138,31 +127,23 @@ public class NetworkEventReceiver implements Runnable
                             String typeName = n.getTypeName();
                             String available = (n.isAvailable())?"true":"false";
 
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] TYPE: " + typeName
-                                    + " (" + type + ")");
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] STATE: " + state);
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] AVAILABLE: "
-                                    + available);
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] TYPE: " + typeName + " (" + type + ")");
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] STATE: " + state);
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] AVAILABLE: " + available);
 
                             // The first event (0) will always be received just after the receiver
-                            // is registered, so we'll ignore it and only notify the ChatUI thread
+                            // is registered, so we'll ignore it and only notify the parent thread
                             // about events thereafter.
-                            if( event == 0 )
-                            {
+                            if( event == 0 ) {
                                 lastNetworkType = type;
                             }
-                            else
-                            {
-                                if( connected )
-                                {
-                                    if( type != lastNetworkType )
-                                    {
+                            else {
+                                if( connected ) {
+                                    if( type != lastNetworkType ) {
                                         lastNetworkType = type;
-                                        Log.d(TAG, "Sending message to ChatUI thread.");
                                         handler.sendEmptyMessage(1);
                                     }
-                                    else
-                                    {
+                                    else {
                                         Log.d(TAG, "Ignoring event #" + event + " (duplicate)");
                                     }
                                 }
@@ -176,8 +157,7 @@ public class NetworkEventReceiver implements Runnable
 
             registerReceiver();
         }
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             StackTraceElement[] ste = e.getStackTrace();
 
             Log.w(TAG, "run(): Caught an exception: " + e.toString());
@@ -196,12 +176,9 @@ public class NetworkEventReceiver implements Runnable
     /**
      * Registers the BroadcastReceiver if it is not already registered.
      */
-    public void registerReceiver()
-    {
-        if( !registered )
-        {
-            try
-            {
+    public void registerReceiver() {
+        if( ! registered ) {
+            try {
                 Log.i(TAG, "Registering broadcast receiver.");
                 context.registerReceiver(receiver, filter);
 
@@ -210,8 +187,7 @@ public class NetworkEventReceiver implements Runnable
 
                 registered = true;
             }
-            catch( Exception e )
-            {
+            catch( Exception e ) {
                 StackTraceElement[] ste = e.getStackTrace();
 
                 Log.w(TAG, "registerReceiver(): Caught an exception: " + e.toString());
@@ -228,18 +204,14 @@ public class NetworkEventReceiver implements Runnable
     /**
      * Unregisters the BroadcastReceiver if it is currently registered.
      */
-    public void unregisterReceiver()
-    {
-        if( registered )
-        {
-            try
-            {
+    public void unregisterReceiver() {
+        if( registered ) {
+            try {
                 Log.i(TAG, "Unregistering broadcast receiver.");
                 context.unregisterReceiver(receiver);
                 registered = false;
             }
-            catch( Exception e )
-            {
+            catch( Exception e ) {
                 StackTraceElement[] ste = e.getStackTrace();
 
                 Log.w(TAG, "unregisterReceiver(): Caught an exception: " + e.toString());
@@ -258,8 +230,7 @@ public class NetworkEventReceiver implements Runnable
      * 
      * @return A boolean value indicating whether or not the receiver is registered.
      */
-    public boolean isRegistered()
-    {
+    public boolean isRegistered() {
         return this.registered;
     }
 
@@ -268,8 +239,7 @@ public class NetworkEventReceiver implements Runnable
      * 
      * @return The receiver as a BroadcastReceiver object
      */
-    public BroadcastReceiver getReceiver()
-    {
+    public BroadcastReceiver getReceiver() {
         return this.receiver;
     }
 
@@ -277,8 +247,7 @@ public class NetworkEventReceiver implements Runnable
      * Shuts down the NetworkEventReceiver. This method simply calls the <tt>interrupt()<tt>
      * method on the NetworkEventReceiver object's thread.
      */
-    public void shutDown()
-    {
+    public void shutDown() {
         Log.i(TAG, "Shutdown was requested; calling interrupt() on this thread.");
         Thread.currentThread().interrupt();
     }

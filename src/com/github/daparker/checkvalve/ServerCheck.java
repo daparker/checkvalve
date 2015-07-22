@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 
-public class ServerCheck implements Runnable
-{
+public class ServerCheck implements Runnable {
     private Handler handler;
     private String server;
     private int port;
@@ -37,12 +36,12 @@ public class ServerCheck implements Runnable
     /**
      * Construct a new instance of the ServerCheck class.
      * <p>
-     * Calling <tt>start()</tt> on this instance will cause it to connect to the specified host and port, and perform an
-     * A2S_INFO query to confirm it is an HLDS/SRCDS listen server. This class was implemented in CheckValve 2.0.0 to
-     * get these sorts of checks off of the main UI thread.
+     * Calling <tt>start()</tt> on this instance will cause it to connect to the
+     * specified host and port, and perform an A2S_INFO query to confirm it is
+     * an HLDS/SRCDS listen server.
      * </p>
      * <p>
-     * One of the following will be sent to the handler as an <b>int</b>:
+     * One of the following will be sent to the handler as the <tt>what<tt> value:
      * <ul>
      * <b>0</b> (The query was successful)<br />
      * <b>1</b> (Encountered UnknownHostException)<br />
@@ -52,23 +51,19 @@ public class ServerCheck implements Runnable
      * <b>5</b> (Encountered some other exception)<br />
      * </ul>
      * </p>
-     * <p>
-     * 
      * @param server The URL or IP address of the server to be queried
      * @param port The port of the server to be queried
      * @param timeout The connection timeout for the server query
      * @param handler The Handler to which the status code is returned.
      */
-    public ServerCheck( String server, int port, int timeout, Handler handler )
-    {
+    public ServerCheck( String server, int port, int timeout, Handler handler ) {
         this.server = server;
         this.port = port;
         this.timeout = timeout;
         this.handler = handler;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         int status = 0;
@@ -76,8 +71,7 @@ public class ServerCheck implements Runnable
         // A2S_INFO query string
         String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
 
-        try
-        {
+        try {
             // Create a UDP socket
             DatagramSocket socket = new DatagramSocket();
             socket.setSoTimeout(timeout * 1000);
@@ -102,24 +96,19 @@ public class ServerCheck implements Runnable
             // Close the UDP socket
             socket.close();
         }
-        catch( UnknownHostException e )
-        {
+        catch( UnknownHostException e ) {
             status = 1;
         }
-        catch( SocketException e )
-        {
+        catch( SocketException e ) {
             status = 2;
         }
-        catch( UnsupportedEncodingException e )
-        {
+        catch( UnsupportedEncodingException e ) {
             status = 3;
         }
-        catch( IOException e )
-        {
+        catch( IOException e ) {
             status = 4;
         }
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             StackTraceElement[] ste = e.getStackTrace();
 
             Log.w(TAG, "Caught an exception: " + e.toString());

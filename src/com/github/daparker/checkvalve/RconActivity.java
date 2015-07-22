@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -47,6 +48,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import com.github.daparker.checkvalve.R;
@@ -55,8 +57,7 @@ import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
-public class RconActivity extends Activity
-{
+public class RconActivity extends Activity {
     private final static String TAG = RconActivity.class.getSimpleName();
     private Animation fade_in;
     private Animation fade_out;
@@ -75,16 +76,19 @@ public class RconActivity extends Activity
     private String server;
     private int port;
     private int timeout;
-    private short[] engine;
+    private int last;
+    private int pos;
     private boolean rconIsAuthenticated;
+    private boolean enableHistory;
 
     private SourceServer s;
     private GoldSrcServer g;
-
-    private OnClickListener sendButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private Thread receiverThread;
+    private NetworkEventReceiver receiverRunnable;
+    private ArrayList<String> commandHistory;
+    
+    private OnClickListener sendButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Send" button was clicked
              */
@@ -98,16 +102,12 @@ public class RconActivity extends Activity
         }
     };
 
-    private OnKeyListener enterKeyListener = new OnKeyListener()
-    {
-        public boolean onKey( View v, int k, KeyEvent e )
-        {
+    private OnKeyListener keyListener = new OnKeyListener() {
+        public boolean onKey( View v, int k, KeyEvent e ) {
             /*
              * "Enter" or "Done" key was pressed
              */
-
-            if( (e.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (e.getAction() == KeyEvent.ACTION_UP) )
-            {
+            if( e.getKeyCode() == KeyEvent.KEYCODE_ENTER && e.getAction() == KeyEvent.ACTION_UP ) {
                 command = field_command.getText().toString().trim();
 
                 if( command.length() == 0 )
@@ -117,54 +117,70 @@ public class RconActivity extends Activity
 
                 return true;
             }
+            
+            if( enableHistory ) {
+                /*
+                 * D-Pad up arrow was pressed
+                 */
+                if( e.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP && e.getAction() == KeyEvent.ACTION_DOWN ) {
+                    // Put the previous command in the text field
+                    if( pos > 0 ) field_command.setText(commandHistory.get(--pos));
+                    return true;
+                }
+                
+                /*
+                 * D-pad down arrow was pressed
+                 */
+                if( e.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && e.getAction() == KeyEvent.ACTION_DOWN ) {
+                    // Put the next command in the text field
+                    if( pos < last ) field_command.setText(commandHistory.get(++pos));
+                    return true;
+                }
+            }
 
             return false;
         }
     };
 
     // Handler for the server query thread
-    private Handler progressHandler = new Handler()
-    {
-        public void handleMessage( Message msg )
-        {
-            switch( msg.what )
-            {
+    private Handler progressHandler = new Handler() {
+        public void handleMessage( Message msg ) {
+            switch( msg.what ) {
                 case -1:
                     Log.d(TAG, "progressHandler [" + msg.toString() + "]");
                     Log.d(TAG, "Message object string = " + msg.obj.toString());
                     Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
                 case Values.ENGINE_GOLDSRC:
+                    Log.i(TAG, "Server engine is GoldSrc.");
                     g = (GoldSrcServer)msg.obj;
                     break;
                 case Values.ENGINE_SOURCE:
+                    Log.i(TAG, "Server engine is Source.");
                     s = (SourceServer)msg.obj;
                     break;
                 default:
+                    Log.w(TAG, "Unhandled value from engine query: " + msg.what);
                     UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
                     break;
             }
 
             p.dismiss();
 
-            if( !rconIsAuthenticated )
-            {
+            if( ! rconIsAuthenticated ) {
                 if( password.length() == 0 )
                     getPassword();
-                else
+                else 
                     rconAuthenticate();
             }
         }
     };
 
     // Handler for the "Sending" pop-up thread
-    private Handler popUpHandler = new Handler()
-    {
-        public void handleMessage( Message msg )
-        {
+    private Handler popUpHandler = new Handler() {
+        public void handleMessage( Message msg ) {
             runFadeOutAnimation(RconActivity.this, sending);
 
-            switch( msg.what )
-            {
+            switch( msg.what ) {
                 case 0:
                     String response = (String)msg.obj;
                     rcon_console.append("> " + command + "\n\n");
@@ -172,20 +188,16 @@ public class RconActivity extends Activity
                     scrollToBottomOfText();
                     break;
                 case 1:
-                    if( msg.obj.getClass() == RCONNoAuthException.class )
-                    {
+                    if( msg.obj.getClass() == RCONNoAuthException.class ) {
                         showBadPasswordMessage();
                     }
-                    else if( msg.obj.getClass() == RCONBanException.class )
-                    {
+                    else if( msg.obj.getClass() == RCONBanException.class ) {
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_ban_exception);
                     }
-                    else if( msg.obj.getClass() == TimeoutException.class )
-                    {
+                    else if( msg.obj.getClass() == TimeoutException.class ) {
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_disconnected);
                     }
-                    else
-                    {
+                    else {
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
                     }
                     break;
@@ -196,21 +208,18 @@ public class RconActivity extends Activity
     };
 
     // Handler for the RCON authentication thread
-    private Handler rconAuthHandler = new Handler()
-    {
+    private Handler rconAuthHandler = new Handler() {
         @Override
-        public void handleMessage( Message msg )
-        {
+        public void handleMessage( Message msg ) {
             runFadeOutAnimation(RconActivity.this, sending);
 
-            switch( msg.what )
-            {
+            switch( msg.what ) {
                 case -1:
                     // An error occurred getting the engine type (most likely a socket timeout)
                     break;
                 case 0:
                     rconIsAuthenticated = true;
-                    if( engine[0] == Values.ENGINE_GOLDSRC )
+                    if( g!= null )
                         g = (GoldSrcServer)msg.obj;
                     else
                         s = (SourceServer)msg.obj;
@@ -220,24 +229,20 @@ public class RconActivity extends Activity
                     Log.d(TAG, "Message object string = " + msg.obj.toString());
                     Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
 
-                    if( msg.obj.getClass() == RCONNoAuthException.class )
-                    {
+                    if( msg.obj.getClass() == RCONNoAuthException.class ) {
                         // Failed authentication
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_no_rcon_auth);
                         getPassword();
                     }
-                    else if( msg.obj.getClass() == RCONBanException.class )
-                    {
+                    else if( msg.obj.getClass() == RCONBanException.class ) {
                         // RCONNoAuthException
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_ban_exception);
                     }
-                    else if( msg.obj.getClass() == TimeoutException.class )
-                    {
+                    else if( msg.obj.getClass() == TimeoutException.class ) {
                         // TimeoutException (happens if RCON password was already sent)
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_timeout_exception);
                     }
-                    else
-                    {
+                    else {
                         // Any other exception
                         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
                     }
@@ -249,21 +254,70 @@ public class RconActivity extends Activity
         }
     };
 
-    public void onCreate( Bundle savedInstanceState )
-    {
-        super.onCreate(savedInstanceState);
+    // Handler for the network event receiver thread
+    private Handler networkEventHandler = new Handler() {
+        @Override
+        public void handleMessage( Message msg ) {
+            /*
+             * Message object "what" codes:
+             * -2  =  Fatal exception in the NetworkEventReceiver thread
+             * -1  =  No network connectivity
+             *  0  =  Initial event from broadcast receiver (should be ignored)
+             *  1  =  Network connection change
+             */
 
-        this.setResult(1);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            Log.d(TAG, "Received " + msg.what + " from NetworkEventReceiver");
+
+            switch( msg.what ) {
+                case -2:
+                    Log.e(TAG, "The network event receiver has aborted");
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+                    finish();
+                    break;
+                    
+                case -1:
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_connection_lost);
+                    closeRconConnection();
+                    rconIsAuthenticated = false;
+                    break;
+                    
+                case 0:
+                    break;
+                    
+                case 1:
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_network_change);
+                    closeRconConnection();
+                    rconIsAuthenticated = false;
+                    getServerType();
+
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+    };
+    
+    public void onCreate( Bundle savedInstanceState ) {
+        super.onCreate(savedInstanceState);
+        
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        
         this.setContentView(R.layout.rcon);
+        this.setResult(1);
 
         Intent thisIntent = getIntent();
 
-        server = thisIntent.getStringExtra("server");
-        port = thisIntent.getIntExtra("port", 27015);
-        timeout = thisIntent.getIntExtra("timeout", 2);
-        password = thisIntent.getStringExtra("password");
-        engine = new short[1];
+        server = thisIntent.getStringExtra(Values.EXTRA_SERVER);
+        port = thisIntent.getIntExtra(Values.EXTRA_PORT, 27015);
+        timeout = thisIntent.getIntExtra(Values.EXTRA_TIMEOUT, 2);
+        password = thisIntent.getStringExtra(Values.EXTRA_PASSWORD);
         rconIsAuthenticated = false;
 
         fade_in = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_in);
@@ -286,44 +340,78 @@ public class RconActivity extends Activity
 
         field_command = (AutoCompleteTextView)findViewById(R.id.field_command);
         field_command.setAdapter(adapter);
-        field_command.setOnKeyListener(enterKeyListener);
+        field_command.setOnKeyListener(keyListener);
 
         // Hack to disable auto-complete if desired by the user
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS) == true )
             field_command.setThreshold(1);
         else
             field_command.setThreshold(1000);
+        
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) == true )
+            unsafeCommands = res.getStringArray(R.array.unsafe_commands);
+        else
+            unsafeCommands = null;
 
-        unsafeCommands = res.getStringArray(R.array.unsafe_commands);
+        enableHistory = CheckValve.settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
+        
+        if( enableHistory ) {
+            commandHistory = new ArrayList<String>();
+            commandHistory.add(0, "");
+            last = 0;
+            pos = 0;
+        }
+        
+        receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
 
+        if( receiverRunnable == null ) {
+            Log.e(TAG, "onCreate(): NetworkEventReceiver object is null, cannot continue");
+            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+            finish();
+        }
+        else {
+            receiverThread = new Thread(receiverRunnable);
+
+            if( receiverThread == null ) {
+                Log.e(TAG, "onCreate(): NetworkEventReceiver thread is null, cannot continue");
+                UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+                finish();
+            }
+
+            receiverThread.start();
+        }
+        
         getServerType();
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        shutdownNetworkEventReceiver();
+        if( g != null ) g.disconnect();
+        if( s != null ) s.disconnect();
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.rcon_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
-        switch( item.getItemId() )
-        {
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        switch( item.getItemId() ) {
             case R.id.back:
                 finish();
                 return true;
@@ -337,41 +425,65 @@ public class RconActivity extends Activity
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
-    public void onActivityResult( int request, int result, Intent data )
-    {
-        if( request == Values.ACTIVITY_RCON_PASSWORD_DIALOG )
-        {
+    /*
+     * Handle up/down arrow keys for scrolling through previous commands
+     
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG, "onKeyDown(): keyCode=" + keyCode + "; event=" + event.toString());
+        
+        if( keyCode == KeyEvent.KEYCODE_DPAD_UP ) {
+            // Put the previous command in the text field
+            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_UP; pos=" + pos + "; last=" + last);
+            if( pos > 0 ) field_command.setText(commandList.get(--pos));
+            return false;
+        }
+        
+        if( keyCode == KeyEvent.KEYCODE_DPAD_DOWN ) {
+            // Put the next command in the text field
+            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_DOWN; pos=" + pos + "; last=" + last);
+            if( pos < last ) field_command.setText(commandList.get(++pos));
+            return false;
+        }
+        
+        return false;
+    }
+    */
+    
+    public void onActivityResult( int request, int result, Intent data ) {
+        if( request == Values.ACTIVITY_RCON_PASSWORD_DIALOG ) {
             if( result == 0 ) finish();
 
-            if( result == 1 )
-            {
-                password = data.getStringExtra("password");
+            if( result == 1 ) {
+                password = data.getStringExtra(Values.EXTRA_PASSWORD);
                 rconAuthenticate();
             }
         }
 
-        if( request == Values.ACTIVITY_CONFIRM_UNSAFE_COMMAND && result == 1 )
-            sendCommand(true);
+        if( request == Values.ACTIVITY_CONFIRM_UNSAFE_COMMAND && result == 1 ) sendCommand(true);
     }
 
-    public void sendCommand( boolean force )
-    {
-        if( !force )
-        {
-            // Get the bare command without any arguments
-            String bareCommand = (command.indexOf(" ") != -1)?command.substring(0, command.indexOf(" ")):command;
-
-            if( Arrays.asList(unsafeCommands).contains(bareCommand) )
-            {
-                // Show a warning and force user acknowledgment
-                confirmUnsafeCommand();
-                return;
+    public void sendCommand( boolean force ) {
+        if( enableHistory ) {
+            commandHistory.add(last, command);
+            pos = ++last;
+        }
+        
+        if( unsafeCommands != null ) {
+            if( !force ) {
+                // Get the bare command without any arguments
+                String bareCommand = (command.indexOf(" ") != -1)?command.substring(0, command.indexOf(" ")):command;
+    
+                if( Arrays.asList(unsafeCommands).contains(bareCommand) ) {
+                    // Show a warning and force user acknowledgment
+                    confirmUnsafeCommand();
+                    return;
+                }
             }
         }
 
@@ -379,7 +491,7 @@ public class RconActivity extends Activity
 
         runFadeInAnimation(RconActivity.this, sending);
 
-        if( engine[0] == Values.ENGINE_GOLDSRC )
+        if( g != null )
             new Thread(new RconQuery(command, g, popUpHandler)).start();
         else
             new Thread(new RconQuery(command, s, popUpHandler)).start();
@@ -387,8 +499,7 @@ public class RconActivity extends Activity
         new Thread(q).start();
     }
 
-    public void getServerType()
-    {
+    public void getServerType() {
         // Show the progress dialog
         p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_connecting), true, false);
 
@@ -396,8 +507,7 @@ public class RconActivity extends Activity
         new Thread(new EngineQuery(server, port, timeout, progressHandler)).start();
     }
 
-    public void scrollToBottomOfText()
-    {
+    public void scrollToBottomOfText() {
         /*
          * I can't take credit for this. This is based on a little trick I found at:
          * http://groups.google.com/group/android-developers/browse_thread/thread/8752156cca1e3742
@@ -408,47 +518,42 @@ public class RconActivity extends Activity
 
         int difference = (lineCount * lineHeight) - viewHeight;
 
-        if( difference < 1 ) return;
+        if( difference < 1 )
+            return;
 
         rcon_console.scrollTo(0, difference);
     }
 
-    public void rconAuthenticate()
-    {
+    public void rconAuthenticate() {
         p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_rcon_verifying_password), true, false);
 
-        if( engine[0] == Values.ENGINE_GOLDSRC )
+        if( g != null )
             new Thread(new RconAuth(password, g, rconAuthHandler)).start();
         else
             new Thread(new RconAuth(password, s, rconAuthHandler)).start();
     }
 
-    public void runFadeInAnimation( Context c, View v )
-    {
+    public void runFadeInAnimation( Context c, View v ) {
         v.startAnimation(fade_in);
     }
 
-    public void runFadeOutAnimation( Context c, View v )
-    {
+    public void runFadeOutAnimation( Context c, View v ) {
         v.startAnimation(fade_out);
     }
 
-    public void getPassword()
-    {
+    public void getPassword() {
         Intent rconPasswordIntent = new Intent();
         rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
-    public void showBadPasswordMessage()
-    {
+    public void showBadPasswordMessage() {
         UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_no_rcon_auth);
         getPassword();
     }
 
     @SuppressLint("InlinedApi")
-    public void confirmUnsafeCommand()
-    {
+    public void confirmUnsafeCommand() {
         AlertDialog.Builder alertDialogBuilder;
 
         if( android.os.Build.VERSION.SDK_INT >= 11 )
@@ -461,8 +566,7 @@ public class RconActivity extends Activity
         alertDialogBuilder.setCancelable(false);
 
         alertDialogBuilder.setPositiveButton(R.string.button_send, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id )
-            {
+            public void onClick( DialogInterface dialog, int id ) {
                 /*
                  *  "Send" button was clicked
                  */
@@ -471,8 +575,7 @@ public class RconActivity extends Activity
         });
 
         alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id )
-            {
+            public void onClick( DialogInterface dialog, int id ) {
                 /*
                  * "Cancel" button was clicked
                  */
@@ -482,5 +585,47 @@ public class RconActivity extends Activity
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+    
+    public void shutdownNetworkEventReceiver() {
+        if( receiverRunnable != null ) {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is not null, calling unregisterReceiver()");
+            receiverRunnable.unregisterReceiver();
+            receiverRunnable.shutDown();
+        }
+        else {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is null");
+        }
+
+        if( receiverThread != null ) {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not null");
+
+            if( receiverThread.isAlive() ) {
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is alive, calling interrupt() on thread " + receiverThread.getId());
+                receiverThread.interrupt();
+            }
+            else {
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not alive, not interrupting");
+            }
+        }
+        else {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is null");
+        }
+    }
+    
+    public void closeRconConnection() {
+        try {
+            if( s != null ) s.disconnect();
+            if( g != null ) g.disconnect();
+        }
+        catch( Exception e ) {
+            Log.w(TAG, "closeRconConnection(): Caught an exception:");
+            Log.w(TAG, e.toString());
+
+            StackTraceElement[] ste = e.getStackTrace();
+            
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
+        }
     }
 }

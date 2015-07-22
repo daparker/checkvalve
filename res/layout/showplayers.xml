@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -22,9 +22,9 @@ along with the CheckValve source code.  If not, see
     android:id="@+id/player_information"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     android:background="@color/steam_gray"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp" >
 
     <LinearLayout
         android:id="@+id/player_information_title_bar"

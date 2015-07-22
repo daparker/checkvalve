@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -73,11 +73,12 @@ along with the CheckValve source code.  If not, see
 
             <TableRow>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/field_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
+                    android:dropDownSelector="@color/steam_blue"
                     android:inputType="text"
                     android:singleLine="true"
                     android:text=""

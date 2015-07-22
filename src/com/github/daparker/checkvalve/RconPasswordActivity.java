@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -35,8 +35,7 @@ import com.github.daparker.checkvalve.R;
 /*
  * Define the RconPassword class
  */
-public class RconPasswordActivity extends Activity
-{
+public class RconPasswordActivity extends Activity {
     private EditText field_password;
     private Button submit_button;
     private Button cancel_button;
@@ -44,32 +43,26 @@ public class RconPasswordActivity extends Activity
     private String password;
     private Intent returned;
 
-    private OnClickListener submitButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener submitButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Submit" button was clicked
              */
-            password = field_password.getText().toString();
+            password = field_password.getText().toString().trim();
 
-            if( password.length() == 0 )
-            {
+            if( password.length() == 0 ) {
                 UserVisibleMessage.showMessage(RconPasswordActivity.this, R.string.msg_empty_rcon_password);
             }
-            else
-            {
-                returned.putExtra("password", password);
+            else {
+                returned.putExtra(Values.EXTRA_PASSWORD, password);
                 setResult(1, returned);
                 finish();
             }
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
+    private OnClickListener cancelButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
             /*
              * "Cancel" button was clicked
              */
@@ -80,8 +73,7 @@ public class RconPasswordActivity extends Activity
     };
 
     @Override
-    protected void onCreate( Bundle savedInstanceState )
-    {
+    protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
         this.setResult(0);
@@ -98,33 +90,28 @@ public class RconPasswordActivity extends Activity
 
         field_password = (EditText)findViewById(R.id.field_password);
 
-        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true )
-        {
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
             ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
-        else
-        {
+        else {
             ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         finish();
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
     }
 
-    public void showPasswordCheckboxHandler( View view )
-    {
+    public void showPasswordCheckboxHandler( View view ) {
         boolean checked = ((CheckBox)view).isChecked();
 
         if( checked )
@@ -134,8 +121,7 @@ public class RconPasswordActivity extends Activity
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -25,8 +25,7 @@ import android.os.Parcelable;
 /*
  * Define the PlayerRecord class
  */
-public class PlayerRecord implements Parcelable
-{
+public class PlayerRecord implements Parcelable {
     private String name;
     private String time;
     private long kills;
@@ -40,82 +39,67 @@ public class PlayerRecord implements Parcelable
      * @param kills The number of kills for the player
      * @param index The index number of the player in the A2S_PLAYER response
      */
-    public PlayerRecord( String name, String time, long kills, int index )
-    {
+    public PlayerRecord( String name, String time, long kills, int index ) {
         this.name = name;
         this.time = time;
         this.kills = kills;
         this.index = index;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
-    public String getTime()
-    {
+    public String getTime() {
         return this.time;
     }
 
-    public long getKills()
-    {
+    public long getKills() {
         return this.kills;
     }
 
-    public int getIndex()
-    {
+    public int getIndex() {
         return this.index;
     }
 
-    public void setName( String s )
-    {
+    public void setName( String s ) {
         this.name = s;
     }
 
-    public void setTime( String t )
-    {
+    public void setTime( String t ) {
         this.time = t;
     }
 
-    public void setKills( long k )
-    {
+    public void setKills( long k ) {
         this.kills = k;
     }
 
-    public void setIndex( int i )
-    {
+    public void setIndex( int i ) {
         this.index = i;
     }
 
-    public int describeContents()
-    {
+    public int describeContents() {
         return 0;
     }
 
-    public void writeToParcel( Parcel dest, int flags )
-    {
+    public void writeToParcel( Parcel dest, int flags ) {
         dest.writeString(this.name);
         dest.writeString(this.time);
         dest.writeLong(this.kills);
         dest.writeInt(this.index);
     }
 
-    public static final Parcelable.Creator<PlayerRecord> CREATOR = new Parcelable.Creator<PlayerRecord>()
-    {
-        public PlayerRecord createFromParcel( Parcel in )
-        {
+    public static final Parcelable.Creator<PlayerRecord> CREATOR = new Parcelable.Creator<PlayerRecord>() {
+        public PlayerRecord createFromParcel( Parcel in ) {
             return new PlayerRecord(in);
         }
 
-        public PlayerRecord[] newArray( int size )
-        {
+        public PlayerRecord[] newArray( int size ) {
             return new PlayerRecord[size];
         }
     };
 
-    private PlayerRecord( Parcel in )
-    {
+    private PlayerRecord( Parcel in ) {
         name = in.readString();
         time = in.readString();
         kills = in.readLong();

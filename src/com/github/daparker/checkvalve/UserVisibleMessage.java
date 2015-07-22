@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -26,8 +26,7 @@ import android.widget.Toast;
 /**
  * Custom wrapper around the built-in Toast class for displaying messages to the user.
  */
-public class UserVisibleMessage
-{
+public class UserVisibleMessage {
     private static final String TAG = UserVisibleMessage.class.getSimpleName();
 
     /**
@@ -36,8 +35,7 @@ public class UserVisibleMessage
      * @param context The context to use
      * @param text The text to be displayed in the message
      */
-    public static void showMessage( Context context, CharSequence text )
-    {
+    public static void showMessage( Context context, CharSequence text ) {
         Log.d(TAG, "Showing message [context=" + context.toString() + "][text=" + text + "]");
 
         // Create a new Toast message
@@ -51,8 +49,7 @@ public class UserVisibleMessage
      * @param context The context to use
      * @param resId The ID of the string resource to be displayed in the message
      */
-    public static void showMessage( Context context, int resId )
-    {
+    public static void showMessage( Context context, int resId ) {
         Log.d(TAG, "Showing message [context=" + context.toString() + "][resId=" + resId + "]");
 
         // Create a new Toast message

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -28,8 +28,7 @@ import java.nio.ByteOrder;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
-public class EngineQuery implements Runnable
-{
+public class EngineQuery implements Runnable {
     private Handler handler;
     private String server;
     private int port;
@@ -48,42 +47,38 @@ public class EngineQuery implements Runnable
      * @param t The timeout for the server query (in milliseconds)
      * @param h The handler to use
      */
-    public EngineQuery( String s, int p, int t, Handler h )
-    {
+    public EngineQuery( String s, int p, int t, Handler h ) {
         this.server = s;
         this.port = p;
         this.timeout = t;
         this.handler = h;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         int result = 0;
         Message msg = new Message();
 
         result = getServerEngine(server, port, timeout);
-        
+
         if( obj != null )
             msg.obj = obj;
 
         msg.what = result;
-        
+
         handler.sendMessage(msg);
     }
 
-    public int getServerEngine(String s, int p, int t)
-    {
+    public int getServerEngine( String s, int p, int t ) {
         int appId = 0;
         int byteNum = 0;
         int firstByte = 0;
         int secondByte = 0;
 
-        try
-        {
+        try {
             int result = 0;
-            
+
             DatagramSocket socket = new DatagramSocket();
 
             // A2S_INFO query string
@@ -103,8 +98,7 @@ public class EngineQuery implements Runnable
             socket.connect(InetAddress.getByName(s), p);
 
             // Show an error if the connection attempt failed
-            if( ! socket.isConnected() )
-            {
+            if( !socket.isConnected() ) {
                 socket.close();
                 return -1;
             }
@@ -159,8 +153,7 @@ public class EngineQuery implements Runnable
             byteNum++;
 
             // If we're not at the end of the array then get the additional data
-            if( byteNum < bufferIn.length )
-            {
+            if( byteNum < bufferIn.length ) {
                 // This byte is the Extra Data Flag (EDF)
                 int EDF = (int)bufferIn[byteNum];
                 byteNum++;
@@ -172,8 +165,7 @@ public class EngineQuery implements Runnable
                 if( (EDF & 0x10) > 0 ) byteNum += 8;
 
                 // Skip SourceTV information if included
-                if( (EDF & 0x40) > 0 )
-                {
+                if( (EDF & 0x40) > 0 ) {
                     byteNum += 2;
 
                     while( bufferIn[byteNum] != 0x00 )
@@ -183,8 +175,7 @@ public class EngineQuery implements Runnable
                 }
 
                 // Skip the server tags (sv_tags) if included
-                if( (EDF & 0x20) > 0 )
-                {
+                if( (EDF & 0x20) > 0 ) {
                     while( bufferIn[byteNum] != 0 )
                         byteNum++;
 
@@ -192,8 +183,7 @@ public class EngineQuery implements Runnable
                 }
 
                 // Get the 64-bit game ID if it's included
-                if( (EDF & 0x01) > 0 )
-                {
+                if( (EDF & 0x01) > 0 ) {
                     // Get the app ID from the lowest 24 bits of the game ID
                     appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn, byteNum, 3).put((byte)0x00).getInt(0);
 
@@ -203,31 +193,28 @@ public class EngineQuery implements Runnable
             }
 
             socket.close();
-            
-            if( result == Values.ENGINE_GOLDSRC )
-            {
+
+            if( result == Values.ENGINE_GOLDSRC ) {
                 gsrv = new GoldSrcServer(InetAddress.getByName(server), port);
                 obj = gsrv;
             }
-            else
-            {
+            else {
                 ssrv = new SourceServer(InetAddress.getByName(server), port);
                 obj = ssrv;
             }
-            
+
             return result;
         }
         // Handle a socket timeout
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             Log.w(TAG, "getServerEngine(): Caught an exception: " + e.toString());
             Log.w(TAG, "Stack trace:");
-            
+
             StackTraceElement[] ste = e.getStackTrace();
-            
+
             for( StackTraceElement x : ste )
                 Log.w(TAG, "    " + x.toString());
-            
+
             return -1;
         }
     }

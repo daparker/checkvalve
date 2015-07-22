@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -22,8 +22,8 @@ along with the CheckValve source code.  If not, see
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.daparker.checkvalve"
     android:installLocation="auto"
-    android:versionCode="9"
-    android:versionName="2.0.0" >
+    android:versionCode="10"
+    android:versionName="2.0.1" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -104,6 +104,11 @@ along with the CheckValve source code.  If not, see
             android:name="com.github.daparker.checkvalve.SettingsActivity"
             class="SettingsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ShowNoteActivity"
+            class="ShowNoteActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
     </application>
 
 </manifest>

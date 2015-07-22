@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -45,16 +45,25 @@ along with the CheckValve source code.  If not, see
             android:layout_marginTop="5dp"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/app_name"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/header_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="15dp"
+            android:gravity="left|center_vertical"
+            android:text="@string/about_header_about"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+        
         <TextView
             android:id="@+id/app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal|center_vertical"
+            android:gravity="left|center_vertical"
             android:text="@string/app_version"
             android:textSize="12sp" />
 
@@ -62,41 +71,48 @@ along with the CheckValve source code.  If not, see
             android:id="@+id/app_credits"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal|center_vertical"
+            android:gravity="left|center_vertical"
             android:text="@string/app_credits"
             android:textSize="12sp" />
 
         <TextView
+            android:id="@+id/header_license"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="15dp"
+            android:gravity="left|center_vertical"
+            android:text="@string/about_header_license"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+        
+        <TextView
             android:id="@+id/app_license"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal|center_vertical"
+            android:gravity="left|center_vertical"
             android:text="@string/app_license"
             android:textSize="12sp" />
-
+  
         <TextView
-            android:id="@+id/app_link"
+            android:id="@+id/header_support"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/app_link"
+            android:layout_marginTop="15dp"
+            android:gravity="left|center_vertical"
+            android:text="@string/about_header_support"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+        
+        <TextView
+            android:id="@+id/app_support"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:text="@string/app_support"
             android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/app_notes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/app_notes"
-            android:textSize="10sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -116,11 +132,11 @@ along with the CheckValve source code.  If not, see
             android:id="@+id/dismiss_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
             android:background="@android:color/transparent"
             android:focusable="true"
             android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:text="@string/button_dismiss"
             android:textColor="#ffffff"
             android:textSize="14sp" />

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -20,19 +20,16 @@
 package com.github.daparker.checkvalve;
 
 import java.util.concurrent.TimeoutException;
-
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
-public class RconAuth implements Runnable
-{
+public class RconAuth implements Runnable {
     private Handler handler;
     private String password;
     private SourceServer ssrv;
@@ -48,8 +45,7 @@ public class RconAuth implements Runnable
      * @param s The SourceServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconAuth( String p, SourceServer s, Handler h )
-    {
+    public RconAuth( String p, SourceServer s, Handler h ) {
         this.password = p;
         this.ssrv = s;
         this.handler = h;
@@ -62,17 +58,15 @@ public class RconAuth implements Runnable
      * @param g The GoldSrcServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconAuth( String p, GoldSrcServer g, Handler h )
-    {
+    public RconAuth( String p, GoldSrcServer g, Handler h ) {
         this.password = p;
         this.gsrv = g;
         this.handler = h;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         Message msg = new Message();
         int status = 0;
 
@@ -86,52 +80,43 @@ public class RconAuth implements Runnable
         this.handler.sendMessage(msg);
     }
 
-    public int rconAuthenticate()
-    {
-        try
-        {
-            if( gsrv != null )
-            {
+    public int rconAuthenticate() {
+        try {
+            if( gsrv != null ) {
                 gsrv.rconAuth(password);
                 gsrv.rconExec("status");
                 obj = gsrv;
             }
-            else
-            {
+            else {
                 ssrv.rconAuth(password);
                 obj = ssrv;
             }
-            
+
             return 0;
         }
-        catch( RCONNoAuthException e )
-        {
+        catch( RCONNoAuthException e ) {
             return 1;
         }
-        catch( RCONBanException e )
-        {
+        catch( RCONBanException e ) {
             return 2;
         }
-        catch( SteamCondenserException e )
-        {
+        catch( SteamCondenserException e ) {
             return 3;
         }
-        catch( TimeoutException e )
-        {
+        catch( TimeoutException e ) {
             return 4;
         }
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             Log.w(TAG, "rconAuthenticate(): Caught exception: " + e.toString());
             Log.w(TAG, "Stack trace:");
-            
+
             StackTraceElement[] ste = e.getStackTrace();
-            
+
             for( StackTraceElement x : ste )
                 Log.w(TAG, "    " + x.toString());
-            
+
             obj = e;
-            
+
             return 5;
         }
     }

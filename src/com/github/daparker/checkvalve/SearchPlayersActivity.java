@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -36,8 +37,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import com.github.daparker.checkvalve.R;
 
-public class SearchPlayersActivity extends Activity
-{
+public class SearchPlayersActivity extends Activity {
     private ProgressDialog p;
     private SearchPlayers q;
     private DatabaseProvider database;
@@ -47,17 +47,22 @@ public class SearchPlayersActivity extends Activity
     private TableRow[] messageRows;
 
     @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if( android.os.Build.VERSION.SDK_INT < 11 ) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         if( database == null )
             database = new DatabaseProvider(SearchPlayersActivity.this);
 
         Intent thisIntent = this.getIntent();
-        String search = thisIntent.getStringExtra("search");
+        String search = thisIntent.getStringExtra(Values.EXTRA_SEARCH);
 
         setContentView(R.layout.searchresults);
 
@@ -68,8 +73,7 @@ public class SearchPlayersActivity extends Activity
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         if( database == null )
@@ -77,12 +81,10 @@ public class SearchPlayersActivity extends Activity
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
-        if( database != null )
-        {
+        if( database != null ) {
             database.close();
             database = null;
         }
@@ -91,25 +93,21 @@ public class SearchPlayersActivity extends Activity
     }
 
     @Override
-    public void onConfigurationChanged( Configuration newConfig )
-    {
+    public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.playersearch_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
-        switch( item.getItemId() )
-        {
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        switch( item.getItemId() ) {
             case R.id.back:
                 quit();
                 return true;
@@ -118,8 +116,7 @@ public class SearchPlayersActivity extends Activity
         }
     }
 
-    public void searchPlayers( String search )
-    {
+    public void searchPlayers( String search ) {
         // Show the progress dialog
         p = ProgressDialog.show(this, "", this.getText(R.string.status_searching_players), true, false);
 
@@ -137,15 +134,12 @@ public class SearchPlayersActivity extends Activity
     }
 
     // Handler for the player search thread
-    Handler progressHandler = new Handler()
-    {
-        public void handleMessage( Message msg )
-        {
+    Handler progressHandler = new Handler() {
+        public void handleMessage( Message msg ) {
             /*
              * Build and display the error messages table if there are errors to be displayed
              */
-            if( messageRows[0] != null )
-            {
+            if( messageRows[0] != null ) {
                 int m = 0;
 
                 while( messageRows[m] != null )
@@ -157,10 +151,14 @@ public class SearchPlayersActivity extends Activity
             /*
              * Build and display the query results table
              */
-            for( int i = 0; i < tableRows.length; i++ )
-            {
-                if( tableRows[i] != null )
-                    search_results_table.addView(tableRows[i], new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            for( int i = 0; i < tableRows.length; i++ ) {
+                if( tableRows[i] != null ) {
+                    search_results_table.addView(
+                            tableRows[i],
+                            new TableLayout.LayoutParams(
+                                    LayoutParams.MATCH_PARENT,
+                                    LayoutParams.WRAP_CONTENT));
+                }
             }
 
             // Dismiss the progress dialog
@@ -168,8 +166,7 @@ public class SearchPlayersActivity extends Activity
         }
     };
 
-    public void quit()
-    {
+    public void quit() {
         finish();
     }
 }

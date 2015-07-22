@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -35,8 +35,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SearchPlayers extends Thread
-{
+public class SearchPlayers extends Thread {
     private static final String TAG = SearchPlayers.class.getSimpleName();
 
     private Handler handler;
@@ -46,8 +45,7 @@ public class SearchPlayers extends Thread
     private String search;
     private byte[] challengeResponse;
 
-    public SearchPlayers( Context c, TableRow[] t, TableRow[] m, Handler h, String s )
-    {
+    public SearchPlayers( Context c, TableRow[] t, TableRow[] m, Handler h, String s ) {
         this.context = c;
         this.tableRows = t;
         this.messageRows = m;
@@ -55,16 +53,14 @@ public class SearchPlayers extends Thread
         this.search = s;
     }
 
-    public void run()
-    {
+    public void run() {
         searchPlayers(search);
 
         if( handler != null )
             this.handler.sendEmptyMessage(0);
     }
 
-    public void searchPlayers( String search )
-    {
+    public void searchPlayers( String search ) {
         DatabaseProvider database = new DatabaseProvider(context);
 
         DatagramSocket socket;
@@ -91,10 +87,8 @@ public class SearchPlayers extends Thread
         ServerRecord[] serverList = database.getAllServers();
         database.close();
 
-        for( ServerRecord sr : serverList )
-        {
-            try
-            {
+        for( ServerRecord sr : serverList ) {
+            try {
                 serverURL = sr.getServerName();
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
@@ -124,8 +118,7 @@ public class SearchPlayers extends Thread
                 socket.connect(InetAddress.getByName(serverURL), serverPort);
 
                 // Return null if the connection attempt failed
-                if( !socket.isConnected() )
-                {
+                if( !socket.isConnected() ) {
                     Log.e(TAG, "getChallangeResponse(): Socket is not connected");
                     socket.close();
 
@@ -138,8 +131,7 @@ public class SearchPlayers extends Thread
 
                 challengeResponse = Arrays.copyOf(bufferIn, packetIn.getLength());
 
-                if( challengeResponse == null )
-                {
+                if( challengeResponse == null ) {
                     if( !socket.isClosed() )
                         socket.close();
 
@@ -172,8 +164,7 @@ public class SearchPlayers extends Thread
                 numpackets = 1;
 
                 // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
-                if( header.equals("\u00FF\u00FF\u00FF\u00FE") )
-                {
+                if( header.equals("\u00FF\u00FF\u00FF\u00FE") ) {
                     /*
                      * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet
                      * (packet 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we
@@ -187,16 +178,14 @@ public class SearchPlayers extends Thread
                     byteNum++;
 
                     // If this is packet 0 then skip the next 5 header bytes
-                    if( thispacket == 0 )
-                    {
+                    if( thispacket == 0 ) {
                         byteNum += 6;
                         numplayers = (short)packetData[byteNum++];
                     }
 
                     packets.add(thispacket, response.substring(byteNum, response.length()));
 
-                    for( int j = 1; j < numpackets; j++ )
-                    {
+                    for( int j = 1; j < numpackets; j++ ) {
                         // Receive the response packet from the server
                         socket.receive(packetIn);
 
@@ -209,8 +198,7 @@ public class SearchPlayers extends Thread
                         byteNum += 2;
 
                         // If this is packet 0 then skip the next 6 header bytes
-                        if( thispacket == 0 )
-                        {
+                        if( thispacket == 0 ) {
                             byteNum += 6;
                             numplayers = (short)bufferIn[byteNum++];
                         }
@@ -218,8 +206,7 @@ public class SearchPlayers extends Thread
                         packets.add(thispacket, response.substring(byteNum, response.length()));
                     }
                 }
-                else
-                {
+                else {
                     // Get number of players (6th byte)
                     numplayers = (short)bufferIn[5];
                     packets.add(0, response.substring(byteNum, response.length()));
@@ -227,19 +214,16 @@ public class SearchPlayers extends Thread
 
                 socket.close();
 
-                if( numplayers == 0 )
-                    continue;
+                if( numplayers == 0 ) continue;
 
-                for( int i = 0; i < packets.size(); i++ )
-                {
+                for( int i = 0; i < packets.size(); i++ ) {
                     String thisPacket = packets.get(i);
 
                     byte[] bytes = thisPacket.getBytes("ISO8859_1");
 
                     byteNum = 0;
 
-                    while( byteNum < thisPacket.length() )
-                    {
+                    while( byteNum < thisPacket.length() ) {
                         name = "";
                         resultString = "";
 
@@ -254,8 +238,7 @@ public class SearchPlayers extends Thread
                         /*
                          * Check for a match
                          */
-                        if( name.toLowerCase().indexOf(search.toLowerCase()) > -1 )
-                        {
+                        if( name.toLowerCase().indexOf(search.toLowerCase()) > -1 ) {
                             // We have a match!
                             numResults++;
 
@@ -285,8 +268,7 @@ public class SearchPlayers extends Thread
                     }
                 }
             }
-            catch( Exception e )
-            {
+            catch( Exception e ) {
                 Log.w(TAG, "queryPlayers(): Caught an exception:");
                 Log.w(TAG, e.toString());
 
@@ -320,8 +302,7 @@ public class SearchPlayers extends Thread
             }
         }
 
-        if( numResults == 0 )
-        {
+        if( numResults == 0 ) {
             resultString = (String)context.getText(R.string.msg_no_search_results);
 
             TextView searchResult = new TextView(context);

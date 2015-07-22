@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -27,8 +27,7 @@ import java.lang.Math;
 import java.net.*;
 import java.util.ArrayList;
 
-public class QueryPlayers implements Runnable
-{
+public class QueryPlayers implements Runnable {
     private static final String TAG = QueryPlayers.class.getSimpleName();
 
     private int status;
@@ -37,21 +36,18 @@ public class QueryPlayers implements Runnable
     private Context context;
     private Handler handler;
 
-    public QueryPlayers( Context context, long rowId, byte[] challengeResponse, Handler handler )
-    {
+    public QueryPlayers( Context context, long rowId, byte[] challengeResponse, Handler handler ) {
         this.context = context;
         this.rowId = rowId;
         this.challengeResponse = challengeResponse;
         this.handler = handler;
     }
 
-    public void run()
-    {
+    public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        
+
         status = 0;
         Message msg = new Message();
-
         ArrayList<PlayerRecord> players = queryPlayers();
 
         if( players != null )
@@ -61,8 +57,7 @@ public class QueryPlayers implements Runnable
         handler.sendMessage(msg);
     }
 
-    public ArrayList<PlayerRecord> queryPlayers()
-    {
+    public ArrayList<PlayerRecord> queryPlayers() {
         DatabaseProvider database = new DatabaseProvider(this.context);
         ServerRecord sr = database.getServer(rowId);
         database.close();
@@ -107,14 +102,13 @@ public class QueryPlayers implements Runnable
         float time = 0;
 
         // Integer variables
-        try
-        {
+        try {
             socket = new DatagramSocket();
             socket.setSoTimeout(serverTimeout * 1000);
 
             // Challenge response becomes the A2S_PLAYER query by changing 0x41 to 0x55
             bufferOut = challengeResponse;
-            bufferOut[4] = 0x55;
+            bufferOut[4] = Values.BYTE_A2S_PLAYER;
 
             tempBuffer = new byte[1400];
 
@@ -126,9 +120,10 @@ public class QueryPlayers implements Runnable
             socket.connect(InetAddress.getByName(serverURL), serverPort);
 
             // Show an error if the connection attempt failed
-            if( !socket.isConnected() )
-            {
-                if( !socket.isClosed() ) socket.close();
+            if( !socket.isConnected() ) {
+                if( !socket.isClosed() )
+                    socket.close();
+                
                 throw new SocketException();
             }
 
@@ -152,8 +147,7 @@ public class QueryPlayers implements Runnable
             numpackets = 1;
 
             // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
-            if( header.equals("\u00FF\u00FF\u00FF\u00FE") )
-            {
+            if( header.equals("\u00FF\u00FF\u00FF\u00FE") ) {
                 /*
                  * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet (packet
                  * 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we need to check
@@ -167,16 +161,14 @@ public class QueryPlayers implements Runnable
                 byteNum++;
 
                 // If this is packet 0 then skip the next 5 header bytes
-                if( thispacket == 0 )
-                {
+                if( thispacket == 0 ) {
                     byteNum += 6;
                     numplayers = (short)bufferIn[byteNum++];
                 }
 
                 packets[thispacket] = response.substring(byteNum, response.length());
 
-                for( int i = 1; i < numpackets; i++ )
-                {
+                for( int i = 1; i < numpackets; i++ ) {
                     // Receive the response packet from the server
                     socket.receive(packetIn);
 
@@ -189,8 +181,7 @@ public class QueryPlayers implements Runnable
                     byteNum += 2;
 
                     // If this is packet 0 then skip the next 6 header bytes
-                    if( thispacket == 0 )
-                    {
+                    if( thispacket == 0 ) {
                         byteNum += 6;
                         numplayers = (short)bufferIn[byteNum++];
                     }
@@ -198,8 +189,7 @@ public class QueryPlayers implements Runnable
                     packets[thispacket] = response.substring(byteNum, response.length());
                 }
             }
-            else
-            {
+            else {
                 // Get number of players (6th byte)
                 numplayers = (short)bufferIn[5];
                 packets[0] = response.substring(6, response.length());
@@ -207,8 +197,7 @@ public class QueryPlayers implements Runnable
 
             socket.close();
 
-            if( numplayers == 0 )
-            {
+            if( numplayers == 0 ) {
                 status = -2;
                 return null;
             }
@@ -216,16 +205,14 @@ public class QueryPlayers implements Runnable
             // Initialize the return array once we know how many elements we need
             playerList = new ArrayList<PlayerRecord>();
 
-            for( int i = 0; i < numpackets; i++ )
-            {
+            for( int i = 0; i < numpackets; i++ ) {
                 String thisPacket = packets[i];
 
                 byte[] bytes = thisPacket.getBytes("ISO8859_1");
 
                 byteNum = 0;
 
-                while( byteNum < thisPacket.length() )
-                {
+                while( byteNum < thisPacket.length() ) {
                     name = new String();
                     totaltime = new String();
                     kills = 0;
@@ -237,13 +224,11 @@ public class QueryPlayers implements Runnable
                         name += (char)bytes[byteNum++];
                     byteNum++;
 
-                    kills = (bytes[byteNum]) | (bytes[byteNum + 1] >> 8) | (bytes[byteNum + 2] >> 16)
-                            | (bytes[byteNum + 3] >> 24);
+                    kills = (bytes[byteNum])|(bytes[byteNum + 1] >> 8)|(bytes[byteNum + 2] >> 16)|(bytes[byteNum + 3] >> 24);
 
                     byteNum += 4;
 
-                    time = Float.intBitsToFloat((int)((long)(bytes[byteNum] & 0xff)
-                            | (long)((bytes[byteNum + 1] & 0xff) << 8) | (long)((bytes[byteNum + 2] & 0xff) << 16) | (long)((bytes[byteNum + 3] & 0xff) << 24)));
+                    time = Float.intBitsToFloat((int)((long)(bytes[byteNum] & 0xff)|(long)((bytes[byteNum + 1] & 0xff) << 8)|(long)((bytes[byteNum + 2] & 0xff) << 16)|(long)((bytes[byteNum + 3] & 0xff) << 24)));
 
                     byteNum += 4;
 
@@ -264,8 +249,7 @@ public class QueryPlayers implements Runnable
 
             return playerList;
         }
-        catch( Exception e )
-        {
+        catch( Exception e ) {
             status = -1;
 
             Log.w(TAG, "queryPlayers(): Caught an exception:");
