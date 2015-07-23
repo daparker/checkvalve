@@ -99,6 +99,7 @@ public class ChatViewerActivity extends Activity {
     private TextView subtitle;
     private Thread chatThread;
     private Thread receiverThread;
+    private DatabaseProvider database;
 
     private boolean rconIsAuthenticated;
     private boolean rconPasswordDialogDismissed;
@@ -163,14 +164,15 @@ public class ChatViewerActivity extends Activity {
         public void handleMessage( Message msg ) {
             /*
              * Message object "what" codes:
-             * -2  =  An exception during shutdown (maybe normal)
-             * -1  =  Failed to connect to the chat relay (probably a SocketException)
-             *  1  =  A heartbeat was received from the server
-             *  3  =  Connection failure (includes error message as String object)
-             *  4  =  Connection successful
-             *  5  =  Chat message (includes ChatMessage object)
+             * -2   = An exception during shutdown (maybe normal)
+             * -1   = Failed to connect to the chat relay (probably a SocketException)
+             *  1   = A heartbeat was received from the server
+             *  3   = Connection failure (includes error message as String object)
+             *  4   = Connection successful
+             *  5   = Chat message (includes ChatMessage object)
+             *  255 = Disconnected (probably due to shutdown)
              *  
-             *  NOTE: Codes >= 0 correspond to response types sent from the Chat Relay
+             *  Values 1-5 correspond to response types sent from the Chat Relay
              */
 
             if( p.isShowing() ) p.dismiss();
@@ -295,6 +297,32 @@ public class ChatViewerActivity extends Activity {
                     
                 case 255:
                     Log.d(TAG, "Handler received 255 (server closed connection)");
+                    
+                    notificationText = (TextView)View.inflate(ChatViewerActivity.this, R.layout.chat_textview_notification_text, null);
+                    notificationText.setText(R.string.msg_chat_disconnected);
+                    notificationText.setTypeface(null, Typeface.BOLD);
+                    notificationTextParams.span = 2;
+                    notificationText.setLayoutParams(notificationTextParams);
+
+                    notificationDate = (TextView)View.inflate(ChatViewerActivity.this, R.layout.chat_textview_notification_date, null);
+                    notificationDate.setText(sdf.format(System.currentTimeMillis()));
+                    notificationDateParams.span = 2;
+                    notificationDate.setLayoutParams(notificationDateParams);
+
+                    row = (TableRow)View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_notification, null);
+                    row.addView(notificationText);
+                    row.addView(notificationDate);
+                    row.setId(rowNum);
+                    chat_table.addView(row);
+
+                    spacerRow = (TableRow)View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_spacer, null);
+                    spacerRow.setLayoutParams(bottomRowParams);
+                    spacerRow.setId(rowNum);
+                    chat_table.addView(spacerRow, bottomRowParams);
+
+                    rowNum++;
+                    
+                    UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_chat_disconnected);
                     break;
                     
                 default:
@@ -542,6 +570,9 @@ public class ChatViewerActivity extends Activity {
             finish();
         }
 
+        if( database == null )
+            database = new DatabaseProvider(ChatViewerActivity.this);
+                
         rconIsAuthenticated = false;
         rconPasswordDialogDismissed = false;
         rconServer = thisIntent.getStringExtra(Values.EXTRA_SERVER);
@@ -609,9 +640,10 @@ public class ChatViewerActivity extends Activity {
         rowNum = 0;
         maxRows = 1000;
 
-        chatRelayIP = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
-        chatRelayPort = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_PORT);
-        chatRelayPassword = CheckValve.settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
+        Bundle settings = database.getSettingsAsBundle();
+        chatRelayIP = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
+        chatRelayPort = settings.getString(Values.SETTING_DEFAULT_RELAY_PORT);
+        chatRelayPassword = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
 
         showNote();
     }
@@ -619,11 +651,19 @@ public class ChatViewerActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+        
+        if( database == null )
+            database = new DatabaseProvider(ChatViewerActivity.this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        
+        if( database != null ) {
+            database.close();
+            database = null;
+        }
     }
 
     @Override
@@ -631,7 +671,6 @@ public class ChatViewerActivity extends Activity {
         super.onDestroy();
         shutdownNetworkEventReceiver();
         shutdownChatRelayConnection();
-
         if( g != null ) g.disconnect();
         if( s != null ) s.disconnect();
     }
@@ -647,7 +686,6 @@ public class ChatViewerActivity extends Activity {
     public boolean onOptionsItemSelected( MenuItem item ) {
         switch( item.getItemId() ) {
             case R.id.back:
-                UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_chat_disconnected);
                 finish();
                 return true;
             case R.id.clear_console:
@@ -702,7 +740,7 @@ public class ChatViewerActivity extends Activity {
 
     public void getRCONPassword() {
         Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
+        rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
@@ -742,7 +780,7 @@ public class ChatViewerActivity extends Activity {
         if( pswd == null ) pswd = "";
 
         Intent chatRelayDetailsIntent = new Intent();
-        chatRelayDetailsIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ChatRelayDetailsActivity");
+        chatRelayDetailsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ChatRelayDetailsActivity");
         chatRelayDetailsIntent.putExtra(Values.EXTRA_SERVER, ip);
         chatRelayDetailsIntent.putExtra(Values.EXTRA_PORT, port);
         chatRelayDetailsIntent.putExtra(Values.EXTRA_PASSWORD, pswd);
@@ -828,7 +866,7 @@ public class ChatViewerActivity extends Activity {
         }
         else {
             Log.d(TAG, "shutdownChatRelayConnection(): Chat thread is null");
-        }
+        }        
     }
 
     public void shutdownNetworkEventReceiver() {
@@ -866,7 +904,7 @@ public class ChatViewerActivity extends Activity {
     	}
     	
         Intent showNoteIntent = new Intent();
-        showNoteIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowNoteActivity");
+        showNoteIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ShowNoteActivity");
         showNoteIntent.putExtra(Values.EXTRA_NOTE_ID, R.string.note_chat_relay_required);
         showNoteIntent.putExtra(Values.EXTRA_FILE_NAME, Values.FILE_HIDE_CHAT_RELAY_NOTE);
         startActivityForResult(showNoteIntent, Values.ACTIVITY_SHOW_NOTE);
