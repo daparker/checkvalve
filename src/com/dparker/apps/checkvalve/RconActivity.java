@@ -48,6 +48,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import com.dparker.apps.checkvalve.R;
@@ -75,11 +76,17 @@ public class RconActivity extends Activity {
     private String server;
     private int port;
     private int timeout;
+    private int last;
+    private int pos;
     private boolean rconIsAuthenticated;
+    private boolean enableHistory;
 
     private SourceServer s;
     private GoldSrcServer g;
-
+    private Thread receiverThread;
+    private NetworkEventReceiver receiverRunnable;
+    private ArrayList<String> commandHistory;
+    
     private OnClickListener sendButtonListener = new OnClickListener() {
         public void onClick( View v ) {
             /*
@@ -95,13 +102,12 @@ public class RconActivity extends Activity {
         }
     };
 
-    private OnKeyListener enterKeyListener = new OnKeyListener() {
+    private OnKeyListener keyListener = new OnKeyListener() {
         public boolean onKey( View v, int k, KeyEvent e ) {
             /*
              * "Enter" or "Done" key was pressed
              */
-
-            if( (e.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (e.getAction() == KeyEvent.ACTION_UP) ) {
+            if( e.getKeyCode() == KeyEvent.KEYCODE_ENTER && e.getAction() == KeyEvent.ACTION_UP ) {
                 command = field_command.getText().toString().trim();
 
                 if( command.length() == 0 )
@@ -110,6 +116,26 @@ public class RconActivity extends Activity {
                     sendCommand(false);
 
                 return true;
+            }
+            
+            if( enableHistory ) {
+                /*
+                 * D-Pad up arrow was pressed
+                 */
+                if( e.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP && e.getAction() == KeyEvent.ACTION_DOWN ) {
+                    // Put the previous command in the text field
+                    if( pos > 0 ) field_command.setText(commandHistory.get(--pos));
+                    return true;
+                }
+                
+                /*
+                 * D-pad down arrow was pressed
+                 */
+                if( e.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && e.getAction() == KeyEvent.ACTION_DOWN ) {
+                    // Put the next command in the text field
+                    if( pos < last ) field_command.setText(commandHistory.get(++pos));
+                    return true;
+                }
             }
 
             return false;
@@ -143,7 +169,7 @@ public class RconActivity extends Activity {
             if( ! rconIsAuthenticated ) {
                 if( password.length() == 0 )
                     getPassword();
-                else
+                else 
                     rconAuthenticate();
             }
         }
@@ -228,6 +254,50 @@ public class RconActivity extends Activity {
         }
     };
 
+    // Handler for the network event receiver thread
+    private Handler networkEventHandler = new Handler() {
+        @Override
+        public void handleMessage( Message msg ) {
+            /*
+             * Message object "what" codes:
+             * -2  =  Fatal exception in the NetworkEventReceiver thread
+             * -1  =  No network connectivity
+             *  0  =  Initial event from broadcast receiver (should be ignored)
+             *  1  =  Network connection change
+             */
+
+            Log.d(TAG, "Received " + msg.what + " from NetworkEventReceiver");
+
+            switch( msg.what ) {
+                case -2:
+                    Log.e(TAG, "The network event receiver has aborted");
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+                    finish();
+                    break;
+                    
+                case -1:
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_connection_lost);
+                    closeRconConnection();
+                    rconIsAuthenticated = false;
+                    break;
+                    
+                case 0:
+                    break;
+                    
+                case 1:
+                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_network_change);
+                    closeRconConnection();
+                    rconIsAuthenticated = false;
+                    getServerType();
+
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+    };
+    
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         
@@ -270,19 +340,47 @@ public class RconActivity extends Activity {
 
         field_command = (AutoCompleteTextView)findViewById(R.id.field_command);
         field_command.setAdapter(adapter);
-        field_command.setOnKeyListener(enterKeyListener);
+        field_command.setOnKeyListener(keyListener);
 
         // Hack to disable auto-complete if desired by the user
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS) == true )
             field_command.setThreshold(1);
         else
             field_command.setThreshold(1000);
-
+        
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) == true )
             unsafeCommands = res.getStringArray(R.array.unsafe_commands);
         else
             unsafeCommands = null;
 
+        enableHistory = CheckValve.settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
+        
+        if( enableHistory ) {
+            commandHistory = new ArrayList<String>();
+            commandHistory.add(0, "");
+            last = 0;
+            pos = 0;
+        }
+        
+        receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
+
+        if( receiverRunnable == null ) {
+            Log.e(TAG, "onCreate(): NetworkEventReceiver object is null, cannot continue");
+            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+            finish();
+        }
+        else {
+            receiverThread = new Thread(receiverRunnable);
+
+            if( receiverThread == null ) {
+                Log.e(TAG, "onCreate(): NetworkEventReceiver thread is null, cannot continue");
+                UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
+                finish();
+            }
+
+            receiverThread.start();
+        }
+        
         getServerType();
     }
 
@@ -294,6 +392,14 @@ public class RconActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        shutdownNetworkEventReceiver();
+        if( g != null ) g.disconnect();
+        if( s != null ) s.disconnect();
     }
 
     @Override
@@ -324,6 +430,31 @@ public class RconActivity extends Activity {
         return;
     }
 
+    /*
+     * Handle up/down arrow keys for scrolling through previous commands
+     
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG, "onKeyDown(): keyCode=" + keyCode + "; event=" + event.toString());
+        
+        if( keyCode == KeyEvent.KEYCODE_DPAD_UP ) {
+            // Put the previous command in the text field
+            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_UP; pos=" + pos + "; last=" + last);
+            if( pos > 0 ) field_command.setText(commandList.get(--pos));
+            return false;
+        }
+        
+        if( keyCode == KeyEvent.KEYCODE_DPAD_DOWN ) {
+            // Put the next command in the text field
+            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_DOWN; pos=" + pos + "; last=" + last);
+            if( pos < last ) field_command.setText(commandList.get(++pos));
+            return false;
+        }
+        
+        return false;
+    }
+    */
+    
     public void onActivityResult( int request, int result, Intent data ) {
         if( request == Values.ACTIVITY_RCON_PASSWORD_DIALOG ) {
             if( result == 0 ) finish();
@@ -338,6 +469,11 @@ public class RconActivity extends Activity {
     }
 
     public void sendCommand( boolean force ) {
+        if( enableHistory ) {
+            commandHistory.add(last, command);
+            pos = ++last;
+        }
+        
         if( unsafeCommands != null ) {
             if( !force ) {
                 // Get the bare command without any arguments
@@ -407,7 +543,7 @@ public class RconActivity extends Activity {
 
     public void getPassword() {
         Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
+        rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
@@ -449,5 +585,47 @@ public class RconActivity extends Activity {
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+    
+    public void shutdownNetworkEventReceiver() {
+        if( receiverRunnable != null ) {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is not null, calling unregisterReceiver()");
+            receiverRunnable.unregisterReceiver();
+            receiverRunnable.shutDown();
+        }
+        else {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver object is null");
+        }
+
+        if( receiverThread != null ) {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not null");
+
+            if( receiverThread.isAlive() ) {
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is alive, calling interrupt() on thread " + receiverThread.getId());
+                receiverThread.interrupt();
+            }
+            else {
+                Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is not alive, not interrupting");
+            }
+        }
+        else {
+            Log.d(TAG, "shutdownNetworkEventReceiver(): NetworkEventReceiver thread is null");
+        }
+    }
+    
+    public void closeRconConnection() {
+        try {
+            if( s != null ) s.disconnect();
+            if( g != null ) g.disconnect();
+        }
+        catch( Exception e ) {
+            Log.w(TAG, "closeRconConnection(): Caught an exception:");
+            Log.w(TAG, e.toString());
+
+            StackTraceElement[] ste = e.getStackTrace();
+            
+            for( StackTraceElement x : ste )
+                Log.w(TAG, "    " + x.toString());
+        }
     }
 }
