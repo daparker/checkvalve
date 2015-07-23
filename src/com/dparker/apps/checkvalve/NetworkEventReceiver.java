@@ -127,12 +127,12 @@ public class NetworkEventReceiver implements Runnable {
                             String typeName = n.getTypeName();
                             String available = (n.isAvailable())?"true":"false";
 
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] TYPE: " + typeName + " (" + type + ")");
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] STATE: " + state);
-                            Log.d(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] AVAILABLE: " + available);
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] TYPE: " + typeName + " (" + type + ")");
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] STATE: " + state);
+                            Log.i(TAG, "[receiver=" + receiver.hashCode() + "][event=" + event + "] AVAILABLE: " + available);
 
                             // The first event (0) will always be received just after the receiver
-                            // is registered, so we'll ignore it and only notify the ChatUI thread
+                            // is registered, so we'll ignore it and only notify the parent thread
                             // about events thereafter.
                             if( event == 0 ) {
                                 lastNetworkType = type;
@@ -141,7 +141,6 @@ public class NetworkEventReceiver implements Runnable {
                                 if( connected ) {
                                     if( type != lastNetworkType ) {
                                         lastNetworkType = type;
-                                        Log.d(TAG, "Sending message to ChatUI thread.");
                                         handler.sendEmptyMessage(1);
                                     }
                                     else {
