@@ -101,7 +101,6 @@ public class Chat implements Runnable {
             for( StackTraceElement x : ste )
                 Log.i(TAG, "    " + x.toString());
 
-            Log.i(TAG, "Chat Relay client thread is shutting down.");
             handler.sendEmptyMessage(-2);
             return;
         }
@@ -123,6 +122,8 @@ public class Chat implements Runnable {
                     }
                 }
             }
+            
+            Log.i(TAG, "Chat Relay client thread is shutting down.");
         }
     }
 
