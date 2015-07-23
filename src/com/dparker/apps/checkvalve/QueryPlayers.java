@@ -108,7 +108,7 @@ public class QueryPlayers implements Runnable {
 
             // Challenge response becomes the A2S_PLAYER query by changing 0x41 to 0x55
             bufferOut = challengeResponse;
-            bufferOut[4] = 0x55;
+            bufferOut[4] = Values.BYTE_A2S_PLAYER;
 
             tempBuffer = new byte[1400];
 
