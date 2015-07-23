@@ -456,13 +456,13 @@ public class CheckValve extends Activity {
 
     public void addNewServer() {
         Intent addNewServerIntent = new Intent();
-        addNewServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AddServerActivity");
+        addNewServerIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.AddServerActivity");
         startActivityForResult(addNewServerIntent, Values.ACTIVITY_ADD_NEW_SERVER);
     }
 
     public void manageServers() {
         Intent manageServersIntent = new Intent();
-        manageServersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ManageServersActivity");
+        manageServersIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ManageServersActivity");
         startActivityForResult(manageServersIntent, Values.ACTIVITY_MANAGE_SERVERS);
     }
 
@@ -488,7 +488,7 @@ public class CheckValve extends Activity {
                         ArrayList<PlayerRecord> playerList = (ArrayList<PlayerRecord>)msg.obj;
 
                         Intent showPlayersIntent = new Intent();
-                        showPlayersIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ShowPlayersActivity");
+                        showPlayersIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowPlayersActivity");
                         showPlayersIntent.putParcelableArrayListExtra(Values.EXTRA_PLAYER_LIST, playerList);
                         startActivityForResult(showPlayersIntent, Values.ACTIVITY_SHOW_PLAYERS);
                     }
@@ -535,13 +535,13 @@ public class CheckValve extends Activity {
 
     public void playerSearch() {
         Intent playerSearchIntent = new Intent();
-        playerSearchIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.PlayerSearchActivity");
+        playerSearchIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.PlayerSearchActivity");
         startActivity(playerSearchIntent);
     }
 
     public void updateServer( final long rowId ) {
         Intent updateServerIntent = new Intent();
-        updateServerIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.EditServerActivity");
+        updateServerIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.EditServerActivity");
         updateServerIntent.putExtra(Values.EXTRA_ROW_ID, rowId);
         startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
     }
@@ -596,7 +596,7 @@ public class CheckValve extends Activity {
         int t = sr.getServerTimeout();
 
         Intent rconIntent = new Intent();
-        rconIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconActivity");
+        rconIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconActivity");
         rconIntent.putExtra(Values.EXTRA_SERVER, s);
         rconIntent.putExtra(Values.EXTRA_PORT, p);
         rconIntent.putExtra(Values.EXTRA_TIMEOUT, t);
@@ -613,7 +613,7 @@ public class CheckValve extends Activity {
         int t = sr.getServerTimeout();
 
         Intent chatIntent = new Intent();
-        chatIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ChatViewerActivity");
+        chatIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ChatViewerActivity");
         chatIntent.putExtra(Values.EXTRA_SERVER, s);
         chatIntent.putExtra(Values.EXTRA_PORT, p);
         chatIntent.putExtra(Values.EXTRA_TIMEOUT, t);
@@ -623,13 +623,13 @@ public class CheckValve extends Activity {
 
     public void about() {
         Intent aboutIntent = new Intent();
-        aboutIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.AboutActivity");
+        aboutIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.AboutActivity");
         startActivityForResult(aboutIntent, Values.ACTIVITY_ABOUT);
     }
 
     public void settings() {
         Intent settingsIntent = new Intent();
-        settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.SettingsActivity");
+        settingsIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.SettingsActivity");
         startActivityForResult(settingsIntent, Values.ACTIVITY_SETTINGS);
     }
 }

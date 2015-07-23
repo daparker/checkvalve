@@ -644,7 +644,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * </p>
      * @param rowId The database row which contains the server's data
      * @return A boolean value indicating whether or not the operation was successful.
-     * @see com.github.daparker.checkvalve.DatabaseProvider#getLastPosition()
+     * @see com.dparker.apps.checkvalve.DatabaseProvider#getLastPosition()
      */
     public boolean moveServerDown( long rowId ) {
         Cursor c;

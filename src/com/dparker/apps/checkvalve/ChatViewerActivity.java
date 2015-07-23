@@ -740,7 +740,7 @@ public class ChatViewerActivity extends Activity {
 
     public void getRCONPassword() {
         Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RconPasswordActivity");
+        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
         startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
     }
 
@@ -780,7 +780,7 @@ public class ChatViewerActivity extends Activity {
         if( pswd == null ) pswd = "";
 
         Intent chatRelayDetailsIntent = new Intent();
-        chatRelayDetailsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ChatRelayDetailsActivity");
+        chatRelayDetailsIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ChatRelayDetailsActivity");
         chatRelayDetailsIntent.putExtra(Values.EXTRA_SERVER, ip);
         chatRelayDetailsIntent.putExtra(Values.EXTRA_PORT, port);
         chatRelayDetailsIntent.putExtra(Values.EXTRA_PASSWORD, pswd);
@@ -904,7 +904,7 @@ public class ChatViewerActivity extends Activity {
     	}
     	
         Intent showNoteIntent = new Intent();
-        showNoteIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.ShowNoteActivity");
+        showNoteIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowNoteActivity");
         showNoteIntent.putExtra(Values.EXTRA_NOTE_ID, R.string.note_chat_relay_required);
         showNoteIntent.putExtra(Values.EXTRA_FILE_NAME, Values.FILE_HIDE_CHAT_RELAY_NOTE);
         startActivityForResult(showNoteIntent, Values.ACTIVITY_SHOW_NOTE);
