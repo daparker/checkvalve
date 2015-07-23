@@ -65,6 +65,12 @@ public class RconQuery implements Runnable {
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
+        Log.d(TAG, "command [toString=" + command.toString() + "][hashCode=" + command.hashCode() + "]");
+        Log.d(TAG, "handler [toString=" + handler.toString() + "][hashCode=" + handler.hashCode() + "]");
+        
+        if( ssrv != null ) Log.d(TAG, "ssrv [toString=" + ssrv.toString() + "][hashCode=" + ssrv.hashCode() + "]");
+        if( gsrv != null ) Log.d(TAG, "gsrv [toString=" + gsrv.toString() + "][hashCode=" + gsrv.hashCode() + "]");
+        
         Message msg = new Message();
         status = 0;
 
