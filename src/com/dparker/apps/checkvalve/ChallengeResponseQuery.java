@@ -24,6 +24,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class ChallengeResponseQuery implements Runnable {
     private Handler handler;
@@ -68,28 +70,26 @@ public class ChallengeResponseQuery implements Runnable {
     }
 
     public void getChallengeResponse() {
-        DatagramSocket socket;
-
-        DatagramPacket packetOut;
-        DatagramPacket packetIn;
-
-        byte[] bufferOut;
-        byte[] bufferIn;
-
         try {
+            // Byte arrays for packet data
+            byte[] arrayIn = new byte[9];
+            byte[] arrayOut = new byte[9];
+            
+            ByteBuffer bufferOut = ByteBuffer.wrap(arrayOut);
+            bufferOut.order(ByteOrder.BIG_ENDIAN);
+            
             // Use A2S_PLAYER query string with 0xFFFFFFFF to get the challenge number
-            String queryString = "\u00FF\u00FF\u00FF\u00FF\u0055\u00FF\u00FF\u00FF\u00FF";
-
-            // Byte buffers for packet data
-            bufferOut = queryString.getBytes("ISO8859_1");
-            bufferIn = new byte[1400];
+            bufferOut.putInt(Values.INT_PACKET_HEADER);
+            bufferOut.put(Values.BYTE_A2S_PLAYER);
+            bufferOut.putInt(Values.INT_PACKET_HEADER);
+            bufferOut.flip();
 
             // UDP datagram packets
-            packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            packetIn = new DatagramPacket(bufferIn, bufferIn.length);
+            DatagramPacket packetOut = new DatagramPacket(arrayOut, arrayOut.length);
+            DatagramPacket packetIn = new DatagramPacket(arrayIn, arrayIn.length);
 
             // Create a socket for querying the server
-            socket = new DatagramSocket();
+            DatagramSocket socket = new DatagramSocket();
             socket.setSoTimeout(timeout * 1000);
 
             // Connect to the remote server
@@ -109,16 +109,14 @@ public class ChallengeResponseQuery implements Runnable {
 
             // Close the socket
             socket.close();
-
+            
             // Store the challenge response in a byte array
-            challengeResponse = new byte[packetIn.getLength()];
+            challengeResponse = packetIn.getData();
+            
+            Log.d(TAG, "Received packet contains " + packetIn.getLength() + " bytes");
+            Log.d(TAG, "Challenge response contains " + challengeResponse.length + " bytes");
 
-            for( int i = 0; i < packetIn.getLength(); i++ )
-                challengeResponse[i] = bufferIn[i];
-
-            status = 0;
-
-            Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + challengeResponse.toString() + "; status=" + status);
+            Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + ByteBuffer.wrap(challengeResponse).getInt(5) + "; status=" + status);
         }
         catch( Exception e ) {
             Log.w(TAG, "getChallengeResponse(): Caught an exception:");
