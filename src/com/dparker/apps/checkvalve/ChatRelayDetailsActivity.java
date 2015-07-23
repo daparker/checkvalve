@@ -23,8 +23,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Button;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -34,12 +37,16 @@ import com.dparker.apps.checkvalve.R;
  * Define the ChatRelayDetails class
  */
 public class ChatRelayDetailsActivity extends Activity {
-    private EditText field_server;
+    private static final String TAG = ChatRelayDetailsActivity.class.getSimpleName();
+    
+    private AutoCompleteTextView field_server;
     private EditText field_port;
     private EditText field_password;
     private Button connectButton;
     private Button cancelButton;
     private Intent returned;
+    private DatabaseProvider database;
+    private String[] previousHosts;
 
     private OnClickListener connectButtonListener = new OnClickListener() {
         public void onClick( View v ) {
@@ -58,12 +65,31 @@ public class ChatRelayDetailsActivity extends Activity {
                 String port = field_port.getText().toString().trim();
                 String password = field_password.getText().toString().trim();
 
-                if( password.length() == 0 ) password = "";
+                boolean alreadySaved = false;
+                
+                Log.d(TAG, "Checking if host " + server + " is already saved.");
+                
+                for( int i = 0; i < previousHosts.length; i++ ) {
+                    if( previousHosts[i].equals(server) ) {
+                        alreadySaved = true;
+                        Log.d(TAG, "Host " + server + " matches list element " + i + "; already saved.");
+                        break;
+                    }
+                }
+                
+                if( ! alreadySaved ) {
+                    Log.d(TAG, "Saving host " + server + " to database.");
+                    database.putRelayHost(server);
+                }
+                
+                if( password.length() == 0 )
+                    password = "";
 
                 returned.putExtra(Values.EXTRA_SERVER, server);
                 returned.putExtra(Values.EXTRA_PORT, port);
                 returned.putExtra(Values.EXTRA_PASSWORD, password);
                 setResult(1, returned);
+                
                 finish();
             }
         }
@@ -89,35 +115,53 @@ public class ChatRelayDetailsActivity extends Activity {
 
         returned = new Intent();
         Intent thisIntent = getIntent();
+        
+        if( database == null )
+            database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
-        field_server = (EditText)findViewById(R.id.field_server);
+        field_server = (AutoCompleteTextView)findViewById(R.id.field_server);
         field_port = (EditText)findViewById(R.id.field_port);
         field_password = (EditText)findViewById(R.id.field_password);
 
         if( thisIntent.getStringExtra(Values.EXTRA_SERVER).length() != 0 )
-        	field_server.setText(thisIntent.getStringExtra(Values.EXTRA_SERVER));
+            field_server.setText(thisIntent.getStringExtra(Values.EXTRA_SERVER));
 
         if( thisIntent.getStringExtra(Values.EXTRA_PORT).length() != 0 )
-        	field_port.setText(thisIntent.getStringExtra(Values.EXTRA_PORT));
+            field_port.setText(thisIntent.getStringExtra(Values.EXTRA_PORT));
 
         if( thisIntent.getStringExtra(Values.EXTRA_PASSWORD).length() != 0 )
-        	field_password.setText(thisIntent.getStringExtra(Values.EXTRA_PASSWORD));
+            field_password.setText(thisIntent.getStringExtra(Values.EXTRA_PASSWORD));
 
         connectButton = (Button)findViewById(R.id.connectButton);
         connectButton.setOnClickListener(connectButtonListener);
 
         cancelButton = (Button)findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(cancelButtonListener);
+        
+        previousHosts = database.getRelayHosts();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, previousHosts);
+
+        field_server = (AutoCompleteTextView)findViewById(R.id.field_server);
+        field_server.setAdapter(adapter);
+        field_server.setThreshold(1);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        
+        if( database != null ) {
+            database.close();
+            database = null;
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        
+        if( database == null )
+            database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
         connectButton = (Button)findViewById(R.id.connectButton);
         connectButton.setOnClickListener(connectButtonListener);

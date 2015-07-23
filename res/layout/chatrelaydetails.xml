@@ -73,11 +73,12 @@ along with the CheckValve source code.  If not, see
 
             <TableRow>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/field_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
+                    android:dropDownSelector="@color/steam_blue"
                     android:inputType="text"
                     android:singleLine="true"
                     android:text=""
