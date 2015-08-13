@@ -107,16 +107,8 @@ public class RconAuth implements Runnable {
             return 4;
         }
         catch( Exception e ) {
-            Log.w(TAG, "rconAuthenticate(): Caught exception: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "rconAuthenticate(): Caught exception:", e);
             obj = e;
-
             return 5;
         }
     }

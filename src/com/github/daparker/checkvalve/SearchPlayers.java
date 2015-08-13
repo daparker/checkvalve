@@ -269,13 +269,7 @@ public class SearchPlayers extends Thread {
                 }
             }
             catch( Exception e ) {
-                Log.w(TAG, "queryPlayers(): Caught an exception:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.w(TAG, "    " + x.toString());
+                Log.w(TAG, "queryPlayers(): Caught an exception:", e);
 
                 String message = new String();
 

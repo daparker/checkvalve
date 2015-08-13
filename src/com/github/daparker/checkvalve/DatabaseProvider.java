@@ -175,13 +175,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);
         }
         catch( SQLiteException e ) {
-            Log.w(TAG, "Caught an exception while creating database:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
+            Log.w(TAG, "Caught an exception while creating database:", e);
         }
     }
 
@@ -269,13 +263,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 c.close();
             }
             catch( SQLiteException e ) {
-                Log.w(TAG, "Caught an exception while upgrading database:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.e(TAG, "    " + x.toString());
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
         }
         
@@ -283,7 +271,6 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             try {
                 /*
                  * Added a setting to enable/disable RCON command history in DB version 4.
-                 * Added the relay_hosts table in DB version 4.
                  */
                 
                 // Add the rcon_enable_history column to the settings table
@@ -296,23 +283,17 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
                 Log.i(TAG, "Setting " + SETTINGS_RCON_ENABLE_HISTORY + " default value to 1");
                 db.update(TABLE_SETTINGS, values, null, null);
-                
-                // Add the relay_hosts table
-                //Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
-                //db.execSQL(CREATE_TABLE_RELAY_HOSTS);
             }
             catch( Exception e ) {
-                Log.w(TAG, "Caught an exception while upgrading database:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.e(TAG, "    " + x.toString());
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
         }
         
         if( oldVersion < 5 ) {
+            /*
+             * Added the relay_hosts table in DB version 5.
+             */
+            
             // Add the relay_hosts table
             Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);

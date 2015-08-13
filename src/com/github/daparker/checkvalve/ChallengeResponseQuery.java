@@ -119,14 +119,7 @@ public class ChallengeResponseQuery implements Runnable {
             Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + ByteBuffer.wrap(challengeResponse).getInt(5) + "; status=" + status);
         }
         catch( Exception e ) {
-            Log.w(TAG, "getChallengeResponse(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "getChallengeResponse(): Caught an exception:", e);
             challengeResponse = null;
             status = 1;
         }

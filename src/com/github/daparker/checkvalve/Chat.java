@@ -112,13 +112,7 @@ public class Chat implements Runnable {
                         Log.i(TAG, "The socket has been closed.");
                     }
                     catch( IOException ioe ) {
-                        Log.w(TAG, "Caught an exception while shutting down the socket:");
-                        Log.w(TAG, ioe.toString());
-
-                        StackTraceElement[] ste = ioe.getStackTrace();
-
-                        for( StackTraceElement x : ste )
-                            Log.e(TAG, "    " + x.toString());
+                        Log.w(TAG, "Caught an exception while shutting down the socket:", ioe);
                     }
                 }
             }
@@ -238,14 +232,7 @@ public class Chat implements Runnable {
             }
         }
         catch( Exception e ) {
-            Log.w(TAG, "Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, x.toString());
-
+            Log.w(TAG, "Caught an exception:", e);
             handler.sendEmptyMessage(-1);
             return;
         }
@@ -386,14 +373,7 @@ public class Chat implements Runnable {
             }
         }
         catch( Exception e ) {
-            StackTraceElement[] ste = e.getStackTrace();
-
-            Log.w(TAG, "Caught an exception while closing socket: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "Caught an exception while closing socket:", e);
             handler.sendEmptyMessage(-2);
         }
 

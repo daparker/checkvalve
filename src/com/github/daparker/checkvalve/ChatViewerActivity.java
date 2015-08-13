@@ -284,13 +284,7 @@ public class ChatViewerActivity extends Activity {
                         rowNum++;
                     }
                     catch( Exception e ) {
-                        Log.w(TAG, "Caught an exception while reading chat message object:");
-                        Log.w(TAG, e.toString());
-
-                        StackTraceElement[] ste = e.getStackTrace();
-
-                        for( StackTraceElement x : ste )
-                            Log.e(TAG, "    " + x.toString());
+                        Log.w(TAG, "Caught an exception while reading chat message object:", e);
                     }
 
                     break;
@@ -451,15 +445,8 @@ public class ChatViewerActivity extends Activity {
                     }
                 }
                 catch( Exception e ) {
-                    StackTraceElement[] ste = e.getStackTrace();
-
-                    Log.w(TAG, "checkRCON(): Caught an exception: " + e.toString());
-                    Log.w(TAG, "Stack trace:");
-
-                    for( StackTraceElement x : ste )
-                        Log.w(TAG, "    " + x.toString());
-
                     p.dismiss();
+                    Log.w(TAG, "checkRCON(): Caught an exception:", e);
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_rcon_general_error);
                 }
             }
@@ -558,15 +545,7 @@ public class ChatViewerActivity extends Activity {
         }
         catch( Exception e ) {
             UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_general_error);
-
-            Log.w(TAG, "onCreate(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "onCreate(): Caught an exception:", e);
             finish();
         }
 

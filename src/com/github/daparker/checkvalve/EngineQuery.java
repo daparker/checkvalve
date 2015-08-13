@@ -207,14 +207,7 @@ public class EngineQuery implements Runnable {
         }
         // Handle a socket timeout
         catch( Exception e ) {
-            Log.w(TAG, "getServerEngine(): Caught an exception: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "getServerEngine(): Caught an exception:", e);
             return -1;
         }
     }

@@ -250,16 +250,8 @@ public class QueryPlayers implements Runnable {
             return playerList;
         }
         catch( Exception e ) {
+            Log.w(TAG, "queryPlayers(): Caught an exception:", e);
             status = -1;
-
-            Log.w(TAG, "queryPlayers(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
-
             return null;
         }
     }

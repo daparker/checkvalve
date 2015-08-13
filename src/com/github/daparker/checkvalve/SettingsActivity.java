@@ -352,14 +352,7 @@ public class SettingsActivity extends Activity {
             }
         }
         catch( Exception e ) {
-            Log.e(TAG, "Caught an exception while saving settings:");
-            Log.e(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
-
+            Log.e(TAG, "Caught an exception while saving settings:", e);
             setResult(1);
         }
     }
