@@ -45,8 +45,6 @@ public class ServerQuery implements Runnable {
      * Construct a new instance of the ServerQuery class for collecting server information.
      * 
      * @param c The context to use
-     * @param t The TableRow array in which server information will be stored
-     * @param m The TableRow array in which error messages will be stored
      * @param h The Handler to use
      */
     public ServerQuery( Context c, Handler h ) {
@@ -159,7 +157,7 @@ public class ServerQuery implements Runnable {
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
                     Log.i(TAG, "Parsing Source Engine response");
-                    serverInfo[i] = SI_parseResponseFromSRCDS(arrayIn);
+                    serverInfo[i] = parseResponseFromSRCDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
@@ -168,7 +166,7 @@ public class ServerQuery implements Runnable {
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
                     Log.i(TAG, "Parsing GoldSrc Engine response");
-                    serverInfo[i] = SI_parseResponseFromHLDS(arrayIn);
+                    serverInfo[i] = parseResponseFromHLDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
@@ -199,7 +197,7 @@ public class ServerQuery implements Runnable {
         messages.add(message);
     }
     
-    private ServerInfo SI_parseResponseFromSRCDS(byte[] data) {
+    private ServerInfo parseResponseFromSRCDS(byte[] data) {
         String name = new String();
         String map = new String();
         String game = new String();
@@ -208,81 +206,63 @@ public class ServerQuery implements Runnable {
         int numPlayers = 0;
         int maxPlayers = 0;
         
-        // Start at byte 6 in the response data
-        int byteNum = 6;
-
-        // Get the server name
-        while( data[byteNum] != 0x00 ) name += (char)data[byteNum++];
-        byteNum++;
-
-        // Get the map name
-        while( data[byteNum] != 0x00 ) map += (char)data[byteNum++];
-        byteNum++;
-
-        // Skip the next string (game server path)
-        while( data[byteNum] != 0x00 ) byteNum++;
-        byteNum++;
-
-        // Get the game description
-        while( data[byteNum] != 0x00 ) game += (char)data[byteNum++];
-        byteNum++;
-
-        // Skip the next 2 bytes (Steam application ID)
-        byteNum += 2;
-
-        // Get the current number of players and move to the next byte
-        numPlayers = (int)data[byteNum++];
-
-        // Get the maximum number of players and move to the next byte
-        maxPlayers = (int)data[byteNum++];
-
-        byteNum += 5;
-
-        while( data[byteNum] != 0x00 ) version += (char)data[byteNum++];
-        byteNum++;
-
-        // If we're not at the end of the array then get the additional data
-        if( byteNum < data.length ) {
-            // This byte is the Extra Data Flag (EDF)
-            int EDF = (int)data[byteNum];
-            byteNum++;
-
-            // Skip the port number if included
-            if( (EDF & 0x80) > 0 ) byteNum += 2;
-
-            // Skip the SteamID if included
-            if( (EDF & 0x10) > 0 ) byteNum += 8;
-
-            // Skip SourceTV information if included
-            if( (EDF & 0x40) > 0 ) {
-                byteNum += 2;
-
-                while( data[byteNum] != 0x00 ) byteNum++;
-                byteNum++;
+        PacketData pd = new PacketData(data);
+        
+        try {
+            pd.setPosition(6);              // Skip the first 6 bytes
+            name = pd.getUTF8String();      // Get the server name
+            map = pd.getUTF8String();       // Get the map name
+            pd.skipString();                // Skip the next string (game server path)
+            game = pd.getUTF8String();      // Get the game description
+            pd.skip(2);                     // Skip the next 2 bytes (Steam application ID)
+            numPlayers = (int)pd.getByte(); // Get the current number of players
+            maxPlayers = (int)pd.getByte(); // Get the maximum number of players
+            pd.skip(5);                     // Skip 5 bytes
+            version = pd.getUTF8String();   // Get the game version
+            
+            // If we're not at the end of the array then get the additional data
+            if( pd.hasRemaining() ) {
+                // This byte is the Extra Data Flag (EDF)
+                int EDF = (int)pd.getByte();
+    
+                // Skip the port number if included (2 bytes)
+                if( (EDF & 0x80) > 0 ) pd.skip(2);
+    
+                // Skip the SteamID if included (8 bytes)
+                if( (EDF & 0x10) > 0 ) pd.skip(8);
+    
+                // Skip SourceTV information if included (2 bytes and a string)
+                if( (EDF & 0x40) > 0 ) {
+                    pd.skip(2);
+                    pd.skipString();
+                }
+    
+                // Get the server tags (sv_tags) if any are included (string)
+                if( (EDF & 0x20) > 0 ) tags = pd.getUTF8String();
+    
+                /*
+                 * Stop here (we're only interested in getting the server tags in this query)
+                 */
             }
-
-            // Get the server tags (sv_tags) if any are included
-            if( (EDF & 0x20) > 0 ) while( data[byteNum] != 0 )
-                tags += (char)data[byteNum++];
-
-            /*
-             * Stop here (we're only interested in getting the server tags in this query)
-             */
+            
+            ServerInfo result = new ServerInfo();
+            result.setName(name);
+            result.setMap(map);
+            result.setGame(game);
+            result.setVersion(version);
+            result.setNumPlayers(numPlayers);
+            result.setMaxPlayers(maxPlayers);
+            result.setTags(tags);
+            
+            return result;
         }
-        
-        ServerInfo result = new ServerInfo();
-        result.setName(name);
-        result.setMap(map);
-        result.setGame(game);
-        result.setVersion(version);
-        result.setNumPlayers(numPlayers);
-        result.setMaxPlayers(maxPlayers);
-        result.setTags(tags);
-        
-        return result;
+        catch( Exception e ) {
+            Log.w(TAG, "parseResponseFromSRCDS(): Caught an exception:", e);
+            return null;
+        }
     }
     
-    public ServerInfo SI_parseResponseFromHLDS(byte[] data) {
+    public ServerInfo parseResponseFromHLDS(byte[] data) {
         String name = new String();
         String map = new String();
         String game = new String();
@@ -291,44 +271,32 @@ public class ServerQuery implements Runnable {
         int numPlayers = 0;
         int maxPlayers = 0;
         
-        // Start at byte 5 in the response data
-        int byteNum = 5;
-
-        // Skip the server IP
-        while( data[byteNum] != 0x00 ) byteNum++;
-        byteNum++;
+        PacketData pd = new PacketData(data);
         
-        // Get the server name
-        while( data[byteNum] != 0x00 ) name += (char)data[byteNum++];
-        byteNum++;
-
-        // Get the map name
-        while( data[byteNum] != 0x00 ) map += (char)data[byteNum++];
-        byteNum++;
-
-        // Skip the game server path
-        while( data[byteNum] != 0x00 ) byteNum++;
-        byteNum++;
-
-        // Get the game description
-        while( data[byteNum] != 0x00 ) game += (char)data[byteNum++];
-        byteNum++;
-
-        // Get the current number of players and move to the next byte
-        numPlayers = (int)data[byteNum++];
-
-        // Get the maximum number of players and move to the next byte
-        maxPlayers = (int)data[byteNum++];
-        
-        ServerInfo result = new ServerInfo();
-        result.setName(name);
-        result.setMap(map);
-        result.setGame(game);
-        result.setVersion(version);
-        result.setNumPlayers(numPlayers);
-        result.setMaxPlayers(maxPlayers);
-        result.setTags(tags);
-        
-        return result;
+        try {
+            pd.setPosition(5);              // Skip the first 5 bytes
+            pd.skipString();                // Skip the server IP
+            name = pd.getUTF8String();      // Get the server name
+            map = pd.getUTF8String();       // Get the map name
+            pd.skipString();                // Skip the game server path
+            game = pd.getUTF8String();      // Get the game description
+            numPlayers = (int)pd.getByte(); // Get the current number of players
+            maxPlayers = (int)pd.getByte(); // Get the maximum number of players
+                    
+            ServerInfo result = new ServerInfo();
+            result.setName(name);
+            result.setMap(map);
+            result.setGame(game);
+            result.setVersion(version);
+            result.setNumPlayers(numPlayers);
+            result.setMaxPlayers(maxPlayers);
+            result.setTags(tags);
+            
+            return result;
+        }
+        catch( Exception e ) {
+            Log.w(TAG, "parseResponseFromHLDS(): Caught an exception:", e);
+            return null;
+        }
     }
 }
