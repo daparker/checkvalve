@@ -337,9 +337,18 @@ public class Chat implements Runnable {
                     for( i = pos; i < end; i++ )
                         responseMessage.append((char)dataBuffer.get());
 
-                    fields = new String(responseMessage.toString().getBytes("UTF-8")).split("\u0000");
+                    fields = new String(responseMessage.toString().getBytes()).split("\u0000");
 
-                    chatMsg = new ChatMessage(protocolVersion, sayTeam, serverTimestamp, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]);
+                    chatMsg = new ChatMessage(
+                            protocolVersion,                            // Protocol version
+                            sayTeam,                                    // say_team flag
+                            serverTimestamp,                            // Epoch timestamp from the Chat Relay
+                            new String(fields[0].getBytes(), "UTF-8"),  // Game server IP
+                            new String(fields[1].getBytes(), "UTF-8"),  // Game server port
+                            new String(fields[2].getBytes(), "UTF-8"),  // Timestamp from the original message
+                            new String(fields[3].getBytes(), "UTF-8"),  // Player name
+                            new String(fields[4].getBytes(), "UTF-8"),  // Player team
+                            new String(fields[5].getBytes(), "UTF-8")); // Chat message
 
                     msg = Message.obtain(handler, 5, chatMsg);
                     handler.sendMessage(msg);
