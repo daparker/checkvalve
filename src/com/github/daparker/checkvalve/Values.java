@@ -22,7 +22,7 @@ package com.github.daparker.checkvalve;
 /*
  * Define the Values class
  */
-public class Values {
+public final class Values {
     // Engine types
     public static final int ENGINE_SOURCE = 0;
     public static final int ENGINE_GOLDSRC = 1;
@@ -56,6 +56,8 @@ public class Values {
     public static final String EXTRA_NOTE_ID = "noteString";
 
     // Bundle keys
+    public static final String MESSAGES = "messages";
+    public static final String SERVER_INFO = "serverInfo";
     public static final String SERVER_NAME = "serverName";
     public static final String SERVER_MAP = "serverMap";
     public static final String SERVER_GAME = "serverGame";
@@ -99,8 +101,9 @@ public class Values {
     public static final int INT_PACKET_HEADER = 0xFFFFFFFF;
     public static final int INT_SPLIT_HEADER = 0xFFFFFFFE;
     public static final byte BYTE_CHALLENGE_RESPONSE = (byte)0x41;
-    public static final byte BYTE_SOURCE_INFO = (byte)0x6D;
-    public static final byte BYTE_GOLDSRC_INFO = (byte)0x49;
+    public static final byte BYTE_A2S_PLAYER_RESPONSE = (byte)0x44;
+    public static final byte BYTE_GOLDSRC_INFO = (byte)0x6D;
+    public static final byte BYTE_SOURCE_INFO = (byte)0x49;
     public static final byte BYTE_A2S_INFO = (byte)0x54;
     public static final byte BYTE_A2S_PLAYER = (byte)0x55;
     public static final byte BYTE_A2S_RULES = (byte)0x56;
