@@ -36,15 +36,11 @@ public class Chat implements Runnable {
     private static final String TAG = "Chat";
 
     private static byte responseType;
-    private static byte protocolVersion;
-    private static byte sayTeam;
     private static short contentLength;
-    private static int serverTimestamp;
     private static int packetHeader;
     private static String passwordString;
     private static StringBuilder responseMessage;
     private static Socket s;
-    private static String[] fields = new String[6];
     private static Message msg;
     private static ChatMessage chatMsg;
     private static InputStream in;
@@ -137,11 +133,7 @@ public class Chat implements Runnable {
         final byte PTYPE_CONNECTION_FAILURE = (byte)0x03;
         final byte PTYPE_CONNECTION_SUCCESS = (byte)0x04;
         final byte PTYPE_MESSAGE_DATA = (byte)0x05;
-
-        int i = 0;
-        int pos = 0;
-        int end = 0;
-
+        
         dataBuffer.order(ByteOrder.LITTLE_ENDIAN);
         dataBuffer.clear();
 
@@ -210,11 +202,10 @@ public class Chat implements Runnable {
 
                 // Read the rest of the packet data
                 if( (in.read(dataBytes, dataBuffer.position(), contentLength)) == -1 ) return;
+                
+                dataBuffer.limit(dataBuffer.position()+contentLength);
 
-                pos = dataBuffer.position();
-                end = pos + contentLength;
-
-                for( i = pos; i < end; i++ )
+                while( dataBuffer.hasRemaining() )
                     responseMessage.append((char)dataBuffer.get());
 
                 Log.i(TAG, "Server identity string is " + responseMessage.toString().trim());
@@ -305,7 +296,9 @@ public class Chat implements Runnable {
                 Log.w(TAG, "Timed out while reading packet data.");
                 continue;
             }
-
+            
+            dataBuffer.limit(dataBuffer.position()+contentLength);
+            
             switch( responseType ) {
                 case PTYPE_CONNECTION_SUCCESS:
                     Log.i(TAG, "Connected to " + chatRelayIP.getHostAddress() + ":" + chatRelayPort + ".");
@@ -313,10 +306,7 @@ public class Chat implements Runnable {
                     break;
 
                 case PTYPE_CONNECTION_FAILURE:
-                    pos = dataBuffer.position();
-                    end = pos + contentLength;
-
-                    for( i = pos; i < end; i++ )
+                    while( dataBuffer.hasRemaining() )
                         responseMessage.append((char)dataBuffer.get());
 
                     String error = responseMessage.substring(2).trim();
@@ -327,28 +317,21 @@ public class Chat implements Runnable {
                     break;
 
                 case PTYPE_MESSAGE_DATA:
-                    protocolVersion = dataBuffer.get();
-                    serverTimestamp = dataBuffer.getInt();
-                    sayTeam = dataBuffer.get();
-
-                    pos = dataBuffer.position();
-                    end = pos + contentLength - 6;
-
-                    for( i = pos; i < end; i++ )
-                        responseMessage.append((char)dataBuffer.get());
-
-                    fields = new String(responseMessage.toString().getBytes()).split("\u0000");
+                    byte[] tmp = new byte[dataBuffer.remaining()];
+                    dataBuffer.get(tmp, 0, dataBuffer.remaining());
+                    
+                    PacketData pd = new PacketData(tmp);
 
                     chatMsg = new ChatMessage(
-                            protocolVersion,                            // Protocol version
-                            sayTeam,                                    // say_team flag
-                            serverTimestamp,                            // Epoch timestamp from the Chat Relay
-                            new String(fields[0].getBytes(), "UTF-8"),  // Game server IP
-                            new String(fields[1].getBytes(), "UTF-8"),  // Game server port
-                            new String(fields[2].getBytes(), "UTF-8"),  // Timestamp from the original message
-                            new String(fields[3].getBytes(), "UTF-8"),  // Player name
-                            new String(fields[4].getBytes(), "UTF-8"),  // Player team
-                            new String(fields[5].getBytes(), "UTF-8")); // Chat message
+                            pd.getByte(),        // Protocol version
+                            pd.getByte(),        // say_team flag
+                            pd.getInt(),         // Epoch timestamp from the Chat Relay
+                            pd.getUTF8String(),  // Game server IP
+                            pd.getUTF8String(),  // Game server port
+                            pd.getUTF8String(),  // Timestamp from the original message
+                            pd.getUTF8String(),  // Player name
+                            pd.getUTF8String(),  // Player team
+                            pd.getUTF8String()); // Chat message
 
                     msg = Message.obtain(handler, 5, chatMsg);
                     handler.sendMessage(msg);
