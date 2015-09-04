@@ -324,8 +324,8 @@ public class Chat implements Runnable {
 
                     chatMsg = new ChatMessage(
                             pd.getByte(),        // Protocol version
-                            pd.getByte(),        // say_team flag
                             pd.getInt(),         // Epoch timestamp from the Chat Relay
+                            pd.getByte(),        // say_team flag
                             pd.getUTF8String(),  // Game server IP
                             pd.getUTF8String(),  // Game server port
                             pd.getUTF8String(),  // Timestamp from the original message
