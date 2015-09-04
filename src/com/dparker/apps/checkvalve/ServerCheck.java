@@ -109,14 +109,7 @@ public class ServerCheck implements Runnable {
             status = 4;
         }
         catch( Exception e ) {
-            StackTraceElement[] ste = e.getStackTrace();
-
-            Log.w(TAG, "Caught an exception: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
-
+            Log.w(TAG, "Caught an exception:", e);
             status = 5;
         }
 

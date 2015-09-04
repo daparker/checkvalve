@@ -158,14 +158,7 @@ public class NetworkEventReceiver implements Runnable {
             registerReceiver();
         }
         catch( Exception e ) {
-            StackTraceElement[] ste = e.getStackTrace();
-
-            Log.w(TAG, "run(): Caught an exception: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "run(): Caught an exception:", e);
             unregisterReceiver();
             handler.sendEmptyMessage(-2);
             Log.i(TAG, "Shutting down network event receiver thread.");
@@ -188,14 +181,7 @@ public class NetworkEventReceiver implements Runnable {
                 registered = true;
             }
             catch( Exception e ) {
-                StackTraceElement[] ste = e.getStackTrace();
-
-                Log.w(TAG, "registerReceiver(): Caught an exception: " + e.toString());
-                Log.w(TAG, "Stack trace:");
-
-                for( StackTraceElement x : ste )
-                    Log.w(TAG, "    " + x.toString());
-
+                Log.w(TAG, "registerReceiver(): Caught an exception:", e);
                 Log.w(TAG, "Failed to register broadcast receiver.");
             }
         }
@@ -212,14 +198,7 @@ public class NetworkEventReceiver implements Runnable {
                 registered = false;
             }
             catch( Exception e ) {
-                StackTraceElement[] ste = e.getStackTrace();
-
-                Log.w(TAG, "unregisterReceiver(): Caught an exception: " + e.toString());
-                Log.w(TAG, "Stack trace:");
-
-                for( StackTraceElement x : ste )
-                    Log.w(TAG, "    " + x.toString());
-
+                Log.w(TAG, "unregisterReceiver(): Caught an exception:", e);
                 Log.w(TAG, "Failed to unregister broadcast receiver.");
             }
         }

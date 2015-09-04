@@ -25,6 +25,8 @@ import android.util.Log;
 import android.content.Context;
 import java.lang.Math;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 
 public class QueryPlayers implements Runnable {
@@ -72,14 +74,14 @@ public class QueryPlayers implements Runnable {
         // Byte buffers for packet data
         byte[] bufferOut;
         byte[] bufferIn;
-        byte[] tempBuffer;
+        
+        String[] packets;
 
         // String variables
         String serverURL = new String();
 
         // Integer variables
         int index = 0;
-        int byteNum = 0;
         int serverPort = 0;
         int serverTimeout = 0;
 
@@ -87,7 +89,7 @@ public class QueryPlayers implements Runnable {
         serverPort = sr.getServerPort();
         serverTimeout = sr.getServerTimeout();
 
-        String header = new String();
+        int header = 0;
         String name = new String();
         String totaltime = new String();
 
@@ -98,7 +100,7 @@ public class QueryPlayers implements Runnable {
         short minutes = 0;
         short seconds = 0;
 
-        long kills = 0;
+        int kills = 0;
         float time = 0;
 
         // Integer variables
@@ -110,11 +112,11 @@ public class QueryPlayers implements Runnable {
             bufferOut = challengeResponse;
             bufferOut[4] = Values.BYTE_A2S_PLAYER;
 
-            tempBuffer = new byte[1400];
+            bufferIn = new byte[1400];
 
             // UDP datagram packets
             packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            packetIn = new DatagramPacket(tempBuffer, tempBuffer.length);
+            packetIn = new DatagramPacket(bufferIn, bufferIn.length);
 
             // Connect to the remote server
             socket.connect(InetAddress.getByName(serverURL), serverPort);
@@ -131,68 +133,63 @@ public class QueryPlayers implements Runnable {
             socket.send(packetOut);
             socket.receive(packetIn);
 
-            bufferIn = new byte[packetIn.getLength()];
-
-            for( int x = 0; x < bufferIn.length; x++ )
-                bufferIn[x] = tempBuffer[x];
-
-            String[] packets = new String[100];
-
-            // Store the response data in a string
-            String response = new String(bufferIn, "ISO8859_1");
+            ByteBuffer buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
 
             // Get the header info to see if data has been split over multiple packets
-            header = response.substring(0, 4);
+            header = buffer.getInt();
 
             numpackets = 1;
 
             // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
-            if( header.equals("\u00FF\u00FF\u00FF\u00FE") ) {
+            if( header == Values.INT_SPLIT_HEADER ) {
                 /*
                  * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet (packet
                  * 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we need to check
                  * the sequence number of each packet to know how many header bytes to strip.
                  */
 
-                // Get rid of 12 header bytes
-                byteNum = 8;
-                numpackets = (short)bufferIn[byteNum++];
-                thispacket = (short)bufferIn[byteNum++];
-                byteNum++;
+                buffer.getInt();    // Discard the answer ID
+                numpackets = (short)buffer.get();
+                thispacket = (short)buffer.get();
+                buffer.get();       // Discard the next byte
 
+                // Initialize the array to hold the number of packets in this response
+                packets = new String[numpackets];
+                
                 // If this is packet 0 then skip the next 5 header bytes
                 if( thispacket == 0 ) {
-                    byteNum += 6;
-                    numplayers = (short)bufferIn[byteNum++];
+                    buffer.position(buffer.position()+6);
+                    numplayers = (short)buffer.get();
                 }
 
-                packets[thispacket] = response.substring(byteNum, response.length());
+                packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
 
                 for( int i = 1; i < numpackets; i++ ) {
                     // Receive the response packet from the server
                     socket.receive(packetIn);
-
-                    // Store the response data in a string
-                    response = new String(bufferIn, "ISO8859_1");
+                    
+                    buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
 
                     // Get rid of 12 header bytes
-                    byteNum = 9;
-                    thispacket = (short)bufferIn[byteNum];
-                    byteNum += 2;
+                    buffer.position(9);
+                    thispacket = (short)buffer.get();
+                    buffer.position(buffer.position()+2);
 
                     // If this is packet 0 then skip the next 6 header bytes
                     if( thispacket == 0 ) {
-                        byteNum += 6;
-                        numplayers = (short)bufferIn[byteNum++];
+                        buffer.position(buffer.position()+6);
+                        numplayers = (short)buffer.get();
                     }
 
-                    packets[thispacket] = response.substring(byteNum, response.length());
+                    packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
                 }
             }
             else {
                 // Get number of players (6th byte)
-                numplayers = (short)bufferIn[5];
-                packets[0] = response.substring(6, response.length());
+                buffer.get();
+                numplayers = (short)buffer.get();
+                packets = new String[] {new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1")};
             }
 
             socket.close();
@@ -206,43 +203,35 @@ public class QueryPlayers implements Runnable {
             playerList = new ArrayList<PlayerRecord>();
 
             for( int i = 0; i < numpackets; i++ ) {
-                String thisPacket = packets[i];
+                byte[] byteArray = packets[i].getBytes("ISO8859_1");
+                PacketData pd = new PacketData(byteArray);
 
-                byte[] bytes = thisPacket.getBytes("ISO8859_1");
-
-                byteNum = 0;
-
-                while( byteNum < thisPacket.length() ) {
+                while( pd.hasRemaining() ) {
                     name = new String();
                     totaltime = new String();
                     kills = 0;
-
-                    // Get this player's index
-                    index = bytes[byteNum++];
-
-                    while( bytes[byteNum] != 0x00 )
-                        name += (char)bytes[byteNum++];
-                    byteNum++;
-
-                    kills = (bytes[byteNum])|(bytes[byteNum + 1] >> 8)|(bytes[byteNum + 2] >> 16)|(bytes[byteNum + 3] >> 24);
-
-                    byteNum += 4;
-
-                    time = Float.intBitsToFloat((int)((long)(bytes[byteNum] & 0xff)|(long)((bytes[byteNum + 1] & 0xff) << 8)|(long)((bytes[byteNum + 2] & 0xff) << 16)|(long)((bytes[byteNum + 3] & 0xff) << 24)));
-
-                    byteNum += 4;
-
+                    
+                    index = (int)pd.getByte(); // Get this player's index
+                    name = pd.getUTF8String(); // Determine the length of the player name
+                    kills = pd.getInt();       // Get the number of kills
+                    time = pd.getFloat();      // Get the connected time
+                    
+                    // Parse the time into hours, minutes, and seconds
                     seconds = (short)(time % 60);
                     time -= seconds;
                     minutes = (short)((time / 60) % 60);
                     hours = (short)(Math.floor(time / 3600));
 
+                    // Values less than 10 should be left-padded with a zero
                     String hourString = (hours < 10)?"0" + Integer.toString(hours):Integer.toString(hours);
                     String minuteString = (minutes < 10)?"0" + Integer.toString(minutes):Integer.toString(minutes);
                     String secondString = (seconds < 10)?"0" + Integer.toString(seconds):Integer.toString(seconds);
-
+                    
+                    // Assemble a string representation of the connected time
                     totaltime = hourString + ":" + minuteString + ":" + secondString;
 
+                    Log.d(TAG, "Adding player [index=" + index + "][name=" + name + "][kills=" + kills + "][time=" + totaltime + "]");
+                    
                     playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                 }
             }
@@ -251,15 +240,7 @@ public class QueryPlayers implements Runnable {
         }
         catch( Exception e ) {
             status = -1;
-
-            Log.w(TAG, "queryPlayers(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
-
+            Log.w(TAG, "queryPlayers(): Caught an exception:", e);
             return null;
         }
     }

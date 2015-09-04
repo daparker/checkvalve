@@ -28,11 +28,12 @@ import android.widget.TextView;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.content.Context;
+import com.dparker.apps.checkvalve.R;
 import com.dparker.apps.checkvalve.exceptions.NullResponseException;
 import com.dparker.apps.checkvalve.exceptions.SocketNotConnectedException;
-import com.dparker.apps.checkvalve.R;
 import java.net.*;
-import java.util.ArrayList;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class SearchPlayers extends Thread {
@@ -50,7 +51,7 @@ public class SearchPlayers extends Thread {
         this.tableRows = t;
         this.messageRows = m;
         this.handler = h;
-        this.search = s;
+        this.search = s.toLowerCase();
     }
 
     public void run() {
@@ -70,14 +71,14 @@ public class SearchPlayers extends Thread {
         // Byte buffers for packet data
         byte[] bufferOut;
         byte[] bufferIn;
-        byte[] packetData;
 
         // String variables
         String serverURL = new String();
         String resultString = new String();
+        
+        String[] packets;
 
         // Integer variables
-        int byteNum = 0;
         int serverPort = 0;
         int serverTimeout = 0;
         int numResults = 0;
@@ -93,7 +94,8 @@ public class SearchPlayers extends Thread {
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
 
-                String header = new String();
+                //String header = new String();
+                int header = 0;
                 String name = new String();
 
                 short numplayers = 0;
@@ -150,95 +152,86 @@ public class SearchPlayers extends Thread {
                 // Send the A2S_PLAYER query string and get the response packet
                 socket.send(packetOut);
                 socket.receive(packetIn);
-
-                packetData = Arrays.copyOf(bufferIn, packetIn.getLength());
-
-                ArrayList<String> packets = new ArrayList<String>();
-
-                // Store the response data in a string
-                String response = new String(packetData, "ISO8859_1");
+                
+                ByteBuffer buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
+                buffer.order(ByteOrder.LITTLE_ENDIAN);
 
                 // Get the header info to see if data has been split over multiple packets
-                header = response.substring(0, 4);
+                header = buffer.getInt();
 
                 numpackets = 1;
 
                 // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
-                if( header.equals("\u00FF\u00FF\u00FF\u00FE") ) {
+                if( header == Values.INT_SPLIT_HEADER ) {
                     /*
-                     * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet
-                     * (packet 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we
-                     * need to check the sequence number of each packet to know how many header bytes to strip.
+                     * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet (packet
+                     * 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we need to check
+                     * the sequence number of each packet to know how many header bytes to strip.
                      */
 
-                    // Get rid of 12 header bytes
-                    byteNum = 8;
-                    numpackets = (short)packetData[byteNum++];
-                    thispacket = (short)packetData[byteNum++];
-                    byteNum++;
+                    buffer.getInt();    // Discard the answer ID
+                    numpackets = (short)buffer.get();
+                    thispacket = (short)buffer.get();
+                    buffer.get();       // Discard the next byte
 
+                    // Initialize the array to hold the number of packets in this response
+                    packets = new String[numpackets];
+                    
                     // If this is packet 0 then skip the next 5 header bytes
                     if( thispacket == 0 ) {
-                        byteNum += 6;
-                        numplayers = (short)packetData[byteNum++];
+                        buffer.position(buffer.position()+6);
+                        numplayers = (short)buffer.get();
                     }
 
-                    packets.add(thispacket, response.substring(byteNum, response.length()));
+                    packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
 
-                    for( int j = 1; j < numpackets; j++ ) {
+                    for( int i = 1; i < numpackets; i++ ) {
                         // Receive the response packet from the server
                         socket.receive(packetIn);
-
-                        // Store the response data in a string
-                        response = new String(bufferIn, "ISO8859_1");
+                        
+                        buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
 
                         // Get rid of 12 header bytes
-                        byteNum = 9;
-                        thispacket = (short)bufferIn[byteNum];
-                        byteNum += 2;
+                        buffer.position(9);
+                        thispacket = (short)buffer.get();
+                        buffer.position(buffer.position()+2);
 
                         // If this is packet 0 then skip the next 6 header bytes
                         if( thispacket == 0 ) {
-                            byteNum += 6;
-                            numplayers = (short)bufferIn[byteNum++];
+                            buffer.position(buffer.position()+6);
+                            numplayers = (short)buffer.get();
                         }
 
-                        packets.add(thispacket, response.substring(byteNum, response.length()));
+                        packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
                     }
                 }
                 else {
                     // Get number of players (6th byte)
-                    numplayers = (short)bufferIn[5];
-                    packets.add(0, response.substring(byteNum, response.length()));
+                    buffer.get();
+                    numplayers = (short)buffer.get();
+                    packets = new String[] {new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1")};
                 }
 
                 socket.close();
 
                 if( numplayers == 0 ) continue;
 
-                for( int i = 0; i < packets.size(); i++ ) {
-                    String thisPacket = packets.get(i);
-
-                    byte[] bytes = thisPacket.getBytes("ISO8859_1");
-
-                    byteNum = 0;
-
-                    while( byteNum < thisPacket.length() ) {
-                        name = "";
-                        resultString = "";
+                for( int i = 0; i < packets.length; i++ ) {
+                    byte[] byteArray = packets[i].getBytes("ISO8859_1");
+                    PacketData pd = new PacketData(byteArray);
+                    
+                    while( pd.hasRemaining() ) {
+                        name = new String();
+                        resultString = new String();
 
                         // Skip the player index
-                        byteNum++;
+                        pd.skip(1);
+                        
+                        // Get the player name
+                        name = pd.getUTF8String();
 
-                        while( bytes[byteNum] != 0x00 )
-                            name += (char)bytes[byteNum++];
-
-                        byteNum++;
-
-                        /*
-                         * Check for a match
-                         */
-                        if( name.toLowerCase().indexOf(search.toLowerCase()) > -1 ) {
+                        // Check for a match
+                        if( name.toLowerCase().indexOf(search) > -1 ) {
                             // We have a match!
                             numResults++;
 
@@ -264,18 +257,12 @@ public class SearchPlayers extends Thread {
                         }
 
                         // Skip the next 8 bytes (number of kills and connection time)
-                        byteNum += 8;
+                        pd.skip(8);
                     }
                 }
             }
             catch( Exception e ) {
-                Log.w(TAG, "queryPlayers(): Caught an exception:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.w(TAG, "    " + x.toString());
+                Log.w(TAG, "queryPlayers(): Caught an exception:", e);
 
                 String message = new String();
 

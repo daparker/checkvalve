@@ -96,14 +96,7 @@ public class ShowNoteActivity extends Activity {
             }
         }
         catch( Exception e ) {
-            Log.w(TAG, "DoNotShowCheckboxHandler(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-            
+            Log.w(TAG, "DoNotShowCheckboxHandler(): Caught an exception:", e);
             finish();
         }
     }

@@ -175,13 +175,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);
         }
         catch( SQLiteException e ) {
-            Log.w(TAG, "Caught an exception while creating database:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, "    " + x.toString());
+            Log.w(TAG, "Caught an exception while creating database:", e);
         }
     }
 
@@ -269,13 +263,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 c.close();
             }
             catch( SQLiteException e ) {
-                Log.w(TAG, "Caught an exception while upgrading database:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.e(TAG, "    " + x.toString());
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
         }
         
@@ -297,13 +285,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 db.update(TABLE_SETTINGS, values, null, null);
             }
             catch( Exception e ) {
-                Log.w(TAG, "Caught an exception while upgrading database:");
-                Log.w(TAG, e.toString());
-
-                StackTraceElement[] ste = e.getStackTrace();
-
-                for( StackTraceElement x : ste )
-                    Log.e(TAG, "    " + x.toString());
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
         }
         

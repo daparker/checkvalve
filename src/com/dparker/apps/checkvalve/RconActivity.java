@@ -429,31 +429,6 @@ public class RconActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         return;
     }
-
-    /*
-     * Handle up/down arrow keys for scrolling through previous commands
-     
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.d(TAG, "onKeyDown(): keyCode=" + keyCode + "; event=" + event.toString());
-        
-        if( keyCode == KeyEvent.KEYCODE_DPAD_UP ) {
-            // Put the previous command in the text field
-            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_UP; pos=" + pos + "; last=" + last);
-            if( pos > 0 ) field_command.setText(commandList.get(--pos));
-            return false;
-        }
-        
-        if( keyCode == KeyEvent.KEYCODE_DPAD_DOWN ) {
-            // Put the next command in the text field
-            //Log.d(TAG, "onKeyDown(): Detected KEYCODE_DPAD_DOWN; pos=" + pos + "; last=" + last);
-            if( pos < last ) field_command.setText(commandList.get(++pos));
-            return false;
-        }
-        
-        return false;
-    }
-    */
     
     public void onActivityResult( int request, int result, Intent data ) {
         if( request == Values.ACTIVITY_RCON_PASSWORD_DIALOG ) {
@@ -619,13 +594,7 @@ public class RconActivity extends Activity {
             if( g != null ) g.disconnect();
         }
         catch( Exception e ) {
-            Log.w(TAG, "closeRconConnection(): Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-            
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
+            Log.w(TAG, "closeRconConnection(): Caught an exception:", e);
         }
     }
 }

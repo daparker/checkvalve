@@ -47,6 +47,7 @@ import android.view.Window;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import com.dparker.apps.checkvalve.R;
 
 public class CheckValve extends Activity {
@@ -56,8 +57,6 @@ public class CheckValve extends Activity {
     private DatabaseProvider database;
     private TableLayout server_info_table;
     private TableLayout message_table;
-    private TableRow[][] tableRows;
-    private TableRow[] messageRows;
 
     public static Bundle settings;
 
@@ -315,18 +314,17 @@ public class CheckValve extends Activity {
             // Show the progress dialog
             p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
-            // Define the TableRow arrays to hold the display data
-            tableRows = new TableRow[count][6];
-            messageRows = new TableRow[count];
-
             // Run the server queries in a separate thread
-            new Thread(new ServerQuery(CheckValve.this, tableRows, messageRows, progressHandler)).start();
+            new Thread(new ServerQuery(CheckValve.this, progressHandler)).start();
         }
     }
 
     // Handler for the server query thread
     Handler progressHandler = new Handler() {
         public void handleMessage( Message msg ) {
+            message_table.setVisibility(View.GONE);
+            server_info_table.setVisibility(View.GONE);
+            
             // A negative "what" code indicates the server query thread failed
             if( msg.what < 0 ) {
                 p.dismiss();
@@ -334,28 +332,149 @@ public class CheckValve extends Activity {
                 return;
             }
             
-            String tag = new String();
-
+            Bundle b = (Bundle)msg.obj;            
+            ArrayList<String> messages = b.getStringArrayList(Values.MESSAGES);
+            ServerInfo[] serverInfo = (ServerInfo[])b.getParcelableArray(Values.SERVER_INFO);
+            
             /*
              * Build and display the messages table if there are errors to be displayed
              */
-            if( messageRows[0] != null ) {
+            if( ! messages.isEmpty() ) {
                 int m = 0;
 
-                while( (m < messageRows.length) && (messageRows[m] != null) )
-                    message_table.addView(messageRows[m++]);
+                for( m = 0; m < messages.size(); m++ ) {
+                    TextView errorMessage = new TextView(CheckValve.this);
 
-                message_table.setVisibility(1);
+                    errorMessage.setId(Integer.MAX_VALUE);
+                    errorMessage.setText(messages.get(m));
+                    errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    errorMessage.setPadding(3, 0, 3, 0);
+                    errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
+                    // Create a TableRow and give it an ID
+                    TableRow messageRow = new TableRow(CheckValve.this);
+                    messageRow.setId(Integer.MAX_VALUE);
+                    messageRow.setBackgroundResource(R.color.translucent_red);
+                    messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    messageRow.addView(errorMessage);
+                    
+                    message_table.addView(messageRow);
+                }
+
+                message_table.setVisibility(View.VISIBLE);
             }
 
             /*
              * Build and display the query results table
              */
-            for( int i = 0; i < tableRows.length; i++ ) {
-                if( tableRows[i] != null ) {
-                    TextView spacer = new TextView(CheckValve.this);
+            for( int i = 0; i < serverInfo.length; i++ ) {
+                if( serverInfo[i] != null ) {
+                    // Create TextViews for table rows
+                    String serverName = serverInfo[i].getName();
+                    TextView serverLabel = new TextView(CheckValve.this);
+                    TextView serverValue = new TextView(CheckValve.this);
+                    serverLabel.setId(i * 200);
+                    serverLabel.setText(CheckValve.this.getText(R.string.label_server));
+                    serverLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    serverLabel.setPadding(3, 0, 3, 0);
+                    serverLabel.setTypeface(null, Typeface.BOLD);
+                    serverLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    serverValue.setId(i * 300);
+                    serverValue.setText(serverName);
+                    serverValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    serverValue.setPadding(3, 0, 3, 0);
+                    serverValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
+                    String serverIP = serverInfo[i].getAddr();
+                    int serverPort = serverInfo[i].getPort();
+                    TextView ipLabel = new TextView(CheckValve.this);
+                    TextView ipValue = new TextView(CheckValve.this);
+                    ipLabel.setId(i * 400);
+                    ipLabel.setText(CheckValve.this.getText(R.string.label_ip));
+                    ipLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    ipLabel.setPadding(3, 0, 3, 0);
+                    ipLabel.setTypeface(null, Typeface.BOLD);
+                    ipLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    ipValue.setId(i * 500);
+                    ipValue.setText(serverIP + ":" + serverPort);
+                    ipValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    ipValue.setPadding(3, 0, 3, 0);
+                    ipValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
+                    String serverGame = serverInfo[i].getGame();
+                    String gameVersion = serverInfo[i].getVersion();
+                    TextView gameLabel = new TextView(CheckValve.this);
+                    TextView gameValue = new TextView(CheckValve.this);
+                    gameLabel.setId(i * 600);
+                    gameLabel.setText(CheckValve.this.getText(R.string.label_game));
+                    gameLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    gameLabel.setPadding(3, 0, 3, 0);
+                    gameLabel.setTypeface(null, Typeface.BOLD);
+                    gameLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    gameValue.setId(i * 700);
+                    gameValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    gameValue.setPadding(3, 0, 3, 0);
+                    gameValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-                    spacer.setId(0);
+                    if( gameVersion.length() > 0 )
+                        gameValue.setText(serverGame + " [" + gameVersion + "]");
+                    else
+                        gameValue.setText(serverGame);
+                    
+                    String serverMap = serverInfo[i].getMap();
+                    TextView mapLabel = new TextView(CheckValve.this);
+                    TextView mapValue = new TextView(CheckValve.this);
+                    mapLabel.setId(i * 800);
+                    mapLabel.setText(CheckValve.this.getText(R.string.label_map));
+                    mapLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    mapLabel.setPadding(3, 0, 3, 0);
+                    mapLabel.setTypeface(null, Typeface.BOLD);
+                    mapLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    mapValue.setId(i * 900);
+                    mapValue.setText(serverMap);
+                    mapValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    mapValue.setPadding(3, 0, 3, 0);
+                    mapValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
+                    int serverNumPlayers = serverInfo[i].getNumPlayers();
+                    int serverMaxPlayers = serverInfo[i].getMaxPlayers();
+                    TextView playersLabel = new TextView(CheckValve.this);
+                    TextView playersValue = new TextView(CheckValve.this);
+                    playersLabel.setId(i * 1000);
+                    playersLabel.setText(CheckValve.this.getText(R.string.label_players));
+                    playersLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    playersLabel.setPadding(3, 0, 3, 0);
+                    playersLabel.setTypeface(null, Typeface.BOLD);
+                    playersLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    playersValue.setId(i * 1100);
+                    playersValue.setText(serverNumPlayers + "/" + serverMaxPlayers);
+                    playersValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    playersValue.setPadding(3, 0, 3, 0);
+                    playersValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
+                    String serverTags = serverInfo[i].getTags();
+                    TextView tagsLabel = new TextView(CheckValve.this);
+                    TextView tagsValue = new TextView(CheckValve.this);
+                    tagsLabel.setId(i * 1200);
+                    tagsLabel.setText(CheckValve.this.getText(R.string.label_tags));
+                    tagsLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    tagsLabel.setPadding(3, 0, 3, 0);
+                    tagsLabel.setTypeface(null, Typeface.BOLD);
+                    tagsLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    tagsValue.setId(i * 1300);
+                    tagsValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    tagsValue.setPadding(3, 0, 3, 0);
+                    tagsValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
+                    if( serverTags.length() > 0 )
+                        tagsValue.setText(serverTags);
+                    else
+                        tagsValue.setText(CheckValve.this.getText(R.string.msg_no_tags));
+                    
+                    int serverRowId = (int)serverInfo[i].getRowId();
+
+                    TextView spacer = new TextView(CheckValve.this);
+                    spacer.setId(i * 100);
                     spacer.setText("");
                     spacer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
                     spacer.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -365,58 +484,107 @@ public class CheckValve extends Activity {
                     spacerRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
                     spacerRow.addView(spacer);
 
-                    tableRows[i][0].setOnFocusChangeListener(tableRowFocusChangeListener);
+                    // Create TableRows
+                    TableRow serverRow = new TableRow(CheckValve.this);
+                    serverRow.setId(serverRowId);
+                    serverRow.setTag(Values.TAG_SERVER_NAME);
+                    serverRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    serverRow.setOnFocusChangeListener(tableRowFocusChangeListener);
+                    serverRow.setOnTouchListener(tableRowTouchListener);
+                    serverRow.setFocusable(false);
+                    serverRow.addView(serverLabel);
+                    serverRow.addView(serverValue);
+                    registerForContextMenu(serverRow);
 
-                    for( int j = 0; j < tableRows[i].length; j++ ) {
-                        registerForContextMenu(tableRows[i][j]);
-                        tableRows[i][j].setOnTouchListener(tableRowTouchListener);
-                        tableRows[i][j].setFocusable(false);
+                    TableRow ipRow = new TableRow(CheckValve.this);
+                    ipRow.setId(serverRowId);
+                    ipRow.setTag(Values.TAG_SERVER_IP);
+                    ipRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    ipRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
+                    ipRow.setOnTouchListener(tableRowTouchListener);
+                    ipRow.setFocusable(false);
+                    ipRow.addView(ipLabel);
+                    ipRow.addView(ipValue);
+                    registerForContextMenu(ipRow);
 
-                        tag = (String)tableRows[i][j].getTag();
+                    TableRow gameRow = new TableRow(CheckValve.this);
+                    gameRow.setId(serverRowId);
+                    gameRow.setTag(Values.TAG_SERVER_GAME);
+                    gameRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    gameRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
+                    gameRow.setOnTouchListener(tableRowTouchListener);
+                    gameRow.setFocusable(false);
+                    gameRow.addView(gameLabel);
+                    gameRow.addView(gameValue);
+                    registerForContextMenu(gameRow);
 
-                        if( tag.equals(Values.TAG_SERVER_IP) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_GAME) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_MAP) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_PLAYERS) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
-                        else if( tag.equals(Values.TAG_SERVER_TAGS) )
-                            tableRows[i][j].setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
-                    }
+                    TableRow mapRow = new TableRow(CheckValve.this);
+                    mapRow.setId(serverRowId);
+                    mapRow.setTag(Values.TAG_SERVER_MAP);
+                    mapRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    mapRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME))?View.VISIBLE:View.GONE);
+                    mapRow.setOnTouchListener(tableRowTouchListener);
+                    mapRow.setFocusable(false);
+                    mapRow.addView(mapLabel);
+                    mapRow.addView(mapValue);
+                    registerForContextMenu(mapRow);
 
+                    TableRow playersRow = new TableRow(CheckValve.this);
+                    playersRow.setId(serverRowId);
+                    playersRow.setTag(Values.TAG_SERVER_PLAYERS);
+                    playersRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    playersRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
+                    playersRow.setOnTouchListener(tableRowTouchListener);
+                    playersRow.setFocusable(false);
+                    playersRow.addView(playersLabel);
+                    playersRow.addView(playersValue);
+                    registerForContextMenu(playersRow);
+
+                    TableRow tagsRow = new TableRow(CheckValve.this);
+                    tagsRow.setId(serverRowId);
+                    tagsRow.setTag(Values.TAG_SERVER_TAGS);
+                    tagsRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    tagsRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
+                    tagsRow.setOnTouchListener(tableRowTouchListener);
+                    tagsRow.setFocusable(false);
+                    tagsRow.addView(tagsLabel);
+                    tagsRow.addView(tagsValue);
+                    registerForContextMenu(tagsRow);
+              
+                    // Add these rows to the server info table
                     server_info_table.addView(
                             spacerRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][0],
+                            serverRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][1],
+                            ipRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][2],
+                            gameRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][3],
+                            mapRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][4],
+                            playersRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
-                            tableRows[i][5],
+                            tagsRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                 }
             }
 
+            server_info_table.setVisibility(View.VISIBLE);
+            
             // Dismiss the progress dialog
             p.dismiss();
         }

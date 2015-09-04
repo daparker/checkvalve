@@ -36,15 +36,11 @@ public class Chat implements Runnable {
     private static final String TAG = "Chat";
 
     private static byte responseType;
-    private static byte protocolVersion;
-    private static byte sayTeam;
     private static short contentLength;
-    private static int serverTimestamp;
     private static int packetHeader;
     private static String passwordString;
     private static StringBuilder responseMessage;
     private static Socket s;
-    private static String[] fields = new String[6];
     private static Message msg;
     private static ChatMessage chatMsg;
     private static InputStream in;
@@ -112,13 +108,7 @@ public class Chat implements Runnable {
                         Log.i(TAG, "The socket has been closed.");
                     }
                     catch( IOException ioe ) {
-                        Log.w(TAG, "Caught an exception while shutting down the socket:");
-                        Log.w(TAG, ioe.toString());
-
-                        StackTraceElement[] ste = ioe.getStackTrace();
-
-                        for( StackTraceElement x : ste )
-                            Log.e(TAG, "    " + x.toString());
+                        Log.w(TAG, "Caught an exception while shutting down the socket:", ioe);
                     }
                 }
             }
@@ -143,11 +133,7 @@ public class Chat implements Runnable {
         final byte PTYPE_CONNECTION_FAILURE = (byte)0x03;
         final byte PTYPE_CONNECTION_SUCCESS = (byte)0x04;
         final byte PTYPE_MESSAGE_DATA = (byte)0x05;
-
-        int i = 0;
-        int pos = 0;
-        int end = 0;
-
+        
         dataBuffer.order(ByteOrder.LITTLE_ENDIAN);
         dataBuffer.clear();
 
@@ -216,11 +202,10 @@ public class Chat implements Runnable {
 
                 // Read the rest of the packet data
                 if( (in.read(dataBytes, dataBuffer.position(), contentLength)) == -1 ) return;
+                
+                dataBuffer.limit(dataBuffer.position()+contentLength);
 
-                pos = dataBuffer.position();
-                end = pos + contentLength;
-
-                for( i = pos; i < end; i++ )
+                while( dataBuffer.hasRemaining() )
                     responseMessage.append((char)dataBuffer.get());
 
                 Log.i(TAG, "Server identity string is " + responseMessage.toString().trim());
@@ -238,14 +223,7 @@ public class Chat implements Runnable {
             }
         }
         catch( Exception e ) {
-            Log.w(TAG, "Caught an exception:");
-            Log.w(TAG, e.toString());
-
-            StackTraceElement[] ste = e.getStackTrace();
-
-            for( StackTraceElement x : ste )
-                Log.e(TAG, x.toString());
-
+            Log.w(TAG, "Caught an exception:", e);
             handler.sendEmptyMessage(-1);
             return;
         }
@@ -318,7 +296,9 @@ public class Chat implements Runnable {
                 Log.w(TAG, "Timed out while reading packet data.");
                 continue;
             }
-
+            
+            dataBuffer.limit(dataBuffer.position()+contentLength);
+            
             switch( responseType ) {
                 case PTYPE_CONNECTION_SUCCESS:
                     Log.i(TAG, "Connected to " + chatRelayIP.getHostAddress() + ":" + chatRelayPort + ".");
@@ -326,10 +306,7 @@ public class Chat implements Runnable {
                     break;
 
                 case PTYPE_CONNECTION_FAILURE:
-                    pos = dataBuffer.position();
-                    end = pos + contentLength;
-
-                    for( i = pos; i < end; i++ )
+                    while( dataBuffer.hasRemaining() )
                         responseMessage.append((char)dataBuffer.get());
 
                     String error = responseMessage.substring(2).trim();
@@ -340,19 +317,21 @@ public class Chat implements Runnable {
                     break;
 
                 case PTYPE_MESSAGE_DATA:
-                    protocolVersion = dataBuffer.get();
-                    serverTimestamp = dataBuffer.getInt();
-                    sayTeam = dataBuffer.get();
+                    byte[] tmp = new byte[dataBuffer.remaining()];
+                    dataBuffer.get(tmp, 0, dataBuffer.remaining());
+                    
+                    PacketData pd = new PacketData(tmp);
 
-                    pos = dataBuffer.position();
-                    end = pos + contentLength - 6;
-
-                    for( i = pos; i < end; i++ )
-                        responseMessage.append((char)dataBuffer.get());
-
-                    fields = new String(responseMessage.toString().getBytes("UTF-8")).split("\u0000");
-
-                    chatMsg = new ChatMessage(protocolVersion, sayTeam, serverTimestamp, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]);
+                    chatMsg = new ChatMessage(
+                            pd.getByte(),        // Protocol version
+                            pd.getInt(),         // Epoch timestamp from the Chat Relay
+                            pd.getByte(),        // say_team flag
+                            pd.getUTF8String(),  // Game server IP
+                            pd.getUTF8String(),  // Game server port
+                            pd.getUTF8String(),  // Timestamp from the original message
+                            pd.getUTF8String(),  // Player name
+                            pd.getUTF8String(),  // Player team
+                            pd.getUTF8String()); // Chat message
 
                     msg = Message.obtain(handler, 5, chatMsg);
                     handler.sendMessage(msg);
@@ -386,14 +365,7 @@ public class Chat implements Runnable {
             }
         }
         catch( Exception e ) {
-            StackTraceElement[] ste = e.getStackTrace();
-
-            Log.w(TAG, "Caught an exception while closing socket: " + e.toString());
-            Log.w(TAG, "Stack trace:");
-
-            for( StackTraceElement x : ste )
-                Log.w(TAG, "    " + x.toString());
-
+            Log.w(TAG, "Caught an exception while closing socket:", e);
             handler.sendEmptyMessage(-2);
         }
 

@@ -46,7 +46,7 @@ public class ChatMessage {
      * @param pteam The team of the player who sent the message
      * @param msg The text of the message
      */
-    public ChatMessage( byte proto, byte stflag, int epoch,
+    public ChatMessage( byte proto, int epoch, byte stflag,
             String gsip, String gsport, String tstamp,
             String pname, String pteam, String msg ) {
         this.protocolVersion = proto;
