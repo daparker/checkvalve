@@ -62,15 +62,44 @@ public class AddServerActivity extends Activity {
             int port_len = field_port.getText().toString().length();
             int timeout_len = field_timeout.getText().toString().length();
             int password_len = field_rcon_password.length();
+            
+            final String server;
+            final String password;
+            final int port;
+            final int timeout;
 
             if( (server_len == 0) || (port_len == 0) || (timeout_len == 0) ) {
                 UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_empty_fields);
             }
             else {
-                final String server = field_server.getText().toString().trim();
-                final int port = Integer.parseInt(field_port.getText().toString().trim());
-                final int timeout = Integer.parseInt(field_timeout.getText().toString().trim());
-                final String password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
+                server = field_server.getText().toString().trim();
+                password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
+                
+                try {
+                    port = Integer.parseInt(field_port.getText().toString().trim());
+                    
+                    if( port < 1 || port > 65535 ) {
+                        UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_port_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_port_value);
+                    return;
+                }
+                
+                try {
+                    timeout = Integer.parseInt(field_timeout.getText().toString().trim());
+                    
+                    if( timeout < 0 ) {
+                        UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_timeout_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_timeout_value);
+                    return;
+                }
 
                 Handler checkServerHandler = new Handler() {
                     String errorMsg = "";

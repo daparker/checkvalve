@@ -55,17 +55,46 @@ public class EditServerActivity extends Activity {
             int server_len = field_server.getText().toString().length();
             int port_len = field_port.getText().toString().length();
             int timeout_len = field_timeout.getText().toString().length();
+            
+            String server;
+            String password;
+            int port;
+            int timeout;
 
             if( (server_len == 0) || (port_len == 0) || (timeout_len == 0) ) {
                 UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_empty_fields);
             }
             else {
-                String server = field_server.getText().toString().trim();
-                int port = Integer.parseInt(field_port.getText().toString().trim());
-                int timeout = Integer.parseInt(field_timeout.getText().toString().trim());
-                String password = field_rcon_password.getText().toString().trim();
-
+                server = field_server.getText().toString().trim();
+                password = field_rcon_password.getText().toString().trim();
+                
                 if( password.length() == 0 ) password = "";
+                
+                try {
+                    port = Integer.parseInt(field_port.getText().toString().trim());
+                    
+                    if( port < 1 || port > 65535 ) {
+                        UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_bad_port_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_bad_port_value);
+                    return;
+                }
+                
+                try {
+                    timeout = Integer.parseInt(field_timeout.getText().toString().trim());
+                    
+                    if( timeout < 0 ) {
+                        UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_bad_timeout_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_bad_timeout_value);
+                    return;
+                }
 
                 if( database.updateServer(rowId, server, port, timeout, password) ) {
                     UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_success);
