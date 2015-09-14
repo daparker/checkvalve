@@ -65,6 +65,19 @@ public class ChatRelayDetailsActivity extends Activity {
                 String port = field_port.getText().toString().trim();
                 String password = field_password.getText().toString().trim();
 
+                try {
+                    int portInt = Integer.parseInt(port);
+                    
+                    if( portInt < 1 || portInt > 65535 ) {
+                        UserVisibleMessage.showMessage(ChatRelayDetailsActivity.this, R.string.msg_bad_port_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(ChatRelayDetailsActivity.this, R.string.msg_bad_port_value);
+                    return;
+                }
+                
                 boolean alreadySaved = false;
                 
                 Log.d(TAG, "Checking if host " + server + " is already saved.");
