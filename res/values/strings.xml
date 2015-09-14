@@ -87,6 +87,8 @@ along with the CheckValve source code.  If not, see
     <string name="menu_settings">Settings</string>
     <string name="menu_show_players">Show Players</string>
     <string name="menu_view_chat">View Chat</string>
+    <string name="msg_bad_port_value">Invalid port value. Please try again.</string>
+    <string name="msg_bad_timeout_value">Invalid timeout value. Please try again.</string>
     <string name="msg_chat_connect_failure">Failed to open a connection to the Chat Relay.</string>
     <string name="msg_chat_connect_success">Connected to the Chat Relay.</string>
     <string name="msg_chat_connection_lost">The connection was lost.</string>
