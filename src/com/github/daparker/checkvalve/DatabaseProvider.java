@@ -33,7 +33,7 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -52,6 +52,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_RCON_SHOW_PASSWORDS = "rcon_show_passwords";
     public static final String SETTINGS_RCON_SHOW_SUGGESTIONS = "rcon_show_suggestions";
     public static final String SETTINGS_RCON_ENABLE_HISTORY = "rcon_enable_history";
+    public static final String SETTINGS_RCON_VOLUME_BUTTONS = "rcon_volume_buttons";
+    public static final String SETTINGS_RCON_DEFAULT_FONT_SIZE = "rcon_default_font_size";
     public static final String SETTINGS_SHOW_SERVER_IP = "show_ip";
     public static final String SETTINGS_SHOW_SERVER_MAP = "show_map";
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
@@ -83,6 +85,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_RCON_SHOW_PASSWORDS + " INTEGER NOT NULL DEFAULT 0, "
             + SETTINGS_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9, "
             + SETTINGS_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
@@ -297,6 +301,34 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             // Add the relay_hosts table
             Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);
+        }
+        
+        if( oldVersion < 6 ) {
+            try {
+                /*
+                 * Added RCON settings for volume buttons and default font size in DB version 6.
+                 */
+                
+                // Add the rcon_volume_buttons column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_VOLUME_BUTTONS + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Add the rcon_default_font_size column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9;");
+                
+                // Set the default values
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_RCON_VOLUME_BUTTONS, 1);
+                values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, 9);
+
+                Log.i(TAG, "Setting " + SETTINGS_RCON_VOLUME_BUTTONS + " default value to 1");
+                Log.i(TAG, "Setting " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " default value to 9");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
         }
     }
 
@@ -702,6 +734,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_RCON_SHOW_PASSWORDS,
                 SETTINGS_RCON_SHOW_SUGGESTIONS,
                 SETTINGS_RCON_ENABLE_HISTORY,
+                SETTINGS_RCON_VOLUME_BUTTONS,
+                SETTINGS_RCON_DEFAULT_FONT_SIZE,
                 SETTINGS_SHOW_SERVER_IP,
                 SETTINGS_SHOW_SERVER_MAP,
                 SETTINGS_SHOW_SERVER_PLAYERS,
@@ -731,6 +765,10 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_RCON_ENABLE_HISTORY) )
                     result.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_RCON_VOLUME_BUTTONS) )
+                    result.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_RCON_DEFAULT_FONT_SIZE) )
+                    result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
                 else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
@@ -770,12 +808,13 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      */
     public boolean updateSettings( Bundle settings ) {
         int result;
-
+        
         // Get boolean values from the Bundle as integers (0 or 1)
         int warnUnsafe = (settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, true))?1:0;
         int showPwds = (settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, true))?1:0;
         int showSuggest = (settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, true))?1:0;
         int enableHistory = (settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY, true))?1:0;
+        int volumeButtons = (settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
@@ -787,6 +826,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int defaultQueryPort = settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT, 27015);
         int defaultQueryTimeout = settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, 1);
         int defaultRelayPort = settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT, 23456);
+        int defaultRconFontSize = settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, 9);
 
         // Get string values from the Bundle
         String defaultRelayHost = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
@@ -797,6 +837,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_SHOW_PASSWORDS, showPwds);
         values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, showSuggest);
         values.put(SETTINGS_RCON_ENABLE_HISTORY, enableHistory);
+        values.put(SETTINGS_RCON_VOLUME_BUTTONS, volumeButtons);
+        values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, defaultRconFontSize);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);

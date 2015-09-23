@@ -43,6 +43,7 @@ public class SettingsActivity extends Activity {
     private boolean rconWarnUnsafeCommand;
     private boolean rconShowSuggestions;
     private boolean rconEnableHistory;
+    private boolean rconVolumeButtons;
     private boolean showServerIP;
     private boolean showServerGameInfo;
     private boolean showServerMapName;
@@ -52,10 +53,13 @@ public class SettingsActivity extends Activity {
 
     private Button saveButton;
     private Button cancelButton;
+    private Button plusButton;
+    private Button minusButton;
     private CheckBox checkbox_rcon_show_passwords;
     private CheckBox checkbox_rcon_warn_unsafe_command;
     private CheckBox checkbox_rcon_show_suggestions;
     private CheckBox checkbox_rcon_enable_history;
+    private CheckBox checkbox_rcon_volume_buttons;
     private CheckBox checkbox_show_server_ip;
     private CheckBox checkbox_show_server_game_info;
     private CheckBox checkbox_show_server_map_name;
@@ -67,6 +71,7 @@ public class SettingsActivity extends Activity {
     private EditText field_default_relay_host;
     private EditText field_default_relay_port;
     private EditText field_default_relay_password;
+    private TextView field_default_rcon_font_size;
     private TextView reset_do_not_show;
     private TextView clear_saved_relays;
 
@@ -151,9 +156,9 @@ public class SettingsActivity extends Activity {
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
         
-        this.setContentView(R.layout.settings);
+        this.setContentView(R.layout.settings2);
         this.setResult(1);
-
+        
         if( database == null )
             database = new DatabaseProvider(SettingsActivity.this);
 
@@ -167,10 +172,14 @@ public class SettingsActivity extends Activity {
         saveButton.setOnClickListener(saveButtonListener);
         saveButton.setOnTouchListener(buttonTouchListener);
         
+        plusButton = (Button)findViewById(R.id.rcon_font_size_plus_button);
+        minusButton = (Button)findViewById(R.id.rcon_font_size_minus_button);
+        
         checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
         checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
         checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.checkbox_rcon_show_suggestions);
         checkbox_rcon_enable_history = (CheckBox)findViewById(R.id.checkbox_rcon_enable_history);
+        checkbox_rcon_volume_buttons = (CheckBox)findViewById(R.id.checkbox_rcon_volume_buttons);
         checkbox_show_server_ip = (CheckBox)findViewById(R.id.checkbox_servers_show_ip);
         checkbox_show_server_game_info = (CheckBox)findViewById(R.id.checkbox_servers_show_game);
         checkbox_show_server_map_name = (CheckBox)findViewById(R.id.checkbox_servers_show_map);
@@ -182,12 +191,35 @@ public class SettingsActivity extends Activity {
         field_default_relay_host = (EditText)findViewById(R.id.field_default_relay_host);
         field_default_relay_port = (EditText)findViewById(R.id.field_default_relay_port);
         field_default_relay_password = (EditText)findViewById(R.id.field_default_relay_password);
+        field_default_rcon_font_size = (TextView)findViewById(R.id.field_default_rcon_font_size);
 
         reset_do_not_show = (TextView)findViewById(R.id.reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
         
         clear_saved_relays = (TextView)findViewById(R.id.clear_saved_relays);
         clear_saved_relays.setOnTouchListener(clearSavedRelaysTouchListener);
+        
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                int size = Integer.parseInt(field_default_rcon_font_size.getText().toString());
+                
+                if( size < 18 ) {
+                    size++;
+                    field_default_rcon_font_size.setText( "" + size);
+                }
+            }
+        });
+        
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                int size = Integer.parseInt(field_default_rcon_font_size.getText().toString());
+                
+                if( size > 6 ) {
+                    size--;
+                    field_default_rcon_font_size.setText( "" + size);
+                }
+            }
+        });
         
         cancelButton.requestFocus();
 
@@ -227,6 +259,7 @@ public class SettingsActivity extends Activity {
         rconWarnUnsafeCommand = b.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
         rconShowSuggestions = b.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS);
         rconEnableHistory = b.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
+        rconVolumeButtons = b.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS);
         showServerIP = b.getBoolean(Values.SETTING_SHOW_SERVER_IP);
         showServerGameInfo = b.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO);
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
@@ -238,6 +271,7 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_warn_unsafe_command.setChecked(rconWarnUnsafeCommand);
         checkbox_rcon_show_suggestions.setChecked(rconShowSuggestions);
         checkbox_rcon_enable_history.setChecked(rconEnableHistory);
+        checkbox_rcon_volume_buttons.setChecked(rconVolumeButtons);
         checkbox_show_server_ip.setChecked(showServerIP);
         checkbox_show_server_game_info.setChecked(showServerGameInfo);
         checkbox_show_server_map_name.setChecked(showServerMapName);
@@ -250,6 +284,7 @@ public class SettingsActivity extends Activity {
         field_default_relay_host.setText(b.getString(Values.SETTING_DEFAULT_RELAY_HOST));
         field_default_relay_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_RELAY_PORT)));
         field_default_relay_password.setText(b.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD));
+        field_default_rcon_font_size.setText(Integer.toString(b.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE)));
     }
 
     public void settingCheckboxHandler( View view ) {
@@ -269,6 +304,9 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.checkbox_rcon_enable_history:
                 rconEnableHistory = checked;
+                break;
+            case R.id.checkbox_rcon_volume_buttons:
+                rconVolumeButtons = checked;
                 break;
             case R.id.checkbox_servers_show_ip:
                 showServerIP = checked;
@@ -296,6 +334,7 @@ public class SettingsActivity extends Activity {
         int defaultQueryPort;
         int defaultQueryTimeout;
         int defaultRelayPort;
+        int defaultRconFontSize;
         String defaultRelayHost;
         String defaultRelayPassword;
 
@@ -320,6 +359,13 @@ public class SettingsActivity extends Activity {
             catch( NumberFormatException nfe ) {
                 defaultRelayPort = 1;
             }
+            
+            try {
+                defaultRconFontSize = Integer.parseInt(field_default_rcon_font_size.getText().toString());
+            }
+            catch( NumberFormatException nfe ) {
+                defaultRconFontSize = 9;
+            }
 
             defaultRelayHost = field_default_relay_host.getText().toString();
             defaultRelayPassword = field_default_relay_password.getText().toString();
@@ -328,6 +374,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, rconWarnUnsafeCommand);
             b.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, rconShowSuggestions);
             b.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, rconEnableHistory);
+            b.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, rconVolumeButtons);
             b.putBoolean(Values.SETTING_SHOW_SERVER_IP, showServerIP);
             b.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, showServerGameInfo);
             b.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, showServerMapName);
@@ -337,6 +384,7 @@ public class SettingsActivity extends Activity {
             b.putInt(Values.SETTING_DEFAULT_QUERY_PORT, defaultQueryPort);
             b.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
             b.putInt(Values.SETTING_DEFAULT_RELAY_PORT, defaultRelayPort);
+            b.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, defaultRconFontSize);
             b.putString(Values.SETTING_DEFAULT_RELAY_HOST, defaultRelayHost);
             b.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, defaultRelayPassword);
 
