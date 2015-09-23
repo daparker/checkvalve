@@ -35,12 +35,13 @@ public class UserVisibleMessage {
      * @param context The context to use
      * @param text The text to be displayed in the message
      */
-    public static void showMessage( Context context, CharSequence text ) {
+    public static Toast showMessage( Context context, CharSequence text ) {
         Log.d(TAG, "Showing message [context=" + context.toString() + "][text=" + text + "]");
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, text, Toast.LENGTH_SHORT);
         t.show();
+        return t;
     }
 
     /**
@@ -49,11 +50,12 @@ public class UserVisibleMessage {
      * @param context The context to use
      * @param resId The ID of the string resource to be displayed in the message
      */
-    public static void showMessage( Context context, int resId ) {
+    public static Toast showMessage( Context context, int resId ) {
         Log.d(TAG, "Showing message [context=" + context.toString() + "][resId=" + resId + "]");
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, resId, Toast.LENGTH_SHORT);
         t.show();
+        return t;
     }
 }

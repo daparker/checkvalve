@@ -69,6 +69,8 @@ public final class Values {
     public static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
     public static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
     public static final String SETTING_RCON_ENABLE_HISTORY = "rconEnableHistory";
+    public static final String SETTING_RCON_VOLUME_BUTTONS = "rconVolumeButtons";
+    public static final String SETTING_RCON_DEFAULT_FONT_SIZE = "rconDefaultFontSize";
     public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
     public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
