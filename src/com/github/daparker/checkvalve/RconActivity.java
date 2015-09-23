@@ -43,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,6 +70,7 @@ public class RconActivity extends Activity {
     private TextView sending;
     private AutoCompleteTextView field_command;
     private Button send_button;
+    private Toast toastMessage;
 
     private String password;
     private String command;
@@ -80,6 +82,9 @@ public class RconActivity extends Activity {
     private int pos;
     private boolean rconIsAuthenticated;
     private boolean enableHistory;
+    private boolean volumeButtons;
+    private float defaultFontSize;
+    private float scaledDensity;
 
     private SourceServer s;
     private GoldSrcServer g;
@@ -135,6 +140,46 @@ public class RconActivity extends Activity {
                     // Put the next command in the text field
                     if( pos < last ) field_command.setText(commandHistory.get(++pos));
                     return true;
+                }
+            }
+            
+            if( volumeButtons ) {
+                if( e.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP ) {
+                    float size = rcon_console.getTextSize();
+                    size /= scaledDensity;
+                    
+                    if( e.getAction() == KeyEvent.ACTION_DOWN ) {                                
+                        if( size < 18.0 ) rcon_console.setTextSize(++size);
+                        return true;
+                    }
+                    
+                    if( e.getAction() == KeyEvent.ACTION_UP ) {
+                        if( toastMessage != null ) toastMessage.cancel();
+                        String fontSize = Float.valueOf(size).toString();
+                        String message = getString(R.string.msg_font_size) + " " + fontSize;
+                        toastMessage = UserVisibleMessage.showMessage(RconActivity.this, message);
+    
+                        return true;
+                    }
+                }
+                
+                if( e.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+                    float size = rcon_console.getTextSize();
+                    size /= scaledDensity;
+                    
+                    if( e.getAction() == KeyEvent.ACTION_DOWN ) {
+                        if( size > 6.0 ) rcon_console.setTextSize(--size);
+                        return true;
+                    }
+                    
+                    if( e.getAction() == KeyEvent.ACTION_UP ) {                    
+                        if( toastMessage != null ) toastMessage.cancel();
+                        String fontSize = Float.valueOf(size).toString();
+                        String message = getString(R.string.msg_font_size) + " " + fontSize;
+                        toastMessage = UserVisibleMessage.showMessage(RconActivity.this, message);
+    
+                        return true;
+                    }
                 }
             }
 
@@ -309,6 +354,11 @@ public class RconActivity extends Activity {
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
         
+        // Get RCON settings
+        defaultFontSize = (float)CheckValve.settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE);
+        volumeButtons = CheckValve.settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS);
+        enableHistory = CheckValve.settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
+        
         this.setContentView(R.layout.rcon);
         this.setResult(1);
 
@@ -319,6 +369,7 @@ public class RconActivity extends Activity {
         timeout = thisIntent.getIntExtra(Values.EXTRA_TIMEOUT, 2);
         password = thisIntent.getStringExtra(Values.EXTRA_PASSWORD);
         rconIsAuthenticated = false;
+        scaledDensity = this.getResources().getDisplayMetrics().scaledDensity;
 
         fade_in = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_in);
         fade_out = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_out);
@@ -330,6 +381,7 @@ public class RconActivity extends Activity {
         send_button.setOnClickListener(sendButtonListener);
         rcon_console.setMovementMethod(ScrollingMovementMethod.getInstance());
         rcon_console.setHorizontallyScrolling(true);
+        rcon_console.setTextSize(defaultFontSize);
 
         sending.setVisibility(-1);
 
@@ -353,7 +405,7 @@ public class RconActivity extends Activity {
         else
             unsafeCommands = null;
 
-        enableHistory = CheckValve.settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
+        
         
         if( enableHistory ) {
             commandHistory = new ArrayList<String>();
