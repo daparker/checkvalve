@@ -41,8 +41,10 @@ along with the CheckValve source code.  If not, see
     <string name="button_delete">Delete</string>
     <string name="button_dismiss">Dismiss</string>
     <string name="button_edit">Edit</string>
+    <string name="button_minus">-</string>
     <string name="button_move_down">Down</string>
     <string name="button_move_up">Up</string>
+    <string name="button_plus">+</string>
     <string name="button_save">Save</string>
     <string name="button_say">Say</string>
     <string name="button_search">Search</string>
@@ -104,6 +106,7 @@ along with the CheckValve source code.  If not, see
     <string name="msg_empty_rcon_command">Please enter a command.</string>
     <string name="msg_empty_rcon_password">You must supply an RCON password.</string>
     <string name="msg_empty_server_list">The server list is currently empty.</string>
+    <string name="msg_font_size">Font size</string>
     <string name="msg_general_error">Oops! An error has occurred."</string>
     <string name="msg_network_change">A network change has been detected.</string>
     <string name="msg_no_challenge_response">No challenge response from\n</string>
@@ -139,9 +142,11 @@ along with the CheckValve source code.  If not, see
     <string name="settings_header_query_options">Server Queries</string>
     <string name="settings_header_rcon">RCON</string>
     <string name="settings_header_server_information">Server Information</string>
+    <string name="settings_rcon_default_font_size">Default font size</string>
     <string name="settings_rcon_enable_history">Arrow keys show command history</string>
     <string name="settings_rcon_show_passwords">Show RCON passwords</string>
     <string name="settings_rcon_show_suggestions">Show suggested commands</string>
+    <string name="settings_rcon_volume_buttons">Volume buttons adjust font size</string>
     <string name="settings_rcon_warn_unsafe_command">Warn if a command is unsafe</string>
     <string name="settings_reset_do_not_show">Reset \"Don\'t show me this again\" options</string>
     <string name="settings_show_game_info">Show game and version</string>
