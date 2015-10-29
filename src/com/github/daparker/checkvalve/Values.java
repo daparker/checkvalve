@@ -19,8 +19,12 @@
 
 package com.github.daparker.checkvalve;
 
-/*
- * Define the Values class
+/**
+ * This class provides static values for standardizing things throughout
+ * the CheckValve source code.
+ * 
+ * @author David A. Parker
+ *
  */
 public final class Values {
     // Engine types
@@ -71,6 +75,7 @@ public final class Values {
     public static final String SETTING_RCON_ENABLE_HISTORY = "rconEnableHistory";
     public static final String SETTING_RCON_VOLUME_BUTTONS = "rconVolumeButtons";
     public static final String SETTING_RCON_DEFAULT_FONT_SIZE = "rconDefaultFontSize";
+    public static final String SETTING_RCON_INCLUDE_SM = "rconIncludeSM";
     public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
     public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
@@ -110,4 +115,8 @@ public final class Values {
     public static final byte BYTE_A2S_PLAYER = (byte)0x55;
     public static final byte BYTE_A2S_RULES = (byte)0x56;
     public static final String A2S_INFO_QUERY = "Source Engine Query";
+    
+    // Server query types
+    public static final int QUERY_ENGINE = 1;
+    public static final int QUERY_INFO = 2;
 }
