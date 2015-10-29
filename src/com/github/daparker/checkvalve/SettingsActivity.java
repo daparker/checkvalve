@@ -44,6 +44,7 @@ public class SettingsActivity extends Activity {
     private boolean rconShowSuggestions;
     private boolean rconEnableHistory;
     private boolean rconVolumeButtons;
+    private boolean rconIncludeSM;
     private boolean showServerIP;
     private boolean showServerGameInfo;
     private boolean showServerMapName;
@@ -60,6 +61,7 @@ public class SettingsActivity extends Activity {
     private CheckBox checkbox_rcon_show_suggestions;
     private CheckBox checkbox_rcon_enable_history;
     private CheckBox checkbox_rcon_volume_buttons;
+    private CheckBox checkbox_rcon_include_sm;
     private CheckBox checkbox_show_server_ip;
     private CheckBox checkbox_show_server_game_info;
     private CheckBox checkbox_show_server_map_name;
@@ -172,14 +174,15 @@ public class SettingsActivity extends Activity {
         saveButton.setOnClickListener(saveButtonListener);
         saveButton.setOnTouchListener(buttonTouchListener);
         
-        plusButton = (Button)findViewById(R.id.rcon_font_size_plus_button);
-        minusButton = (Button)findViewById(R.id.rcon_font_size_minus_button);
+        plusButton = (Button)findViewById(R.id.rcon_font_size_plus);
+        minusButton = (Button)findViewById(R.id.rcon_font_size_minus);
         
         checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
         checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
         checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.checkbox_rcon_show_suggestions);
         checkbox_rcon_enable_history = (CheckBox)findViewById(R.id.checkbox_rcon_enable_history);
         checkbox_rcon_volume_buttons = (CheckBox)findViewById(R.id.checkbox_rcon_volume_buttons);
+        checkbox_rcon_include_sm = (CheckBox)findViewById(R.id.checkbox_rcon_include_sm);
         checkbox_show_server_ip = (CheckBox)findViewById(R.id.checkbox_servers_show_ip);
         checkbox_show_server_game_info = (CheckBox)findViewById(R.id.checkbox_servers_show_game);
         checkbox_show_server_map_name = (CheckBox)findViewById(R.id.checkbox_servers_show_map);
@@ -207,6 +210,7 @@ public class SettingsActivity extends Activity {
                     size++;
                     field_default_rcon_font_size.setText( "" + size);
                 }
+                Log.d(TAG, "plusButton clicked; view ID = " + v.getId() + "; size = " + size);
             }
         });
         
@@ -218,6 +222,7 @@ public class SettingsActivity extends Activity {
                     size--;
                     field_default_rcon_font_size.setText( "" + size);
                 }
+                Log.d(TAG, "minusButton clicked; view ID = " + v.getId() + "; size = " + size);
             }
         });
         
@@ -260,6 +265,7 @@ public class SettingsActivity extends Activity {
         rconShowSuggestions = b.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS);
         rconEnableHistory = b.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
         rconVolumeButtons = b.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS);
+        rconIncludeSM = b.getBoolean(Values.SETTING_RCON_INCLUDE_SM);
         showServerIP = b.getBoolean(Values.SETTING_SHOW_SERVER_IP);
         showServerGameInfo = b.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO);
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
@@ -272,6 +278,7 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_show_suggestions.setChecked(rconShowSuggestions);
         checkbox_rcon_enable_history.setChecked(rconEnableHistory);
         checkbox_rcon_volume_buttons.setChecked(rconVolumeButtons);
+        checkbox_rcon_include_sm.setChecked(rconIncludeSM);
         checkbox_show_server_ip.setChecked(showServerIP);
         checkbox_show_server_game_info.setChecked(showServerGameInfo);
         checkbox_show_server_map_name.setChecked(showServerMapName);
@@ -307,6 +314,9 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.checkbox_rcon_volume_buttons:
                 rconVolumeButtons = checked;
+                break;
+            case R.id.checkbox_rcon_include_sm:
+                rconIncludeSM = checked;
                 break;
             case R.id.checkbox_servers_show_ip:
                 showServerIP = checked;
@@ -375,6 +385,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, rconShowSuggestions);
             b.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, rconEnableHistory);
             b.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, rconVolumeButtons);
+            b.putBoolean(Values.SETTING_RCON_INCLUDE_SM, rconIncludeSM);
             b.putBoolean(Values.SETTING_SHOW_SERVER_IP, showServerIP);
             b.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, showServerGameInfo);
             b.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, showServerMapName);

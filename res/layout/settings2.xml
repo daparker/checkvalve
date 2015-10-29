@@ -275,7 +275,7 @@ along with the CheckValve source code.  If not, see
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
-
+                    
                     <TextView
                         android:id="@+id/label_servers_show_tags"
                         android:layout_width="wrap_content"
@@ -370,6 +370,30 @@ along with the CheckValve source code.  If not, see
                     android:layout_height="wrap_content" >
 
                     <TextView
+                        android:id="@+id/label_rcon_include_sm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_rcon_include_sm"
+                        android:textSize="14sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_rcon_include_sm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
                         android:id="@+id/label_rcon_enable_history"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -414,60 +438,63 @@ along with the CheckValve source code.  If not, see
                 </TableRow>
             </TableLayout>
 
-            <TableLayout
-                android:id="@+id/rcon_font_size_table"
+            <RelativeLayout
+                android:id="@+id/rcon_font_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:stretchColumns="0" >
+                android:background="@android:color/transparent"
+                android:orientation="horizontal" >
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                <TextView
+                    android:id="@+id/label_rcon_default_font_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:focusable="false"
+                    android:gravity="start|center_vertical"
+                    android:padding="10dp"
+                    android:singleLine="false"
+                    android:text="@string/settings_rcon_default_font_size"
+                    android:textSize="14sp" />
 
-                    <TextView
-                        android:id="@+id/label_rcon_default_font_size"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="start|center_vertical"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:text="@string/settings_rcon_default_font_size"
-                        android:textSize="14sp" />
-
-                    <Button
-                        android:id="@+id/rcon_font_size_minus_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:text="@string/button_minus"
-                        android:textColor="#ffffff"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/field_default_rcon_font_size"
-                        android:layout_width="30dp"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:textColor="#ffffff"
-                        android:textSize="18sp" />
-
-                    <Button
-                        android:id="@+id/rcon_font_size_plus_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:text="@string/button_plus"
-                        android:textColor="#ffffff"
-                        android:textSize="18sp" />
-                </TableRow>
-            </TableLayout>
+                <Button
+                    android:id="@+id/rcon_font_size_plus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@android:color/transparent"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/button_plus"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp" />
+                
+                <TextView
+                    android:id="@+id/field_default_rcon_font_size"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/rcon_font_size_plus"
+                    android:focusable="true"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:maxLength="2"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textSize="18sp" />
+                
+                <Button
+                    android:id="@+id/rcon_font_size_minus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/field_default_rcon_font_size"
+                    android:background="@android:color/transparent"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/button_minus"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp" />
+            </RelativeLayout>
 
             <TableLayout
                 android:id="@+id/query_settings_table"
