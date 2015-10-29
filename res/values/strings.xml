@@ -144,6 +144,7 @@ along with the CheckValve source code.  If not, see
     <string name="settings_header_server_information">Server Information</string>
     <string name="settings_rcon_default_font_size">Default font size</string>
     <string name="settings_rcon_enable_history">Arrow keys show command history</string>
+    <string name="settings_rcon_include_sm">Include SourceMod in suggested commands</string>
     <string name="settings_rcon_show_passwords">Show RCON passwords</string>
     <string name="settings_rcon_show_suggestions">Show suggested commands</string>
     <string name="settings_rcon_volume_buttons">Volume buttons adjust font size</string>
@@ -274,4 +275,49 @@ along with the CheckValve source code.  If not, see
         <item>_restart</item>
     </string-array>
 
+    <string-array name="sm_commands">
+        <item>sm_addban</item>
+        <item>sm_admin</item>
+        <item>sm_ban</item>
+        <item>sm_banip</item>
+        <item>sm_beacon</item>
+        <item>sm_burn</item>
+        <item>sm_cancelvote</item>
+        <item>sm_chat</item>
+        <item>sm_csay</item>
+        <item>sm_cvar</item>
+        <item>sm_execcfg</item>
+        <item>sm_gag</item>
+        <item>sm_help</item>
+        <item>sm_hsay</item>
+        <item>sm_kick</item>
+        <item>sm_map</item>
+        <item>sm_msay</item>
+        <item>sm_mute</item>
+        <item>sm_play</item>
+        <item>sm_psay</item>
+        <item>sm_rcon</item>
+        <item>sm_reloadadmins</item>
+        <item>sm_rename</item>
+        <item>sm_resetcvar</item>
+        <item>sm_say</item>
+        <item>sm_silence</item>
+        <item>sm_slap</item>
+        <item>sm_slay</item>
+        <item>sm_tsay</item>
+        <item>sm_unban</item>
+        <item>sm_ungag</item>
+        <item>sm_unmute</item>
+        <item>sm_unsilence</item>
+        <item>sm_vote</item>
+        <item>sm_votealltalk</item>
+        <item>sm_voteban</item>
+        <item>sm_voteburn</item>
+        <item>sm_voteff</item>
+        <item>sm_votegravity</item>
+        <item>sm_votekick</item>
+        <item>sm_votemap</item>
+        <item>sm_voteslay</item>
+        <item>sm_who</item>
+    </string-array>
 </resources>
