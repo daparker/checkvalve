@@ -22,16 +22,13 @@ package com.github.daparker.checkvalve;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class RconQuery implements Runnable {
     private Handler handler;
     private String response;
     private String command;
-    private int status;
-    private SourceServer ssrv;
-    private GoldSrcServer gsrv;
+    private GameServer srv;
     private Object obj;
 
     private static final String TAG = RconQuery.class.getSimpleName();
@@ -40,41 +37,20 @@ public class RconQuery implements Runnable {
      * Class for executing commands via RCON.
      * 
      * @param c The command to execute
-     * @param s The SourceServer on which to execute the command
+     * @param g The GameServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconQuery( String c, SourceServer s, Handler h ) {
+    public RconQuery( String c, GameServer s, Handler h ) {
         this.command = c;
-        this.ssrv = s;
+        this.srv = s;
         this.handler = h;
     }
-
-    /**
-     * Class for executing commands via RCON.
-     * 
-     * @param c The command to execute
-     * @param g The GoldSrcServer on which to execute the command
-     * @param h The Handler to use
-     */
-    public RconQuery( String c, GoldSrcServer g, Handler h ) {
-        this.command = c;
-        this.gsrv = g;
-        this.handler = h;
-    }
-
+    
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-
-        Log.d(TAG, "command [toString=" + command.toString() + "][hashCode=" + command.hashCode() + "]");
-        Log.d(TAG, "handler [toString=" + handler.toString() + "][hashCode=" + handler.hashCode() + "]");
-        
-        if( ssrv != null ) Log.d(TAG, "ssrv [toString=" + ssrv.toString() + "][hashCode=" + ssrv.hashCode() + "]");
-        if( gsrv != null ) Log.d(TAG, "gsrv [toString=" + gsrv.toString() + "][hashCode=" + gsrv.hashCode() + "]");
         
         Message msg = new Message();
-        status = 0;
-
-        getRconResponse();
+        int status = getRconResponse();
 
         msg.what = status;
 
@@ -86,17 +62,15 @@ public class RconQuery implements Runnable {
         this.handler.sendMessage(msg);
     }
 
-    public void getRconResponse() {
+    public int getRconResponse() {        
         try {
-            if( ssrv != null )
-                response = ssrv.rconExec(command);
-            else
-                response = gsrv.rconExec(command);
+            response = srv.rconExec(command);
+            return 0;
         }
         catch( Exception e ) {
             Log.w(TAG, "Caught an exception:", e);            
-            status = 1;
             obj = e;
+            return 1;
         }
     }
 }

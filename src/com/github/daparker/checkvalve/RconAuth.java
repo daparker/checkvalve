@@ -26,51 +26,34 @@ import android.util.Log;
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
 import com.github.koraktor.steamcondenser.exceptions.SteamCondenserException;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class RconAuth implements Runnable {
-    private Handler handler;
-    private String password;
-    private SourceServer ssrv;
-    private GoldSrcServer gsrv;
-    private Object obj;
-
     private static final String TAG = RconAuth.class.getSimpleName();
 
-    /**
-     * Class for authenticating RCON.
-     * 
-     * @param p The RCON password to use
-     * @param s The SourceServer on which to execute the command
-     * @param h The Handler to use
-     */
-    public RconAuth( String p, SourceServer s, Handler h ) {
-        this.password = p;
-        this.ssrv = s;
-        this.handler = h;
-    }
+    private Handler handler;
+    private String password;
+    private GameServer srv;
+    private Object obj;
 
     /**
      * Class for authenticating RCON.
      * 
      * @param p The RCON password to use
-     * @param g The GoldSrcServer on which to execute the command
+     * @param g The GameServer on which to execute the command
      * @param h The Handler to use
      */
-    public RconAuth( String p, GoldSrcServer g, Handler h ) {
+    public RconAuth( String p, GameServer s, Handler h ) {
         this.password = p;
-        this.gsrv = g;
+        this.srv = s;
         this.handler = h;
     }
-
+    
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         Message msg = new Message();
-        int status = 0;
-
-        status = rconAuthenticate();
+        int status = rconAuthenticate();
 
         msg.what = status;
 
@@ -82,16 +65,9 @@ public class RconAuth implements Runnable {
 
     public int rconAuthenticate() {
         try {
-            if( gsrv != null ) {
-                gsrv.rconAuth(password);
-                gsrv.rconExec("status");
-                obj = gsrv;
-            }
-            else {
-                ssrv.rconAuth(password);
-                obj = ssrv;
-            }
-
+            srv.rconAuth(password);
+            srv.rconExec("status");
+            obj = srv;
             return 0;
         }
         catch( RCONNoAuthException e ) {

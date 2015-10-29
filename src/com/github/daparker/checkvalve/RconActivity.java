@@ -55,8 +55,7 @@ import java.util.concurrent.TimeoutException;
 import com.github.daparker.checkvalve.R;
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class RconActivity extends Activity {
     private final static String TAG = RconActivity.class.getSimpleName();
@@ -64,7 +63,6 @@ public class RconActivity extends Activity {
     private Animation fade_out;
 
     private ProgressDialog p;
-    private ServerQuery q;
 
     private TextView rcon_console;
     private TextView sending;
@@ -86,8 +84,7 @@ public class RconActivity extends Activity {
     private float defaultFontSize;
     private float scaledDensity;
 
-    private SourceServer s;
-    private GoldSrcServer g;
+    private GameServer srv;
     private Thread receiverThread;
     private NetworkEventReceiver receiverRunnable;
     private ArrayList<String> commandHistory;
@@ -190,32 +187,34 @@ public class RconActivity extends Activity {
     // Handler for the server query thread
     private Handler progressHandler = new Handler() {
         public void handleMessage( Message msg ) {
-            switch( msg.what ) {
-                case -1:
-                    Log.d(TAG, "progressHandler [" + msg.toString() + "]");
-                    Log.d(TAG, "Message object string = " + msg.obj.toString());
-                    Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
-                case Values.ENGINE_GOLDSRC:
-                    Log.i(TAG, "Server engine is GoldSrc.");
-                    g = (GoldSrcServer)msg.obj;
-                    break;
-                case Values.ENGINE_SOURCE:
-                    Log.i(TAG, "Server engine is Source.");
-                    s = (SourceServer)msg.obj;
-                    break;
-                default:
-                    Log.w(TAG, "Unhandled value from engine query: " + msg.what);
-                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
-                    break;
-            }
-
             p.dismiss();
-
-            if( ! rconIsAuthenticated ) {
-                if( password.length() == 0 )
-                    getPassword();
-                else 
-                    rconAuthenticate();
+            
+            if( msg.obj != null ) {
+                srv = (GameServer)msg.obj;
+                
+                switch( msg.what ) {
+                    case Values.ENGINE_GOLDSRC:
+                        Log.i(TAG, "Server engine is GoldSrc.");
+                        break;
+                    case Values.ENGINE_SOURCE:
+                        Log.i(TAG, "Server engine is Source.");
+                        break;
+                    default:
+                        Log.w(TAG, "Unhandled value from engine query: " + msg.what);
+                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
+                        break;
+                }
+                
+                if( ! rconIsAuthenticated ) {
+                    if( password.length() == 0 )
+                        getPassword();
+                    else 
+                        rconAuthenticate();
+                }
+            }
+            else {
+                Log.w(TAG, "EngineQuery returned a null object.");
+                UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
             }
         }
     };
@@ -264,10 +263,7 @@ public class RconActivity extends Activity {
                     break;
                 case 0:
                     rconIsAuthenticated = true;
-                    if( g!= null )
-                        g = (GoldSrcServer)msg.obj;
-                    else
-                        s = (SourceServer)msg.obj;
+                    srv = (GameServer)msg.obj;
                     break;
                 case 1:
                     Log.d(TAG, "rconAuthHandler [" + msg.toString() + "]");
@@ -383,11 +379,9 @@ public class RconActivity extends Activity {
         rcon_console.setHorizontallyScrolling(true);
         rcon_console.setTextSize(defaultFontSize);
 
-        sending.setVisibility(-1);
-
-        Resources res = getResources();
-        String[] commandList = res.getStringArray(R.array.all_commands);
-
+        sending.setVisibility(View.INVISIBLE);
+        
+        String[] commandList = getCommandList();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, commandList);
 
         field_command = (AutoCompleteTextView)findViewById(R.id.field_command);
@@ -401,11 +395,9 @@ public class RconActivity extends Activity {
             field_command.setThreshold(1000);
         
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) == true )
-            unsafeCommands = res.getStringArray(R.array.unsafe_commands);
+            unsafeCommands = this.getResources().getStringArray(R.array.unsafe_commands);
         else
             unsafeCommands = null;
-
-        
         
         if( enableHistory ) {
             commandHistory = new ArrayList<String>();
@@ -450,8 +442,7 @@ public class RconActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         shutdownNetworkEventReceiver();
-        if( g != null ) g.disconnect();
-        if( s != null ) s.disconnect();
+        if( srv != null ) srv.disconnect();
     }
 
     @Override
@@ -495,6 +486,35 @@ public class RconActivity extends Activity {
         if( request == Values.ACTIVITY_CONFIRM_UNSAFE_COMMAND && result == 1 ) sendCommand(true);
     }
 
+    public String[] getCommandList() {
+        Resources res = getResources();
+        String[] result = null;
+
+        if( CheckValve.settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM) == false ) {
+            // Get the list of standard commands
+            result = res.getStringArray(R.array.all_commands);
+        }
+        else {
+            // Get the lists of both standard and SourceMod commands 
+            String[] allCommands = res.getStringArray(R.array.all_commands);
+            String[] smCommands = res.getStringArray(R.array.sm_commands);
+            
+            // Determine the length of each list
+            int len1 = allCommands.length;
+            int len2 = smCommands.length;
+            
+            // Create a new array to hold the combined contents of both lists
+            result = new String[len1+len2];
+            
+            // Concatenate the arrays so the command list will include both
+            // standard and SourceMod commands
+            System.arraycopy(allCommands, 0, result, 0, len1);
+            System.arraycopy(smCommands, 0, result, len1, len2);
+        }
+
+        return result;
+    }
+    
     public void sendCommand( boolean force ) {
         if( enableHistory ) {
             commandHistory.add(last, command);
@@ -518,12 +538,7 @@ public class RconActivity extends Activity {
 
         runFadeInAnimation(RconActivity.this, sending);
 
-        if( g != null )
-            new Thread(new RconQuery(command, g, popUpHandler)).start();
-        else
-            new Thread(new RconQuery(command, s, popUpHandler)).start();
-
-        new Thread(q).start();
+        new Thread(new RconQuery(command, srv, popUpHandler)).start();
     }
 
     public void getServerType() {
@@ -542,7 +557,6 @@ public class RconActivity extends Activity {
         int lineCount = rcon_console.getLineCount();
         int lineHeight = rcon_console.getLineHeight();
         int viewHeight = rcon_console.getHeight();
-
         int difference = (lineCount * lineHeight) - viewHeight;
 
         if( difference < 1 )
@@ -553,11 +567,7 @@ public class RconActivity extends Activity {
 
     public void rconAuthenticate() {
         p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_rcon_verifying_password), true, false);
-
-        if( g != null )
-            new Thread(new RconAuth(password, g, rconAuthHandler)).start();
-        else
-            new Thread(new RconAuth(password, s, rconAuthHandler)).start();
+        new Thread(new RconAuth(password, srv, rconAuthHandler)).start();
     }
 
     public void runFadeInAnimation( Context c, View v ) {
@@ -642,8 +652,7 @@ public class RconActivity extends Activity {
     
     public void closeRconConnection() {
         try {
-            if( s != null ) s.disconnect();
-            if( g != null ) g.disconnect();
+            if( srv != null ) srv.disconnect();
         }
         catch( Exception e ) {
             Log.w(TAG, "closeRconConnection(): Caught an exception:", e);

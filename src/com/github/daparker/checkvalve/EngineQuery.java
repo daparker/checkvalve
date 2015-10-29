@@ -25,16 +25,12 @@ import android.util.Log;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
 
 public class EngineQuery implements Runnable {
     private Handler handler;
     private String server;
     private int port;
     private int timeout;
-    private SourceServer ssrv;
-    private GoldSrcServer gsrv;
     private Object obj;
 
     private static final String TAG = EngineQuery.class.getSimpleName();
@@ -77,7 +73,7 @@ public class EngineQuery implements Runnable {
         int secondByte = 0;
 
         try {
-            int result = 0;
+            int engine = 0;
 
             DatagramSocket socket = new DatagramSocket();
 
@@ -141,7 +137,7 @@ public class EngineQuery implements Runnable {
             // If the app ID is less than 200 then the engine is assumed to be GoldSource,
             // but we'll check for the 64-bit game ID later and use that if possible since
             // it's more accurate
-            result = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
+            engine = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
 
             // Skip the next 9 bytes
             byteNum += 9;
@@ -188,22 +184,15 @@ public class EngineQuery implements Runnable {
                     appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn, byteNum, 3).put((byte)0x00).getInt(0);
 
                     // Use this app ID to determine the engine
-                    result = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
+                    engine = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
                 }
             }
 
             socket.close();
+            
+            obj = Server.getServer(engine, InetAddress.getByName(server), port);
 
-            if( result == Values.ENGINE_GOLDSRC ) {
-                gsrv = new GoldSrcServer(InetAddress.getByName(server), port);
-                obj = gsrv;
-            }
-            else {
-                ssrv = new SourceServer(InetAddress.getByName(server), port);
-                obj = ssrv;
-            }
-
-            return result;
+            return engine;
         }
         // Handle a socket timeout
         catch( Exception e ) {
