@@ -156,7 +156,7 @@ public class ServerQuery implements Runnable {
                 
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
-                    Log.i(TAG, "Parsing Source Engine response");
+                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + serverPort);
                     serverInfo[i] = parseResponseFromSRCDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
@@ -165,7 +165,7 @@ public class ServerQuery implements Runnable {
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
-                    Log.i(TAG, "Parsing GoldSrc Engine response");
+                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + serverPort);
                     serverInfo[i] = parseResponseFromHLDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
@@ -175,7 +175,8 @@ public class ServerQuery implements Runnable {
                 else {
                     // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ','0').toUpperCase();
-                    Log.w(TAG, "Packet type " + rcv + " does not match expected values 0x49 or 0x6d");
+                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort 
+                            + " does not match expected values 0x49 or 0x6d");
                     serverInfo[i] = null;
                     addErrorRow(serverURL, serverPort, serverListPos);
                     continue;
