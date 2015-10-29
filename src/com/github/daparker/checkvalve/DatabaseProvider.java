@@ -33,7 +33,7 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -54,6 +54,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_RCON_ENABLE_HISTORY = "rcon_enable_history";
     public static final String SETTINGS_RCON_VOLUME_BUTTONS = "rcon_volume_buttons";
     public static final String SETTINGS_RCON_DEFAULT_FONT_SIZE = "rcon_default_font_size";
+    public static final String SETTINGS_RCON_INCLUDE_SM = "rcon_include_sm";
     public static final String SETTINGS_SHOW_SERVER_IP = "show_ip";
     public static final String SETTINGS_SHOW_SERVER_MAP = "show_map";
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
@@ -87,6 +88,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9, "
+            + SETTINGS_RCON_INCLUDE_SM + " INTEGER NOT NULL DEFAULT 0, "
             + SETTINGS_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
@@ -193,20 +195,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 
         if( oldVersion < 2 ) {
-            /*
-             * Added the RCON password column to the servers table in DB version 2.
-             */
-            
             // Add the rcon_password column to the servers table
             db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_RCON + " TEXT NOT NULL DEFAULT '';");
         }
 
         if( oldVersion < 3 ) {
             try {
-                /*
-                 * Added the settings table in DB version 3.
-                 */
-                
                 // Create the settings table
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
@@ -244,9 +238,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
                 int count = c.getCount();
 
-                // Fix list position numbering in the servers table which
-                // may have been broken by deletions from the table in
-                // previous versions
+                // Fix list position numbering in the servers table which may have
+                // been broken by deletions from the table in previous versions
                 for( int i = 0; i < count; i++ ) {
                     c.moveToPosition(i);
 
@@ -273,10 +266,6 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         
         if( oldVersion < 4 ) {
             try {
-                /*
-                 * Added a setting to enable/disable RCON command history in DB version 4.
-                 */
-                
                 // Add the rcon_enable_history column to the settings table
                 Log.i(TAG, "Adding column " + SETTINGS_RCON_ENABLE_HISTORY + " to table " + TABLE_SETTINGS);
                 db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1;");
@@ -294,10 +283,6 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         }
         
         if( oldVersion < 5 ) {
-            /*
-             * Added the relay_hosts table in DB version 5.
-             */
-            
             // Add the relay_hosts table
             Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);
@@ -305,10 +290,6 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         
         if( oldVersion < 6 ) {
             try {
-                /*
-                 * Added RCON settings for volume buttons and default font size in DB version 6.
-                 */
-                
                 // Add the rcon_volume_buttons column to the settings table
                 Log.i(TAG, "Adding column " + SETTINGS_RCON_VOLUME_BUTTONS + " to table " + TABLE_SETTINGS);
                 db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1;");
@@ -324,6 +305,24 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
                 Log.i(TAG, "Setting " + SETTINGS_RCON_VOLUME_BUTTONS + " default value to 1");
                 Log.i(TAG, "Setting " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " default value to 9");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 7 ) {
+            try {
+                // Add the rcon_include_sm column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_INCLUDE_SM + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_INCLUDE_SM + " INTEGER NOT NULL DEFAULT 0;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_RCON_INCLUDE_SM, 0);
+
+                Log.i(TAG, "Setting " + SETTINGS_RCON_INCLUDE_SM + " default value to 0");
                 db.update(TABLE_SETTINGS, values, null, null);
             }
             catch( Exception e ) {
@@ -736,6 +735,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_RCON_ENABLE_HISTORY,
                 SETTINGS_RCON_VOLUME_BUTTONS,
                 SETTINGS_RCON_DEFAULT_FONT_SIZE,
+                SETTINGS_RCON_INCLUDE_SM,
                 SETTINGS_SHOW_SERVER_IP,
                 SETTINGS_SHOW_SERVER_MAP,
                 SETTINGS_SHOW_SERVER_PLAYERS,
@@ -769,6 +769,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_RCON_DEFAULT_FONT_SIZE) )
                     result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
+                else if( column.equals(SETTINGS_RCON_INCLUDE_SM) )
+                    result.putBoolean(Values.SETTING_RCON_INCLUDE_SM, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
@@ -815,6 +817,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int showSuggest = (settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, true))?1:0;
         int enableHistory = (settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY, true))?1:0;
         int volumeButtons = (settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, true))?1:0;
+        int includeSM = (settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
@@ -839,6 +842,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_ENABLE_HISTORY, enableHistory);
         values.put(SETTINGS_RCON_VOLUME_BUTTONS, volumeButtons);
         values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, defaultRconFontSize);
+        values.put(SETTINGS_RCON_INCLUDE_SM, includeSM);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
