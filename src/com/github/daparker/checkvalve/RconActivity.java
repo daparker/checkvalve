@@ -192,19 +192,6 @@ public class RconActivity extends Activity {
             if( msg.obj != null ) {
                 srv = (GameServer)msg.obj;
                 
-                switch( msg.what ) {
-                    case Values.ENGINE_GOLDSRC:
-                        Log.i(TAG, "Server engine is GoldSrc.");
-                        break;
-                    case Values.ENGINE_SOURCE:
-                        Log.i(TAG, "Server engine is Source.");
-                        break;
-                    default:
-                        Log.w(TAG, "Unhandled value from engine query: " + msg.what);
-                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
-                        break;
-                }
-                
                 if( ! rconIsAuthenticated ) {
                     if( password.length() == 0 )
                         getPassword();
