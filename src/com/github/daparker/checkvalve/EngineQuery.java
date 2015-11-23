@@ -25,13 +25,14 @@ import android.util.Log;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class EngineQuery implements Runnable {
     private Handler handler;
     private String server;
     private int port;
     private int timeout;
-    private Object obj;
+    private GameServer gs;
 
     private static final String TAG = EngineQuery.class.getSimpleName();
 
@@ -53,20 +54,14 @@ public class EngineQuery implements Runnable {
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
-        int result = 0;
         Message msg = new Message();
-
-        result = getServerEngine(server, port, timeout);
-
-        if( obj != null )
-            msg.obj = obj;
-
-        msg.what = result;
-
+        
+        gs = getServerEngine(server, port, timeout);
+        msg.obj = gs;
         handler.sendMessage(msg);
     }
 
-    public int getServerEngine( String s, int p, int t ) {
+    public GameServer getServerEngine( String s, int p, int t ) {
         int appId = 0;
         int byteNum = 0;
         int firstByte = 0;
@@ -96,7 +91,7 @@ public class EngineQuery implements Runnable {
             // Show an error if the connection attempt failed
             if( !socket.isConnected() ) {
                 socket.close();
-                return -1;
+                return null;
             }
 
             // Send the query string to the server
@@ -190,14 +185,24 @@ public class EngineQuery implements Runnable {
 
             socket.close();
             
-            obj = Server.getServer(engine, InetAddress.getByName(server), port);
-
-            return engine;
+            if( engine == Values.ENGINE_GOLDSRC ) {
+                Log.i(TAG, "Server engine is GoldSrc");
+            }
+            else if( engine == Values.ENGINE_SOURCE ) {
+                Log.i(TAG, "Server engine is Source");
+            }
+            else {
+                Log.w(TAG, "Unrecognized server engine");
+                return null;
+            }
+            
+            GameServer result = Server.getServer(engine, InetAddress.getByName(server), port);
+            return result;
         }
         // Handle a socket timeout
         catch( Exception e ) {
             Log.w(TAG, "getServerEngine(): Caught an exception:", e);
-            return -1;
+            return null;
         }
     }
 }
