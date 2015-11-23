@@ -191,6 +191,7 @@ along with the CheckValve source code.  If not, see
         <item>listid</item>
         <item>listip</item>
         <item>log</item>
+        <item>logadderss</item>
         <item>logaddress_add</item>
         <item>logaddress_del</item>
         <item>logaddress_list</item>
