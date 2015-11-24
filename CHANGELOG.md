@@ -1,14 +1,14 @@
-CheckValve 2.0
-==============
+CheckValve 2.0 Change Log
+=========================
 
-**Bug Fixes**
+**2.0.0**
+Bug Fixes
 - Added better exception handling
 - Fixed a few possible crashes due to database cursors being mishandled
 - Trailing spaces in server URLs will no longer cause Unknown Host errors
 - Fixed errors when moving servers up or down in the list if other servers have been deleted
 
-
-**Code Changes**
+Code Changes
 - Made compatible with API 11+ (Honeycomb and above)
   - Moved network operations to background threads
   - Created new classes to handle all server queries in the background
@@ -30,8 +30,7 @@ CheckValve 2.0
 - Added the `Values` class to standardize constants used throughout the app
 - Added `ACCESS_NETWORK_STATE` permission requirement for monitoring the network state while using the Chat Viewer
 
-
-**New Features**
+New Features
 - Show/hide RCON passwords on screens where they appear
 - RCON command auto-fill for common commands
 - Warn before sending unsafe commands via RCON
@@ -61,7 +60,26 @@ CheckValve 2.0
     - Port
     - Password
 
-
-**Notes**
+Notes
 - While the target SDK version has been increased, the minimum SDK version remains 8 (Froyo).
 - I am trying very hard to keep the minimum SDK version at 8 so that CheckValve will continue to work on older devices.  However, changes to the Android API are making it increasingly difficult to stay comaptible with any SDK version below 11 (Honeycomb), and the minimum SDK may need to be rasied in the near future out of necessity.
+
+**2.0.1**
+- Added an action bar for devices which do not have a dedicated menu button (Honeycomb and above)
+
+**2.0.2**
+- Fixed a bug which prevented RCON from working with GoldSrc servers
+- Fixed a bug which caused the "Warn if a command is unsafe" option to not be honored
+
+**2.0.3**
+- Fixed a crash when resuming CheckValve after the Chat Viewer was left open for a long time
+- Fixed HLTV query issue
+- Redesigned About screen with links for support
+- Added support for the old GoldSrc query response
+- Up/Down arrow keys scroll through RCON command history
+- RCON will reconnect automatically when the device changes connections
+- Server field on Chat Relay Details screen will auto-fill with previously used hosts
+
+**2.0.4**
+- Added UTF-8 support for server information, player names, and chat messages
+
