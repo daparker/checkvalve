@@ -2,6 +2,7 @@ CheckValve 2.0 Change Log
 =========================
 
 **2.0.0**
+
 Bug Fixes
 - Added better exception handling
 - Fixed a few possible crashes due to database cursors being mishandled
