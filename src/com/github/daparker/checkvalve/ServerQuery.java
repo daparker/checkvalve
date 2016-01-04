@@ -106,6 +106,10 @@ public class ServerQuery implements Runnable {
             int serverTimeout = sr.getServerTimeout();
             int serverListPos = sr.getServerListPosition();
             
+            long startTime = 0L;
+            long endTime = 0L;
+            long requestTime = 0L;
+            
             try {
                 socket = new DatagramSocket();
                 socket.setSoTimeout(serverTimeout * 1000);
@@ -132,11 +136,20 @@ public class ServerQuery implements Runnable {
 
                 String serverIP = socket.getInetAddress().getHostAddress();
 
+                // Get the start time of the request
+                startTime = System.currentTimeMillis();
+                
                 // Send the query string to the server
                 socket.send(packetOut);
 
                 // Receive the response packet from the server
                 socket.receive(packetIn);
+                
+                // Get the end time of the request
+                endTime = System.currentTimeMillis();
+                
+                // Calculate how long this request took (the ping time)
+                requestTime = endTime-startTime;
                 
                 // Close the UDP socket
                 socket.close();
@@ -162,6 +175,7 @@ public class ServerQuery implements Runnable {
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
+                    serverInfo[i].setPing(requestTime);
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
@@ -171,6 +185,7 @@ public class ServerQuery implements Runnable {
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
+                    serverInfo[i].setPing(requestTime);
                 }
                 else {
                     // Packet type did not match 0x49 or 0x6D
