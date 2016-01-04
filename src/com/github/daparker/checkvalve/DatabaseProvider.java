@@ -33,7 +33,7 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -60,6 +60,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
     public static final String SETTINGS_SHOW_SERVER_GAME = "show_game_info";
     public static final String SETTINGS_SHOW_SERVER_TAGS = "show_tags";
+    public static final String SETTINGS_SHOW_SERVER_PING = "show_ping";
     public static final String SETTINGS_DEFAULT_QUERY_PORT = "default_query_port";
     public static final String SETTINGS_DEFAULT_QUERY_TIMEOUT = "default_query_timeout";
     public static final String SETTINGS_DEFAULT_RELAY_HOST = "default_relay_host";
@@ -94,6 +95,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
@@ -167,6 +169,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_SHOW_SERVER_PLAYERS, 1);
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
+            values.put(SETTINGS_SHOW_SERVER_PING, 1);
             values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
@@ -323,6 +326,24 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 values.put(SETTINGS_RCON_INCLUDE_SM, 0);
 
                 Log.i(TAG, "Setting " + SETTINGS_RCON_INCLUDE_SM + " default value to 0");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 8 ) {
+            try {
+                // Add the show_ping column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_PING + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_SHOW_SERVER_PING, 1);
+
+                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_PING + " default value to 1");
                 db.update(TABLE_SETTINGS, values, null, null);
             }
             catch( Exception e ) {
@@ -741,6 +762,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_SHOW_SERVER_PLAYERS,
                 SETTINGS_SHOW_SERVER_GAME,
                 SETTINGS_SHOW_SERVER_TAGS,
+                SETTINGS_SHOW_SERVER_PING,
                 SETTINGS_VALIDATE_NEW_SERVERS,
                 SETTINGS_DEFAULT_QUERY_PORT,
                 SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -781,6 +803,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_TAGS) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
+                    result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
                     result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
@@ -823,6 +847,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
+        int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
 
         // Get int values from the Bundle
@@ -848,6 +873,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
         values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
+        values.put(SETTINGS_SHOW_SERVER_PING, showPing);
         values.put(SETTINGS_VALIDATE_NEW_SERVERS, validate);
         values.put(SETTINGS_DEFAULT_QUERY_PORT, defaultQueryPort);
         values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
