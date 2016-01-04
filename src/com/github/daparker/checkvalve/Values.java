@@ -81,6 +81,7 @@ public final class Values {
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
     public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
     public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
+    public static final String SETTING_SHOW_SERVER_PING = "showServerPing";
     public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
     public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
     public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
@@ -97,6 +98,7 @@ public final class Values {
     public static final String TAG_SERVER_MAP = "serverMap";
     public static final String TAG_SERVER_PLAYERS = "serverPlayers";
     public static final String TAG_SERVER_TAGS = "serverTags";
+    public static final String TAG_SERVER_PING = "serverPing";
     public static final String TAG_PLAYER_INFO = "playerInfo";
     public static final String TAG_MESSAGE_INFO = "messageInfo";
     
