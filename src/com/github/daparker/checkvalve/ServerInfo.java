@@ -37,6 +37,7 @@ public class ServerInfo implements Parcelable {
     private int maxPlayers;
     private int listPos;
     private long rowId;
+    private long ping;
 
     public ServerInfo() {}
 
@@ -54,7 +55,7 @@ public class ServerInfo implements Parcelable {
      * @param maxPlayers The max number of players the server will support
      */
     public ServerInfo( String name, String addr, String game, String version, String map, String tags,
-            int port, int numPlayers, int maxPlayers, int listPos, long rowId ) {
+            int port, int numPlayers, int maxPlayers, int listPos, long rowId, long ping ) {
         this.name = name;
         this.addr = addr;
         this.game = game;
@@ -66,6 +67,7 @@ public class ServerInfo implements Parcelable {
         this.maxPlayers = maxPlayers;
         this.listPos = listPos;
         this.rowId = rowId;
+        this.ping = ping;
     }
 
     public void setName( String s ) {
@@ -112,6 +114,10 @@ public class ServerInfo implements Parcelable {
         this.maxPlayers = i;
     }
     
+    public void setPing( long l ) {
+        this.ping = l;
+    }
+    
     public String getName() {
         return this.name;
     }
@@ -156,6 +162,10 @@ public class ServerInfo implements Parcelable {
         return this.rowId;
     }
     
+    public long getPing() {
+        return this.ping;
+    }
+    
     public int describeContents() {
         return 0;
     }
@@ -172,6 +182,7 @@ public class ServerInfo implements Parcelable {
         dest.writeInt(this.maxPlayers);
         dest.writeInt(this.listPos);
         dest.writeLong(this.rowId);
+        dest.writeLong(this.ping);
     }
 
     public static final Parcelable.Creator<ServerInfo> CREATOR = new Parcelable.Creator<ServerInfo>() {
@@ -196,5 +207,6 @@ public class ServerInfo implements Parcelable {
         maxPlayers = in.readInt();
         listPos = in.readInt();
         rowId = in.readLong();
+        ping = in.readLong();
     }
 }
