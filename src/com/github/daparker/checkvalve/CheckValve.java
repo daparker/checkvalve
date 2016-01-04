@@ -471,6 +471,21 @@ public class CheckValve extends Activity {
                     else
                         tagsValue.setText(CheckValve.this.getText(R.string.msg_no_tags));
                     
+                    long serverPing = serverInfo[i].getPing();
+                    TextView pingLabel = new TextView(CheckValve.this);
+                    TextView pingValue = new TextView(CheckValve.this);
+                    pingLabel.setId(i * 1400);
+                    pingLabel.setText(CheckValve.this.getText(R.string.label_ping));
+                    pingLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    pingLabel.setPadding(3, 0, 3, 0);
+                    pingLabel.setTypeface(null, Typeface.BOLD);
+                    pingLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    pingValue.setId(i * 1500);
+                    pingValue.setText(serverPing + " ms");
+                    pingValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    pingValue.setPadding(3, 0, 3, 0);
+                    pingValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
                     int serverRowId = (int)serverInfo[i].getRowId();
 
                     TextView spacer = new TextView(CheckValve.this);
@@ -550,6 +565,17 @@ public class CheckValve extends Activity {
                     tagsRow.addView(tagsLabel);
                     tagsRow.addView(tagsValue);
                     registerForContextMenu(tagsRow);
+                    
+                    TableRow pingRow = new TableRow(CheckValve.this);
+                    pingRow.setId(serverRowId);
+                    pingRow.setTag(Values.TAG_SERVER_PING);
+                    pingRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    pingRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_PING))?View.VISIBLE:View.GONE);
+                    pingRow.setOnTouchListener(tableRowTouchListener);
+                    pingRow.setFocusable(false);
+                    pingRow.addView(pingLabel);
+                    pingRow.addView(pingValue);
+                    registerForContextMenu(pingRow);
               
                     // Add these rows to the server info table
                     server_info_table.addView(
@@ -580,6 +606,10 @@ public class CheckValve extends Activity {
                             tagsRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
+                    server_info_table.addView(
+                            pingRow,
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
                 }
             }
 
@@ -608,6 +638,8 @@ public class CheckValve extends Activity {
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS))?View.VISIBLE:View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_TAGS) )
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS))?View.VISIBLE:View.GONE);
+                else if( tag.equals(Values.TAG_SERVER_PING) )
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_PING))?View.VISIBLE:View.GONE);
             }
         }
 
