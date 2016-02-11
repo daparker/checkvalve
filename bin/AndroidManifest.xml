@@ -109,6 +109,10 @@ along with the CheckValve source code.  If not, see
             class="ShowNoteActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.DebugConsoleActivity"
+            class="DebugConsoleActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
     </application>
 
 </manifest>
