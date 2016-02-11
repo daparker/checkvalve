@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -38,6 +38,9 @@ public class ServerQuery implements Runnable {
     private ArrayList<String> messages;
     private ServerInfo[] serverInfo;
     private int status;
+    private boolean debug;
+    private Message m;
+    private QueryDebugLog debugLog;
 
     private static final String TAG = ServerQuery.class.getSimpleName();
 
@@ -47,10 +50,13 @@ public class ServerQuery implements Runnable {
      * @param c The context to use
      * @param h The Handler to use
      */
-    public ServerQuery( Context c, Handler h ) {
+    public ServerQuery( Context c, Handler h, boolean debugMode, QueryDebugLog debugLog ) {
         this.context = c;
         this.status = 0;
         this.handler = h;
+        //this.debug = true;
+        this.debug = debugMode;
+        this.debugLog = debugLog;
     }
 
     public void run() {
@@ -79,10 +85,20 @@ public class ServerQuery implements Runnable {
     }
 
     public void queryServers() throws UnsupportedEncodingException {
+        long runStartTime = System.currentTimeMillis();
+        
+        if( debug == true ) {
+            debugLog.addMessage("Run started at " + runStartTime + "\n");
+        }
+        
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
         ServerRecord[] serverList = database.getAllServers();
         database.close();
+        
+        if( debug == true ) {
+            debugLog.addMessage(serverList.length + " servers will be queried.");
+        }
         
         // The outgoing data only needs to be set up once
         byte[] arrayOut = new byte[25];
@@ -98,6 +114,23 @@ public class ServerQuery implements Runnable {
         messages = new ArrayList<String>();
 
         for( int i = 0; i < serverList.length; i++ ) {
+            long startTime = 0L;
+            long endTime = 0L;
+            long requestTime = 0L;
+            long queryStart = 0L;
+            long queryEnd = 0L;
+            long queryTime = 0L;
+            long parseStart = 0L;
+            long parseEnd = 0L;
+            long parseTime = 0L;
+            
+            queryStart = System.currentTimeMillis();
+            
+            if( debug == true ) {
+                debugLog.addMessage("\nQUERY #" + (i+1));
+                debugLog.addMessage("> Start time: " + queryStart);
+            }
+            
             ServerRecord sr = serverList[i];
 
             String serverURL = sr.getServerName();
@@ -106,13 +139,16 @@ public class ServerQuery implements Runnable {
             int serverTimeout = sr.getServerTimeout();
             int serverListPos = sr.getServerListPosition();
             
-            long startTime = 0L;
-            long endTime = 0L;
-            long requestTime = 0L;
+            int socketTimeout = 0;
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> Server: " + serverURL + ":" + serverPort);
+            }
             
             try {
                 socket = new DatagramSocket();
                 socket.setSoTimeout(serverTimeout * 1000);
+                socketTimeout = socket.getSoTimeout();
 
                 // Byte buffers for packet data
                 byte[] arrayIn = new byte[1400];
@@ -131,29 +167,61 @@ public class ServerQuery implements Runnable {
                 if( !socket.isConnected() ) {
                     serverInfo[i] = null;
                     addErrorRow(serverURL, serverPort, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Socket connect failed!");
+                    }
+                    
                     continue;
                 }
 
                 String serverIP = socket.getInetAddress().getHostAddress();
+                
+                if( debug == true ) {
+                	debugLog.addMessage("> Socket is connected");
+                    
+                    String localAddr = socket.getLocalAddress().getHostAddress();
+                    int localPort = socket.getLocalPort();
+                    int timeout = socket.getSoTimeout();
+                    
+                    debugLog.addMessage(">   Local addr: " + localAddr);
+                    debugLog.addMessage(">   Local port: " + localPort);
+                    debugLog.addMessage(">   Remote addr: " + serverIP);
+                    debugLog.addMessage(">   Remote port: " + serverPort);
+                    debugLog.addMessage(">   Timeout: " + timeout);
+                }
 
                 // Get the start time of the request
                 startTime = System.currentTimeMillis();
                 
                 // Send the query string to the server
                 socket.send(packetOut);
+                
+                if( debug == true ) {
+                	debugLog.addMessage("> Sent query to " + serverIP + ":" + serverPort);
+                }
 
                 // Receive the response packet from the server
                 socket.receive(packetIn);
+                
+                if( debug == true ) {
+                	debugLog.addMessage("> Received response from " + serverIP + ":" + serverPort);
+                }
                 
                 // Get the end time of the request
                 endTime = System.currentTimeMillis();
                 
                 // Calculate how long this request took (the ping time)
                 requestTime = endTime-startTime;
-                
+
                 // Close the UDP socket
                 socket.close();
-
+                
+                if( debug == true ) {
+                	debugLog.addMessage("> Disconnected from " + serverIP + ":" + serverPort);
+                	debugLog.addMessage("> Request took " + requestTime + " ms");
+                }
+                
                 int packetHeader = bufferIn.getInt();
                 
                 // Make sure the packet includes the expected header bytes
@@ -162,6 +230,11 @@ public class ServerQuery implements Runnable {
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
                     serverInfo[i] = null;
                     addErrorRow(serverURL, serverPort, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> ERROR: Invalid response header: " + rcv);
+                    }
+                    
                     continue;
                 }
 
@@ -170,22 +243,52 @@ public class ServerQuery implements Runnable {
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
                     Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + serverPort);
+                    
+                    if( debug == true ) {
+                        debugLog.addMessage("> Response type: Source");
+                        debugLog.addMessage("> Parsing Source Engine response");
+                    }
+                    
+                    parseStart = System.currentTimeMillis();
+                    
                     serverInfo[i] = parseResponseFromSRCDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
                     serverInfo[i].setPing(requestTime);
+                    
+                    parseEnd = System.currentTimeMillis();
+                    parseTime = (parseEnd - parseStart);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Parsed Source Engine response in " + parseTime + " ms");
+                    }
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
                     Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + serverPort);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Response type: GoldSrc");
+                    	debugLog.addMessage("> Parsing GoldSrc Engine response");
+                    }
+                    
+                    parseStart = System.currentTimeMillis();
+                    
                     serverInfo[i] = parseResponseFromHLDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
                     serverInfo[i].setPing(requestTime);
+                    
+                    parseEnd = System.currentTimeMillis();
+                    parseTime = (parseEnd - parseStart);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Parsed GoldSrc Engine response in " + parseTime + " ms");
+                    }
                 }
                 else {
                     // Packet type did not match 0x49 or 0x6D
@@ -194,15 +297,48 @@ public class ServerQuery implements Runnable {
                             + " does not match expected values 0x49 or 0x6d");
                     serverInfo[i] = null;
                     addErrorRow(serverURL, serverPort, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> ERROR: Invalid response type: " + rcv);
+                    }
+                    
                     continue;
                 }
             }
+            catch( SocketTimeoutException e ) {
+                if( debug == true ) {
+                	debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
+                }
+                serverInfo[i] = null;
+                addErrorRow(serverURL, serverPort, serverListPos);
+            }
             catch( Exception e ) {
+                if( debug == true ) {
+                	debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
+                }
                 serverInfo[i] = null;
                 addErrorRow(serverURL, serverPort, serverListPos);
             }
 
+            queryEnd = System.currentTimeMillis();
+            queryTime = (queryEnd-queryStart);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> End time: " + queryEnd);
+                debugLog.addMessage("> Query time: " + queryTime + " ms");
+            }
+            
             status++;
+        }
+        
+        long runEndTime = System.currentTimeMillis();
+        
+        if( debug == true ) {
+        	debugLog.addMessage("\nRun finished at " + runEndTime + "\n");
+            
+            long totalRunTime = (runEndTime-runStartTime);
+            
+            debugLog.addMessage("Total time: " + totalRunTime + " ms");
         }
     }
     
@@ -274,6 +410,12 @@ public class ServerQuery implements Runnable {
         }
         catch( Exception e ) {
             Log.w(TAG, "parseResponseFromSRCDS(): Caught an exception:", e);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> ERROR: Exception while parsing:");
+            	debugLog.addMessage("> " + e.toString());
+            }
+            
             return null;
         }
     }
@@ -312,6 +454,12 @@ public class ServerQuery implements Runnable {
         }
         catch( Exception e ) {
             Log.w(TAG, "parseResponseFromHLDS(): Caught an exception:", e);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> ERROR: Exception while parsing:");
+            	debugLog.addMessage("> " + e.toString());
+            }
+            
             return null;
         }
     }

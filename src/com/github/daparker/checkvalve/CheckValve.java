@@ -39,6 +39,7 @@ import android.view.MenuInflater;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewConfiguration;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnFocusChangeListener;
@@ -57,12 +58,15 @@ public class CheckValve extends Activity {
     private DatabaseProvider database;
     private TableLayout server_info_table;
     private TableLayout message_table;
+    private StringBuilder debug_sb = new StringBuilder();
+    private boolean debugMode = false;
+    private QueryDebugLog debugLog;
 
     public static Bundle settings;
 
     private long selectedServerRowId;
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint({ "InlinedApi", "NewApi" })
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
@@ -84,7 +88,10 @@ public class CheckValve extends Activity {
         selectedServerRowId = 0;
         server_info_table = (TableLayout)findViewById(R.id.server_info_table);
         message_table = (TableLayout)findViewById(R.id.message_table);
-        message_table.setVisibility(-1);
+        message_table.setVisibility(View.INVISIBLE);
+        
+        TextView titleBar = (TextView)findViewById(R.id.title);
+        titleBar.setOnLongClickListener(titleBarClickListener);
         
         getSettings();
         queryServers();
@@ -123,8 +130,16 @@ public class CheckValve extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu( Menu menu ) {
+        int menuResId;
+        
+        if( debugMode == true )
+            menuResId = R.menu.main_menu_debug;
+        else
+            menuResId = R.menu.main_menu;
+        
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        //inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(menuResId, menu);
         return true;
     }
 
@@ -170,8 +185,13 @@ public class CheckValve extends Activity {
                 break;
 
             case R.id.settings:
-                // "About" option was selected
+                // "Settings" option was selected
                 settings();
+                break;
+                
+            case R.id.debug:
+                // "Debug option was clicked
+                showDebugConsole();
                 break;
 
             default:
@@ -235,6 +255,7 @@ public class CheckValve extends Activity {
             case Values.ACTIVITY_CHAT:
             case Values.ACTIVITY_ABOUT:
             case Values.ACTIVITY_SHOW_PLAYERS:
+            case Values.ACTIVITY_DEBUG_CONSOLE:
                 break;
 
             case Values.ACTIVITY_ADD_NEW_SERVER:
@@ -295,8 +316,18 @@ public class CheckValve extends Activity {
         }
     };
 
+    private OnLongClickListener titleBarClickListener = new OnLongClickListener() {
+        public boolean onLongClick( View v ) {
+            toggleDebugMode();
+            return true;
+        }
+    };
+    
     //@SuppressWarnings("deprecation")
     public void queryServers() {
+    	if( debugMode )
+    		debugLog = new QueryDebugLog();
+    	
         // Clear the server info table
         server_info_table.setVisibility(-1);
         server_info_table.removeAllViews();
@@ -315,13 +346,13 @@ public class CheckValve extends Activity {
             p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
             // Run the server queries in a separate thread
-            new Thread(new ServerQuery(CheckValve.this, progressHandler)).start();
+            new Thread(new ServerQuery(CheckValve.this, progressHandler, debugMode, debugLog)).start();
         }
     }
 
     // Handler for the server query thread
     Handler progressHandler = new Handler() {
-        public void handleMessage( Message msg ) {
+        public void handleMessage( Message msg ) {            
             message_table.setVisibility(View.GONE);
             server_info_table.setVisibility(View.GONE);
             
@@ -746,7 +777,7 @@ public class CheckValve extends Activity {
         startActivityForResult(updateServerIntent, Values.ACTIVITY_UPDATE_SERVER);
     }
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint({ "InlinedApi", "NewApi" })
     public void deleteServer( final long rowId ) {
         AlertDialog.Builder alertDialogBuilder;
 
@@ -831,5 +862,31 @@ public class CheckValve extends Activity {
         Intent settingsIntent = new Intent();
         settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.SettingsActivity");
         startActivityForResult(settingsIntent, Values.ACTIVITY_SETTINGS);
+    }
+    
+    public void showDebugConsole() {
+    	if( debugLog != null ) {
+            Intent debugConsoleIntent = new Intent();
+            debugConsoleIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.DebugConsoleActivity");
+            debugConsoleIntent.putExtra("debugText", debugLog.getString());
+            startActivityForResult(debugConsoleIntent, Values.ACTIVITY_DEBUG_CONSOLE);
+    	}
+    	else {
+    		UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_log_empty);
+    	}
+    }
+    
+    @SuppressLint("NewApi")
+	private void toggleDebugMode() {
+        if( debugMode == false ) {
+            debugMode = true;
+            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);
+        }
+        else {
+            debugMode = false;
+            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_disabled);
+        }
+        
+        invalidateOptionsMenu();
     }
 }
