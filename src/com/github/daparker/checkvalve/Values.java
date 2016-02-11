@@ -45,6 +45,7 @@ public final class Values {
     public static final int ACTIVITY_CONFIRM_UNSAFE_COMMAND = 12;
     public static final int ACTIVITY_SETTINGS = 13;
     public static final int ACTIVITY_SHOW_NOTE = 14;
+    public static final int ACTIVITY_DEBUG_CONSOLE = 15;
 
     // Intent extra names
     public static final String EXTRA_ROW_ID = "rowId";
@@ -58,6 +59,7 @@ public final class Values {
     public static final String EXTRA_MESSAGE_LIST = "messageList";
     public static final String EXTRA_FILE_NAME = "filename";
     public static final String EXTRA_NOTE_ID = "noteString";
+    public static final String EXTRA_DEBUG_TEXT = "debugText";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
