@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import com.github.daparker.checkvalve.R;
 import com.github.daparker.checkvalve.exceptions.NullResponseException;
@@ -36,6 +37,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+@SuppressLint({ "NewApi", "DefaultLocale" })
 public class SearchPlayers extends Thread {
     private static final String TAG = SearchPlayers.class.getSimpleName();
 
@@ -90,7 +92,7 @@ public class SearchPlayers extends Thread {
 
         for( ServerRecord sr : serverList ) {
             try {
-                serverURL = sr.getServerName();
+                serverURL = sr.getServerURL();
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
 
