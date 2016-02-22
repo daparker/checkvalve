@@ -181,6 +181,30 @@ along with the CheckValve source code.  If not, see
                     android:layout_height="wrap_content" >
 
                     <TextView
+                        android:id="@+id/label_servers_show_nickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_show_server_nickname"
+                        android:textSize="14sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_servers_show_nickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:onClick="settingCheckboxHandler"
+                        android:padding="10dp" />
+                </TableRow>
+                
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
                         android:id="@+id/label_servers_show_ip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -275,7 +299,7 @@ along with the CheckValve source code.  If not, see
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
-                    
+
                     <TextView
                         android:id="@+id/label_servers_show_tags"
                         android:layout_width="wrap_content"
@@ -295,11 +319,11 @@ along with the CheckValve source code.  If not, see
                         android:onClick="settingCheckboxHandler"
                         android:padding="10dp" />
                 </TableRow>
-                
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
-                    
+
                     <TextView
                         android:id="@+id/label_servers_show_ping"
                         android:layout_width="wrap_content"
@@ -493,7 +517,7 @@ along with the CheckValve source code.  If not, see
                     android:text="@string/button_plus"
                     android:textColor="#ffffff"
                     android:textSize="18sp" />
-                
+
                 <TextView
                     android:id="@+id/field_default_rcon_font_size"
                     android:layout_width="40dp"
@@ -505,7 +529,7 @@ along with the CheckValve source code.  If not, see
                     android:padding="10dp"
                     android:singleLine="true"
                     android:textSize="18sp" />
-                
+
                 <Button
                     android:id="@+id/rcon_font_size_minus"
                     android:layout_width="wrap_content"
@@ -685,6 +709,96 @@ along with the CheckValve source code.  If not, see
             </TableLayout>
 
             <TableLayout
+                android:id="@+id/backup_settings_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0" >
+
+                <TextView
+                    android:id="@+id/label_backup_settings_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/steam_blue"
+                    android:focusable="false"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/settings_header_backups"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/create_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:focusable="false"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_create_backup"
+                        android:textSize="14sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_span="1"
+                        android:background="@color/steam_gray"
+                        android:gravity="center"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="0dp"
+                        android:paddingRight="0dp"
+                        android:paddingTop="5dp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/restore_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="0dp"
+                        android:focusable="false"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_restore_backup"
+                        android:textSize="14sp" />
+                </TableRow>
+<!--
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_span="1"
+                        android:background="@color/steam_gray"
+                        android:gravity="center"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="0dp"
+                        android:paddingRight="0dp"
+                        android:paddingTop="5dp" />
+                </TableRow>
+-->
+            </TableLayout>
+
+            <TableLayout
                 android:id="@+id/miscellaneous_settings_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -754,7 +868,7 @@ along with the CheckValve source code.  If not, see
                         android:text="@string/settings_clear_saved_relays"
                         android:textSize="14sp" />
                 </TableRow>
-
+<!--
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -771,6 +885,7 @@ along with the CheckValve source code.  If not, see
                         android:paddingRight="0dp"
                         android:paddingTop="5dp" />
                 </TableRow>
+-->
             </TableLayout>
         </LinearLayout>
     </ScrollView>
