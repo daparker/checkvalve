@@ -56,10 +56,37 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
+                    android:id="@+id/label_nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:singleLine="true"
+                    android:text="@string/label_nickname_field"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </TableRow>
+
+            <TableRow>
+
+                <EditText
+                    android:id="@+id/field_nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:text=""
+                    android:textSize="14sp" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
                     android:id="@+id/label_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
+                    android:paddingTop="10dp"
                     android:singleLine="true"
                     android:text="@string/label_server"
                     android:textSize="12sp"
