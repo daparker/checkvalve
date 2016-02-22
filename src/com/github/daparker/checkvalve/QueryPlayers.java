@@ -85,7 +85,7 @@ public class QueryPlayers implements Runnable {
         int serverPort = 0;
         int serverTimeout = 0;
 
-        serverURL = sr.getServerName();
+        serverURL = sr.getServerURL();
         serverPort = sr.getServerPort();
         serverTimeout = sr.getServerTimeout();
 
