@@ -53,10 +53,12 @@ import android.graphics.Typeface;
 import java.io.File;
 import java.net.*;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import com.github.daparker.checkvalve.R;
 import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
 import com.github.koraktor.steamcondenser.servers.SourceServer;
 
+@SuppressLint("HandlerLeak")
 public class ChatViewerActivity extends Activity {
     private final static String TAG = ChatViewerActivity.class.getSimpleName();
 
@@ -615,13 +617,13 @@ public class ChatViewerActivity extends Activity {
             receiverThread.start();
         }
 
-        sdf = new SimpleDateFormat("HH:mm:ss");
+        sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         rowNum = 0;
         maxRows = 1000;
 
         Bundle settings = database.getSettingsAsBundle();
         chatRelayIP = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
-        chatRelayPort = settings.getString(Values.SETTING_DEFAULT_RELAY_PORT);
+        chatRelayPort = Integer.valueOf(settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT)).toString();
         chatRelayPassword = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
 
         showNote();
