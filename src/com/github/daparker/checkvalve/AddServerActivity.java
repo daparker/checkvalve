@@ -19,6 +19,7 @@
 
 package com.github.daparker.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
@@ -38,6 +39,7 @@ import com.github.daparker.checkvalve.R;
 /*
  * Define the AddNewServer class
  */
+@SuppressLint("HandlerLeak")
 public class AddServerActivity extends Activity {
     private static final String TAG = AddServerActivity.class.getSimpleName();
 
@@ -47,6 +49,7 @@ public class AddServerActivity extends Activity {
 
     private ProgressDialog p;
 
+    private EditText field_nickname;
     private EditText field_server;
     private EditText field_port;
     private EditText field_timeout;
@@ -62,9 +65,11 @@ public class AddServerActivity extends Activity {
             int port_len = field_port.getText().toString().length();
             int timeout_len = field_timeout.getText().toString().length();
             int password_len = field_rcon_password.length();
+            int nickname_len = field_nickname.length();
             
             final String server;
             final String password;
+            final String nickname;
             final int port;
             final int timeout;
 
@@ -74,6 +79,15 @@ public class AddServerActivity extends Activity {
             else {
                 server = field_server.getText().toString().trim();
                 password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
+                nickname = (nickname_len > 0)?field_nickname.getText().toString().trim():"";
+                
+                if( nickname.length() > 0 ) {
+                    if( database.serverNicknameExists(nickname) ) {
+                        Log.w(TAG, "addButtonListener: Server nickname '" + nickname + "' is a duplicate!");
+                        UserVisibleMessage.showMessage(AddServerActivity.this, "The server nickname is already in use.");
+                        return;
+                    }
+                }
                 
                 try {
                     port = Integer.parseInt(field_port.getText().toString().trim());
@@ -100,7 +114,7 @@ public class AddServerActivity extends Activity {
                     UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_timeout_value);
                     return;
                 }
-
+                
                 Handler checkServerHandler = new Handler() {
                     String errorMsg = "";
 
@@ -109,7 +123,7 @@ public class AddServerActivity extends Activity {
 
                         switch( msg.what ) {
                             case 0:
-                                if( (database.insertServer(server, port, timeout, password)) > -1 ) {
+                                if( (database.insertServer(nickname, server, port, timeout, password)) > -1 ) {
                                     UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                                     setResult(1);
                                 }
@@ -151,7 +165,7 @@ public class AddServerActivity extends Activity {
                     new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
                 }
                 else {
-                    if( (database.insertServer(server, port, timeout, password)) > -1 ) {
+                    if( (database.insertServer(nickname, server, port, timeout, password)) > -1 ) {
                         UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                         setResult(1);
                     }

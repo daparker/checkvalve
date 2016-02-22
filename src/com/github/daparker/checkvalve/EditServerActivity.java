@@ -41,6 +41,7 @@ public class EditServerActivity extends Activity {
     private EditText field_port;
     private EditText field_timeout;
     private EditText field_rcon_password;
+    private EditText field_nickname;
     private Button saveButton;
     private Button cancelButton;
     private String errorMsg;
@@ -58,6 +59,7 @@ public class EditServerActivity extends Activity {
             
             String server;
             String password;
+            String nickname;
             int port;
             int timeout;
 
@@ -67,8 +69,20 @@ public class EditServerActivity extends Activity {
             else {
                 server = field_server.getText().toString().trim();
                 password = field_rcon_password.getText().toString().trim();
+                nickname = field_nickname.getText().toString().trim();
                 
                 if( password.length() == 0 ) password = "";
+                
+                if( nickname.length() == 0 ) {
+                    nickname = "";
+                }
+                else {
+                    if( database.serverNicknameExists(nickname) ) {
+                        Log.w(TAG, "saveButtonListener: Server nickname '" + nickname + "' is a duplicate!");
+                        UserVisibleMessage.showMessage(EditServerActivity.this, "The server nickname is already in use.");
+                        return;
+                    }
+                }
                 
                 try {
                     port = Integer.parseInt(field_port.getText().toString().trim());
@@ -96,7 +110,7 @@ public class EditServerActivity extends Activity {
                     return;
                 }
 
-                if( database.updateServer(rowId, server, port, timeout, password) ) {
+                if( database.updateServer(rowId, nickname, server, port, timeout, password) ) {
                     UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_success);
                 }
                 else {
@@ -153,11 +167,13 @@ public class EditServerActivity extends Activity {
         field_port = (EditText)findViewById(R.id.field_port);
         field_timeout = (EditText)findViewById(R.id.field_timeout);
         field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
+        field_nickname = (EditText)findViewById(R.id.field_nickname);
 
-        field_server.setText(sr.getServerName());
+        field_server.setText(sr.getServerURL());
         field_port.setText(Integer.toString(sr.getServerPort()));
         field_timeout.setText(Integer.toString(sr.getServerTimeout()));
         field_rcon_password.setText(sr.getServerRCONPassword());
+        field_nickname.setText(sr.getServerNickname());
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
             ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
