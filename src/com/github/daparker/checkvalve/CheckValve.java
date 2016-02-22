@@ -51,6 +51,7 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import com.github.daparker.checkvalve.R;
 
+@SuppressLint("HandlerLeak")
 public class CheckValve extends Activity {
     private static final String TAG = CheckValve.class.getSimpleName();
 
@@ -58,7 +59,6 @@ public class CheckValve extends Activity {
     private DatabaseProvider database;
     private TableLayout server_info_table;
     private TableLayout message_table;
-    private StringBuilder debug_sb = new StringBuilder();
     private boolean debugMode = false;
     private QueryDebugLog debugLog;
 
@@ -190,10 +190,10 @@ public class CheckValve extends Activity {
                 break;
                 
             case R.id.debug:
-                // "Debug option was clicked
+                // "Debug" option was clicked
                 showDebugConsole();
                 break;
-
+                
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -256,6 +256,8 @@ public class CheckValve extends Activity {
             case Values.ACTIVITY_ABOUT:
             case Values.ACTIVITY_SHOW_PLAYERS:
             case Values.ACTIVITY_DEBUG_CONSOLE:
+            case Values.ACTIVITY_CREATE_BACKUP:
+            case Values.ACTIVITY_RESTORE_BACKUP:
                 break;
 
             case Values.ACTIVITY_ADD_NEW_SERVER:
@@ -272,6 +274,13 @@ public class CheckValve extends Activity {
                 else if( result == 0 ) {
                     getSettings();
                     refreshView();
+                }
+                else if( result == 1 ) {
+                    getSettings();
+                    queryServers();
+                }
+                else {
+                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                 }
                 break;
             default:
@@ -401,6 +410,21 @@ public class CheckValve extends Activity {
             for( int i = 0; i < serverInfo.length; i++ ) {
                 if( serverInfo[i] != null ) {
                     // Create TextViews for table rows
+                    String serverNickname = serverInfo[i].getNickame();
+                    TextView nicknameLabel = new TextView(CheckValve.this);
+                    TextView nicknameValue = new TextView(CheckValve.this);
+                    nicknameLabel.setId(i * 200);
+                    nicknameLabel.setText(CheckValve.this.getText(R.string.label_nickname));
+                    nicknameLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    nicknameLabel.setPadding(3, 0, 3, 0);
+                    nicknameLabel.setTypeface(null, Typeface.BOLD);
+                    nicknameLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    nicknameValue.setId(i * 300);
+                    nicknameValue.setText(serverNickname);
+                    nicknameValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+                    nicknameValue.setPadding(3, 0, 3, 0);
+                    nicknameValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    
                     String serverName = serverInfo[i].getName();
                     TextView serverLabel = new TextView(CheckValve.this);
                     TextView serverValue = new TextView(CheckValve.this);
@@ -531,6 +555,18 @@ public class CheckValve extends Activity {
                     spacerRow.addView(spacer);
 
                     // Create TableRows
+                    TableRow nicknameRow = new TableRow(CheckValve.this);
+                    nicknameRow.setId(serverRowId);
+                    nicknameRow.setTag(Values.TAG_SERVER_NICKNAME);
+                    nicknameRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    nicknameRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME))?View.VISIBLE:View.GONE);
+                    nicknameRow.setOnFocusChangeListener(tableRowFocusChangeListener);
+                    nicknameRow.setOnTouchListener(tableRowTouchListener);
+                    nicknameRow.setFocusable(false);
+                    nicknameRow.addView(nicknameLabel);
+                    nicknameRow.addView(nicknameValue);
+                    registerForContextMenu(nicknameRow);
+                    
                     TableRow serverRow = new TableRow(CheckValve.this);
                     serverRow.setId(serverRowId);
                     serverRow.setTag(Values.TAG_SERVER_NAME);
@@ -614,6 +650,10 @@ public class CheckValve extends Activity {
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
                     server_info_table.addView(
+                            nicknameRow,
+                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                    );
+                    server_info_table.addView(
                             serverRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
@@ -659,6 +699,8 @@ public class CheckValve extends Activity {
             tag = (String)server_info_table.getChildAt(i).getTag();
 
             if( tag != null ) {
+                if( tag.equals(Values.TAG_SERVER_NICKNAME) )
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME))?View.VISIBLE:View.GONE);
                 if( tag.equals(Values.TAG_SERVER_IP) )
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_GAME) )
@@ -699,7 +741,7 @@ public class CheckValve extends Activity {
 
     public void showPlayers( final long rowId ) {
         final ServerRecord sr = database.getServer(rowId);
-        final String server = sr.getServerName();
+        final String server = sr.getServerURL();
         final int port = sr.getServerPort();
         final int timeout = sr.getServerTimeout();
 
@@ -821,7 +863,7 @@ public class CheckValve extends Activity {
     public void rcon( final long rowId ) {
         ServerRecord sr = database.getServer(rowId);
 
-        String s = sr.getServerName();
+        String s = sr.getServerURL();
         String r = sr.getServerRCONPassword();
         int p = sr.getServerPort();
         int t = sr.getServerTimeout();
@@ -838,7 +880,7 @@ public class CheckValve extends Activity {
     public void chat( final long rowId ) {
         ServerRecord sr = database.getServer(rowId);
 
-        String s = sr.getServerName();
+        String s = sr.getServerURL();
         String r = sr.getServerRCONPassword();
         int p = sr.getServerPort();
         int t = sr.getServerTimeout();
