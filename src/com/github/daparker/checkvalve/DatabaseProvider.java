@@ -19,6 +19,7 @@
 
 package com.github.daparker.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -27,13 +28,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 /*
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -47,6 +49,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SERVERS_TIMEOUT = "timeout";
     public static final String SERVERS_LISTPOS = "list_position";
     public static final String SERVERS_RCON = "rcon_password";
+    public static final String SERVERS_NICKNAME = "nickname";
     public static final String SETTINGS_ROWID = "row_id";
     public static final String SETTINGS_RCON_WARN_UNSAFE = "rcon_warn_unsafe";
     public static final String SETTINGS_RCON_SHOW_PASSWORDS = "rcon_show_passwords";
@@ -61,6 +64,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_SHOW_SERVER_GAME = "show_game_info";
     public static final String SETTINGS_SHOW_SERVER_TAGS = "show_tags";
     public static final String SETTINGS_SHOW_SERVER_PING = "show_ping";
+    public static final String SETTINGS_SHOW_SERVER_NICKNAME = "show_nickname";
     public static final String SETTINGS_DEFAULT_QUERY_PORT = "default_query_port";
     public static final String SETTINGS_DEFAULT_QUERY_TIMEOUT = "default_query_timeout";
     public static final String SETTINGS_DEFAULT_RELAY_HOST = "default_relay_host";
@@ -77,7 +81,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SERVERS_PORT + " TEXT NOT NULL, "
             + SERVERS_TIMEOUT + " INTEGER NOT NULL, "
             + SERVERS_LISTPOS + " INTEGER NOT NULL DEFAULT 0, "
-            + SERVERS_RCON + " TEXT NOT NULL DEFAULT ''"
+            + SERVERS_RCON + " TEXT NOT NULL DEFAULT '', "
+            + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT ''"
             + ");";
 
     private static final String CREATE_TABLE_SETTINGS =
@@ -96,6 +101,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_SHOW_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
@@ -170,6 +176,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
             values.put(SETTINGS_SHOW_SERVER_PING, 1);
+            values.put(SETTINGS_SHOW_SERVER_NICKNAME, 1);
             values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
@@ -350,6 +357,28 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
         }
+        
+        if( oldVersion < 9 ) {
+            try {
+                // Add the nickname column to the servers table
+                Log.i(TAG, "Adding column " + SERVERS_NICKNAME + " to table " + TABLE_SERVERS);
+                db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT '';");
+                
+                // Add the show_nickname column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_NICKNAME + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_SHOW_SERVER_NICKNAME, 1);
+    
+                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_NICKNAME + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
     }
 
     public long getServerCount() {
@@ -366,18 +395,20 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     /**
      * Adds a new server to the database.
      * 
-     * @param server The URL or IP address of the server
+     * @param nickname The nickname of the server in CheckValve
+     * @param url The URL or IP address of the server
      * @param port The listen port of the server
      * @param timeout The query timeout for the server (in seconds)
      * @param password The RCON password for the server
      * @return The ID of the newly created database row.
      */
-    public long insertServer( String server, int port, int timeout, String password ) {
+    public long insertServer( String nickname, String url, int port, int timeout, String password ) {
         long result;
         int pos = getLastPosition() + 1;
 
         ContentValues values = new ContentValues();
-        values.put(SERVERS_SERVER, server);
+        values.put(SERVERS_NICKNAME, nickname);
+        values.put(SERVERS_SERVER, url);
         values.put(SERVERS_PORT, port);
         values.put(SERVERS_TIMEOUT, timeout);
         values.put(SERVERS_LISTPOS, pos);
@@ -430,6 +461,16 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         return result;
     }
 
+    /**
+     * Deletes all servers from the database.  Only used when restoring a backup file.
+     */
+    public void deleteAllServers() {
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete(TABLE_SERVERS, null, null);
+        }
+    }
+    
     public int getServerListPosition( long rowId ) {
         int result = -1;
         Cursor c;
@@ -475,12 +516,13 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
-                            SERVERS_ROWID,
+                            SERVERS_NICKNAME,
                             SERVERS_SERVER,
+                            SERVERS_RCON,
                             SERVERS_PORT,
                             SERVERS_TIMEOUT,
                             SERVERS_LISTPOS,
-                            SERVERS_RCON },
+                            SERVERS_ROWID},
                     null,
                     null,
                     null,
@@ -493,7 +535,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
             for( int i = 0; i < count; i++ ) {
                 c.moveToPosition(i);
-                result[i] = new ServerRecord(c.getString(1), c.getString(5), c.getInt(2), c.getInt(3), c.getInt(4), c.getLong(0));
+                result[i] = new ServerRecord(c.getString(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getLong(6));
             }
 
             c.close();
@@ -519,12 +561,13 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
-                            SERVERS_ROWID,
+                            SERVERS_NICKNAME,
                             SERVERS_SERVER,
+                            SERVERS_RCON,
                             SERVERS_PORT,
                             SERVERS_TIMEOUT,
                             SERVERS_LISTPOS,
-                            SERVERS_RCON },
+                            SERVERS_ROWID },
                     SERVERS_ROWID + "=" + rowId,
                     null,
                     null,
@@ -534,7 +577,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             if( c != null ) {
                 if( c.getCount() > 0 ) {
                     c.moveToFirst();
-                    result = new ServerRecord(c.getString(1), c.getString(5), c.getInt(2), c.getInt(3), c.getInt(4), c.getLong(0));
+                    result = new ServerRecord(c.getString(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getLong(6));
                 }
 
                 c.close();
@@ -548,16 +591,18 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * Updates the specified server's information in the database.
      * 
      * @param rowId The database row which contains the server's data
+     * @param nickname The nickname for the server in CheckValve
      * @param server The URL or IP address of the server
      * @param port The listen port of the server
      * @param timeout The query timeout for the server (in seconds)
      * @param password The RCON password for the server
      * @return A boolean value indicating whether or not the operation was successful.
      */
-    public boolean updateServer( long rowId, String server, int port, int timeout, String password ) {
+    public boolean updateServer( long rowId, String nickname, String server, int port, int timeout, String password ) {
         boolean result;
 
         ContentValues values = new ContentValues();
+        values.put(SERVERS_NICKNAME, nickname);
         values.put(SERVERS_SERVER, server);
         values.put(SERVERS_PORT, port);
         values.put(SERVERS_TIMEOUT, timeout);
@@ -763,6 +808,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_SHOW_SERVER_GAME,
                 SETTINGS_SHOW_SERVER_TAGS,
                 SETTINGS_SHOW_SERVER_PING,
+                SETTINGS_SHOW_SERVER_NICKNAME,
                 SETTINGS_VALIDATE_NEW_SERVERS,
                 SETTINGS_DEFAULT_QUERY_PORT,
                 SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -805,6 +851,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_SHOW_SERVER_NICKNAME) )
+                    result.putBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
                     result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
@@ -848,6 +896,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
         int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
+        int showNickname = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
 
         // Get int values from the Bundle
@@ -874,6 +923,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
         values.put(SETTINGS_SHOW_SERVER_PING, showPing);
+        values.put(SETTINGS_SHOW_SERVER_NICKNAME, showNickname);
         values.put(SETTINGS_VALIDATE_NEW_SERVERS, validate);
         values.put(SETTINGS_DEFAULT_QUERY_PORT, defaultQueryPort);
         values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
@@ -965,5 +1015,137 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete(TABLE_RELAY_HOSTS, null, null);
         }
+    }
+    
+    /**
+     * Creates a new backup file
+     */
+    @SuppressLint("NewApi")
+    public StringBuilder getBackupData(boolean includeServers, boolean includeSettings) {
+        StringBuilder sb = new StringBuilder();
+        Cursor c;
+        
+        try {
+            if( includeServers ) {
+                synchronized( lock ) {
+                    SQLiteDatabase db = this.getReadableDatabase();
+    
+                    c = db.query(
+                            TABLE_SERVERS,
+                            new String[] {
+                                    SERVERS_ROWID,
+                                    SERVERS_NICKNAME,
+                                    SERVERS_SERVER,
+                                    SERVERS_PORT,
+                                    SERVERS_TIMEOUT,
+                                    SERVERS_LISTPOS,
+                                    SERVERS_RCON },
+                            null,
+                            null,
+                            null,
+                            null,
+                            SERVERS_LISTPOS);
+    
+                    int rowCount = c.getCount();
+                    String rconRaw = new String();
+                    String rconB64 = new String();
+                    
+                    for( int i = 0; i < rowCount; i++ ) {
+                        c.moveToPosition(i);
+                        
+                        // Base64 encode the RCON password
+                        rconRaw = c.getString(6);
+                        rconB64 = (rconRaw.length() > 0)?Base64.encodeToString(rconRaw.getBytes("UTF-8"), Base64.NO_WRAP):"";
+                        
+                        sb.append("[server]").append("\r\n")
+                          .append("nickname=").append(c.getString(1)).append("\r\n")
+                          .append("url=").append(c.getString(2)).append("\r\n")
+                          .append("port=").append(c.getString(3)).append("\r\n")
+                          .append("timeout=").append(c.getInt(4)).append("\r\n")
+                          .append("rcon=").append(rconB64).append("\r\n")
+                          .append("listpos=").append(c.getInt(5)).append("\r\n")
+                          .append("\r\n");
+                    }
+                }
+            }
+            
+            if( includeSettings ) {
+                String[] cols = new String[] {
+                        SETTINGS_RCON_WARN_UNSAFE,
+                        SETTINGS_RCON_SHOW_PASSWORDS,
+                        SETTINGS_RCON_SHOW_SUGGESTIONS,
+                        SETTINGS_RCON_ENABLE_HISTORY,
+                        SETTINGS_RCON_VOLUME_BUTTONS,
+                        SETTINGS_RCON_DEFAULT_FONT_SIZE,
+                        SETTINGS_RCON_INCLUDE_SM,
+                        SETTINGS_SHOW_SERVER_IP,
+                        SETTINGS_SHOW_SERVER_MAP,
+                        SETTINGS_SHOW_SERVER_PLAYERS,
+                        SETTINGS_SHOW_SERVER_GAME,
+                        SETTINGS_SHOW_SERVER_TAGS,
+                        SETTINGS_SHOW_SERVER_PING,
+                        SETTINGS_SHOW_SERVER_NICKNAME,
+                        SETTINGS_VALIDATE_NEW_SERVERS,
+                        SETTINGS_DEFAULT_QUERY_PORT,
+                        SETTINGS_DEFAULT_QUERY_TIMEOUT,
+                        SETTINGS_DEFAULT_RELAY_HOST,
+                        SETTINGS_DEFAULT_RELAY_PORT,
+                        SETTINGS_DEFAULT_RELAY_PASSWORD };
+                
+                synchronized( lock ) {
+                    SQLiteDatabase db = this.getReadableDatabase();
+    
+                    c = db.query(TABLE_SETTINGS, cols, null, null, null, null, SETTINGS_ROWID);
+    
+                    int columnCount = c.getColumnCount();
+                    String type = new String();
+                    
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {
+                        type = (c.getType(i) == Cursor.FIELD_TYPE_INTEGER)?"int":"string";
+                        
+                        sb.append("[setting]\r\n")
+                          .append("type=").append(type).append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n");
+                        
+                        if( type.equals("string") )
+                            sb.append("value=").append(c.getString(i)).append("\r\n");
+                        else
+                            sb.append("value=").append(c.getInt(i)).append("\r\n");
+                        
+                        sb.append("\r\n");
+                    }
+                }
+            }
+            
+            return sb;
+        }
+        catch( Exception e ) {
+            Log.e(TAG, "createBackupFile(): Caught an exception:", e);
+            return null;
+        }
+    }
+    
+    public boolean serverNicknameExists(String s) {
+        boolean result = false;
+        String[] cols = new String[] { SERVERS_NICKNAME };
+        String where = String.format("%1$s = '%2$s'", SERVERS_NICKNAME, s);
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            
+            Cursor c = db.query(TABLE_SERVERS, cols, where, null, null, null, null);
+
+            if( c != null ) {
+                if( c.getCount() > 0 ) {
+                    result = true;
+                }
+            }
+
+            c.close();
+        }
+        
+        return result;
     }
 }
