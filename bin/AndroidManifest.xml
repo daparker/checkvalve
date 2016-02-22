@@ -23,7 +23,7 @@ along with the CheckValve source code.  If not, see
     package="com.github.daparker.checkvalve"
     android:installLocation="auto"
     android:versionCode="10"
-    android:versionName="2.0.1" >
+    android:versionName="2.0.5" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -32,6 +32,8 @@ along with the CheckValve source code.  If not, see
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
     </uses-permission>
 
     <application
@@ -112,6 +114,18 @@ along with the CheckValve source code.  If not, see
         <activity
             android:name="com.github.daparker.checkvalve.DebugConsoleActivity"
             class="DebugConsoleActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.CreateBackupActivity"
+            class="CreateBackupActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RestoreBackupActivity"
+            class="RestoreBackupActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.backup.FileChooserActivity"
+            class="FileChooserActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
     </application>
 
