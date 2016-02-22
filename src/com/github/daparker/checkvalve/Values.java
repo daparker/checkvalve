@@ -46,6 +46,9 @@ public final class Values {
     public static final int ACTIVITY_SETTINGS = 13;
     public static final int ACTIVITY_SHOW_NOTE = 14;
     public static final int ACTIVITY_DEBUG_CONSOLE = 15;
+    public static final int ACTIVITY_CREATE_BACKUP = 16;
+    public static final int ACTIVITY_RESTORE_BACKUP = 17;
+    public static final int ACTIVITY_FILE_CHOOSER = 18;
 
     // Intent extra names
     public static final String EXTRA_ROW_ID = "rowId";
@@ -84,6 +87,7 @@ public final class Values {
     public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
     public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
     public static final String SETTING_SHOW_SERVER_PING = "showServerPing";
+    public static final String SETTING_SHOW_SERVER_NICKNAME = "showServerNickname";
     public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
     public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
     public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
@@ -101,6 +105,7 @@ public final class Values {
     public static final String TAG_SERVER_PLAYERS = "serverPlayers";
     public static final String TAG_SERVER_TAGS = "serverTags";
     public static final String TAG_SERVER_PING = "serverPing";
+    public static final String TAG_SERVER_NICKNAME = "serverNickname";
     public static final String TAG_PLAYER_INFO = "playerInfo";
     public static final String TAG_MESSAGE_INFO = "messageInfo";
     
