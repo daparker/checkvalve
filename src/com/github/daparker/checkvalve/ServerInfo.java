@@ -26,6 +26,7 @@ import android.os.Parcelable;
  * Define the ServerInfo class
  */
 public class ServerInfo implements Parcelable {
+    private String nickname;
     private String name;
     private String addr;
     private String game;
@@ -44,6 +45,7 @@ public class ServerInfo implements Parcelable {
     /**
      * Create a new ServerInfo object using information from an A2S_INFO response
      * 
+     * @param nickname The server's nickname in CheckValve
      * @param name The server's name
      * @param addr The server's IP address
      * @param game The game which is running on the server
@@ -54,8 +56,9 @@ public class ServerInfo implements Parcelable {
      * @param numPlayers The number of players on the server
      * @param maxPlayers The max number of players the server will support
      */
-    public ServerInfo( String name, String addr, String game, String version, String map, String tags,
-            int port, int numPlayers, int maxPlayers, int listPos, long rowId, long ping ) {
+    public ServerInfo( String nickname, String name, String addr, String game, String version, String map,
+            String tags, int port, int numPlayers, int maxPlayers, int listPos, long rowId, long ping ) {
+        this.nickname = nickname;
         this.name = name;
         this.addr = addr;
         this.game = game;
@@ -70,6 +73,10 @@ public class ServerInfo implements Parcelable {
         this.ping = ping;
     }
 
+    public void setNickname( String s ) {
+        this.nickname = s;
+    }
+    
     public void setName( String s ) {
         this.name = s;
     }
@@ -116,6 +123,10 @@ public class ServerInfo implements Parcelable {
     
     public void setPing( long l ) {
         this.ping = l;
+    }
+    
+    public String getNickame() {
+        return this.nickname;
     }
     
     public String getName() {
@@ -171,6 +182,7 @@ public class ServerInfo implements Parcelable {
     }
 
     public void writeToParcel( Parcel dest, int flags ) {
+        dest.writeString(this.nickname);
         dest.writeString(this.name);
         dest.writeString(this.addr);
         dest.writeString(this.game);
@@ -196,6 +208,7 @@ public class ServerInfo implements Parcelable {
     };
 
     private ServerInfo( Parcel in ) {
+        nickname = in.readString();
         name = in.readString();
         addr = in.readString();
         game = in.readString();
