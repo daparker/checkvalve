@@ -20,7 +20,9 @@
 package com.github.daparker.checkvalve;
 
 import java.io.File;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.CheckBox;
@@ -51,7 +53,9 @@ public class SettingsActivity extends Activity {
     private boolean showServerNumPlayers;
     private boolean showServerTags;
     private boolean showServerPing;
+    private boolean showServerNickname;
     private boolean validateNewServers;
+    private boolean refreshServers;
 
     private Button saveButton;
     private Button cancelButton;
@@ -69,6 +73,7 @@ public class SettingsActivity extends Activity {
     private CheckBox checkbox_show_server_num_players;
     private CheckBox checkbox_show_server_tags;
     private CheckBox checkbox_show_server_ping;
+    private CheckBox checkbox_show_server_nickname;
     private CheckBox checkbox_validate_new_servers;
     private EditText field_default_query_port;
     private EditText field_default_query_timeout;
@@ -126,6 +131,26 @@ public class SettingsActivity extends Activity {
         }
     };
     
+    private OnTouchListener createBackupTouchListener = new OnTouchListener() {
+        public boolean onTouch( View v, MotionEvent m ) {
+            if( m.getAction() == MotionEvent.ACTION_DOWN ) {
+                createBackup();
+            }
+            
+            return false;
+        }
+    };
+    
+    private OnTouchListener restoreBackupTouchListener = new OnTouchListener() {
+        public boolean onTouch( View v, MotionEvent m ) {
+            if( m.getAction() == MotionEvent.ACTION_DOWN ) {
+                restoreBackup();
+            }
+            
+            return false;
+        }
+    };
+    
     private OnClickListener saveButtonListener = new OnClickListener() {
         public void onClick( View v ) {
             /*
@@ -133,6 +158,7 @@ public class SettingsActivity extends Activity {
              */
 
             saveSettings();
+            setResult((refreshServers)?1:0);
             finish();
         }
     };
@@ -143,11 +169,12 @@ public class SettingsActivity extends Activity {
              * "Cancel" button was clicked
              */
             
-            setResult(1);
+            setResult((refreshServers)?1:0);
             finish();
         }
     };
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
@@ -161,7 +188,10 @@ public class SettingsActivity extends Activity {
         }
         
         this.setContentView(R.layout.settings2);
-        this.setResult(1);
+        this.setResult(0);
+        
+        // Flag to main Activity to refresh the server list if necessary
+        refreshServers = false;
         
         if( database == null )
             database = new DatabaseProvider(SettingsActivity.this);
@@ -191,6 +221,7 @@ public class SettingsActivity extends Activity {
         checkbox_show_server_num_players = (CheckBox)findViewById(R.id.checkbox_servers_show_players);
         checkbox_show_server_tags = (CheckBox)findViewById(R.id.checkbox_servers_show_tags);
         checkbox_show_server_ping = (CheckBox)findViewById(R.id.checkbox_servers_show_ping);
+        checkbox_show_server_nickname = (CheckBox)findViewById(R.id.checkbox_servers_show_nickname);
         checkbox_validate_new_servers = (CheckBox)findViewById(R.id.checkbox_validate_new_servers);
         field_default_query_port = (EditText)findViewById(R.id.field_default_query_port);
         field_default_query_timeout = (EditText)findViewById(R.id.field_default_query_timeout);
@@ -204,6 +235,9 @@ public class SettingsActivity extends Activity {
         
         clear_saved_relays = (TextView)findViewById(R.id.clear_saved_relays);
         clear_saved_relays.setOnTouchListener(clearSavedRelaysTouchListener);
+        
+        findViewById(R.id.create_backup).setOnTouchListener(createBackupTouchListener);
+        findViewById(R.id.restore_backup).setOnTouchListener(restoreBackupTouchListener);
         
         plusButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -258,7 +292,23 @@ public class SettingsActivity extends Activity {
         return;
     }
 
+    public void onActivityResult( int request, int result, Intent data ) {
+        switch( request ) {
+            case Values.ACTIVITY_CREATE_BACKUP:
+                break;
+            case Values.ACTIVITY_RESTORE_BACKUP:
+                showCurrentValues();
+                refreshServers = true;
+                break;
+            default:
+                break;
+        }
+    }
+    
     public void showCurrentValues() {
+        if( database == null )
+            database = new DatabaseProvider(SettingsActivity.this);
+        
         Bundle b = database.getSettingsAsBundle();
 
         Log.i(TAG, "showCurrentValues(): Applying values from Bundle " + b.toString());
@@ -275,6 +325,7 @@ public class SettingsActivity extends Activity {
         showServerNumPlayers = b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
         showServerTags = b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS);
         showServerPing = b.getBoolean(Values.SETTING_SHOW_SERVER_PING);
+        showServerNickname = b.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME);
         validateNewServers = b.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS);
 
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
@@ -289,6 +340,7 @@ public class SettingsActivity extends Activity {
         checkbox_show_server_num_players.setChecked(showServerNumPlayers);
         checkbox_show_server_tags.setChecked(showServerTags);
         checkbox_show_server_ping.setChecked(showServerPing);
+        checkbox_show_server_nickname.setChecked(showServerNickname);
         checkbox_validate_new_servers.setChecked(validateNewServers);
 
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
@@ -340,6 +392,9 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.checkbox_servers_show_ping:
                 showServerPing = checked;
+                break;
+            case R.id.checkbox_servers_show_nickname:
+                showServerNickname = checked;
                 break;
             case R.id.checkbox_validate_new_servers:
                 validateNewServers = checked;
@@ -400,6 +455,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, showServerNumPlayers);
             b.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, showServerTags);
             b.putBoolean(Values.SETTING_SHOW_SERVER_PING, showServerPing);
+            b.putBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, showServerNickname);
             b.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, validateNewServers);
             b.putInt(Values.SETTING_DEFAULT_QUERY_PORT, defaultQueryPort);
             b.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
@@ -423,5 +479,17 @@ public class SettingsActivity extends Activity {
             Log.e(TAG, "Caught an exception while saving settings:", e);
             setResult(1);
         }
+    }
+    
+    public void createBackup() {
+        Intent backupIntent = new Intent();
+        backupIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.CreateBackupActivity");
+        startActivityForResult(backupIntent, Values.ACTIVITY_CREATE_BACKUP);
+    }
+    
+    public void restoreBackup() {
+        Intent restoreIntent = new Intent();
+        restoreIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.RestoreBackupActivity");
+        startActivityForResult(restoreIntent, Values.ACTIVITY_RESTORE_BACKUP);
     }
 }
