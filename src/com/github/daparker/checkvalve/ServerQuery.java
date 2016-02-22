@@ -39,7 +39,6 @@ public class ServerQuery implements Runnable {
     private ServerInfo[] serverInfo;
     private int status;
     private boolean debug;
-    private Message m;
     private QueryDebugLog debugLog;
 
     private static final String TAG = ServerQuery.class.getSimpleName();
@@ -54,7 +53,6 @@ public class ServerQuery implements Runnable {
         this.context = c;
         this.status = 0;
         this.handler = h;
-        //this.debug = true;
         this.debug = debugMode;
         this.debugLog = debugLog;
     }
@@ -133,7 +131,8 @@ public class ServerQuery implements Runnable {
             
             ServerRecord sr = serverList[i];
 
-            String serverURL = sr.getServerName();
+            String serverURL = sr.getServerURL();
+            String serverNickname = sr.getServerNickname();
             long serverRowId = sr.getServerRowID();
             int serverPort = sr.getServerPort();
             int serverTimeout = sr.getServerTimeout();
@@ -178,7 +177,7 @@ public class ServerQuery implements Runnable {
                 String serverIP = socket.getInetAddress().getHostAddress();
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Socket is connected");
+                    debugLog.addMessage("> Socket is connected");
                     
                     String localAddr = socket.getLocalAddress().getHostAddress();
                     int localPort = socket.getLocalPort();
@@ -205,7 +204,7 @@ public class ServerQuery implements Runnable {
                 socket.receive(packetIn);
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Received response from " + serverIP + ":" + serverPort);
+                    debugLog.addMessage("> Received response from " + serverIP + ":" + serverPort);
                 }
                 
                 // Get the end time of the request
@@ -218,8 +217,8 @@ public class ServerQuery implements Runnable {
                 socket.close();
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Disconnected from " + serverIP + ":" + serverPort);
-                	debugLog.addMessage("> Request took " + requestTime + " ms");
+                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + serverPort);
+                    debugLog.addMessage("> Request took " + requestTime + " ms");
                 }
                 
                 int packetHeader = bufferIn.getInt();
@@ -257,6 +256,7 @@ public class ServerQuery implements Runnable {
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
                     serverInfo[i].setPing(requestTime);
+                    serverInfo[i].setNickname(serverNickname);
                     
                     parseEnd = System.currentTimeMillis();
                     parseTime = (parseEnd - parseStart);
@@ -282,6 +282,7 @@ public class ServerQuery implements Runnable {
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
                     serverInfo[i].setPing(requestTime);
+                    serverInfo[i].setNickname(serverNickname);
                     
                     parseEnd = System.currentTimeMillis();
                     parseTime = (parseEnd - parseStart);
@@ -307,14 +308,14 @@ public class ServerQuery implements Runnable {
             }
             catch( SocketTimeoutException e ) {
                 if( debug == true ) {
-                	debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
+                    debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
                 }
                 serverInfo[i] = null;
                 addErrorRow(serverURL, serverPort, serverListPos);
             }
             catch( Exception e ) {
                 if( debug == true ) {
-                	debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
+                    debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
                 }
                 serverInfo[i] = null;
                 addErrorRow(serverURL, serverPort, serverListPos);
@@ -334,10 +335,8 @@ public class ServerQuery implements Runnable {
         long runEndTime = System.currentTimeMillis();
         
         if( debug == true ) {
-        	debugLog.addMessage("\nRun finished at " + runEndTime + "\n");
-            
+            debugLog.addMessage("\nRun finished at " + runEndTime + "\n");
             long totalRunTime = (runEndTime-runStartTime);
-            
             debugLog.addMessage("Total time: " + totalRunTime + " ms");
         }
     }
