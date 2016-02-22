@@ -39,6 +39,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import com.github.daparker.checkvalve.R;
 
+@SuppressLint("NewApi")
 public class ManageServersActivity extends Activity {
     private DatabaseProvider database;
     private TableLayout server_table;
@@ -250,16 +251,23 @@ public class ManageServersActivity extends Activity {
          */
         for( int i = 0; i < serverList.length; i++ ) {
             ServerRecord sr = serverList[i];
-
-            String server = sr.getServerName();
+            
             int rowId = (int)sr.getServerRowID();
             int port = sr.getServerPort();
+            
+            // Use the nickname as the preferred server name in the list
+            String server = sr.getServerNickname();
+            
+            // If there's no nickname then use the URL as the server name 
+            if( server.length() == 0 ) {
+                server = sr.getServerURL() + ":" + port;
+            }
 
             View v = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
             v.setId(i);
 
             TextView serverName = (TextView)View.inflate(ManageServersActivity.this, R.layout.manageservers_servername, null);
-            serverName.setText(server + ":" + port);
+            serverName.setText(server);
             serverName.setId(i);
 
             Button editButton = (Button)v.findViewById(R.id.edit_button);
