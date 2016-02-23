@@ -39,6 +39,7 @@ import android.view.MenuInflater;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewConfiguration;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -89,6 +90,8 @@ public class CheckValve extends Activity {
         server_info_table = (TableLayout)findViewById(R.id.server_info_table);
         message_table = (TableLayout)findViewById(R.id.message_table);
         message_table.setVisibility(View.INVISIBLE);
+        
+        this.findViewById(R.id.debug_button).setOnClickListener(debugButtonListener);
         
         TextView titleBar = (TextView)findViewById(R.id.title);
         titleBar.setOnLongClickListener(titleBarClickListener);
@@ -256,8 +259,6 @@ public class CheckValve extends Activity {
             case Values.ACTIVITY_ABOUT:
             case Values.ACTIVITY_SHOW_PLAYERS:
             case Values.ACTIVITY_DEBUG_CONSOLE:
-            case Values.ACTIVITY_CREATE_BACKUP:
-            case Values.ACTIVITY_RESTORE_BACKUP:
                 break;
 
             case Values.ACTIVITY_ADD_NEW_SERVER:
@@ -329,6 +330,14 @@ public class CheckValve extends Activity {
         public boolean onLongClick( View v ) {
             toggleDebugMode();
             return true;
+        }
+    };
+    
+    private OnClickListener debugButtonListener = new OnClickListener() {
+        public void onClick( View v ) {
+            v.setBackgroundColor(CheckValve.this.getResources().getColor(R.color.steam_blue));
+            showDebugConsole();
+            v.setBackgroundColor(CheckValve.this.getResources().getColor(android.R.color.transparent));
         }
     };
     
@@ -923,12 +932,20 @@ public class CheckValve extends Activity {
         if( debugMode == false ) {
             debugMode = true;
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);
+            
+            if( android.os.Build.VERSION.SDK_INT >= 11 )
+                invalidateOptionsMenu();
+            else
+                this.findViewById(R.id.debug_button_layout).setVisibility(View.VISIBLE);
         }
         else {
             debugMode = false;
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_disabled);
+            
+            if( android.os.Build.VERSION.SDK_INT >= 11 )
+                invalidateOptionsMenu();
+            else
+                this.findViewById(R.id.debug_button_layout).setVisibility(View.GONE);
         }
-        
-        invalidateOptionsMenu();
     }
 }
