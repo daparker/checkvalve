@@ -92,6 +92,39 @@ along with the CheckValve source code.  If not, see
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/backup_file_details_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@color/steam_blue"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="10dp"
+        android:visibility="gone" >
+        
+        <TextView
+        android:id="@+id/backup_file_details_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="15dp"
+        android:text="@string/title_file_details"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+        <TableLayout
+            android:id="@+id/backup_file_details_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="0"
+            android:animateLayoutChanges="true" >
+        </TableLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/buttonTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
