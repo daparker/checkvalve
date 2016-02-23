@@ -113,7 +113,7 @@ public class BackupWriter implements Runnable {
                 return 0;
             }
             else {
-                Log.e(TAG, "DatabaseProvider#getBackupData() returned a null value!");
+                Log.e(TAG, "saveBackupFile(): getBackupData() returned a null value!");
                 bw.close();
                 backupFile.delete();
                 return 1;
