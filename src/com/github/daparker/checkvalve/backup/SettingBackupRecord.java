@@ -61,28 +61,39 @@ public class SettingBackupRecord {
             val = s;
     }
 
-    public boolean isValid() {                        
-        // Make sure every member has a value
-        if( type != null && id != null && val != null ) {
-            if( type.equals("string") || type.equals("int") ) {
-                // If this is an int then make sure the value is really a number
-                if( type.equals("int") ) {
-                    try {
-                        Integer.parseInt(val);
-                    }
-                    catch( NumberFormatException nfe ) {
-                        return false;
-                    }
-                }
-            }
-            else {
-                return false;
-            }
-        }
-        else {
+    public boolean isValid() {
+        // Make sure every member attribute has a value
+        if( type == null || id == null || val == null ) {
             return false;
         }
         
-        return true;
+        if( type.length() == 0 || id.length() == 0 ) {
+            return false;
+        }
+        
+        if( type.equals("string") ) {
+            // Good enough
+            return true;
+        }
+        
+        if( type.equals("bool") ) {
+            // Make sure the value is a boolean string
+            if( val.equals("true") || val.equals("false") ) {
+                return true;
+            }
+        }
+        
+        if( type.equals("int") ) {
+            // Make sure the value is really a number
+            try {
+                    Integer.parseInt(val);
+                    return true;
+            }
+            catch( NumberFormatException nfe ) {
+                    return false;
+            }
+        }
+        
+        return false;
     }
 }
