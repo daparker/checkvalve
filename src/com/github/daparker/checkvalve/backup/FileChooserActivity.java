@@ -77,7 +77,7 @@ public class FileChooserActivity extends Activity {
             }
             else {
                 Intent i = new Intent();
-                i.putExtra(Values.EXTRA_FILE_NAME, text);
+                i.putExtra(Values.EXTRA_BACKUP_FILE, tag);
                 setResult(Activity.RESULT_OK, i);
                 finish();
             }
