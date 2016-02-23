@@ -19,7 +19,9 @@
 
 package com.github.daparker.checkvalve;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,11 +29,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.EditText;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.util.Log;
 import android.view.View;
@@ -40,12 +46,14 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import com.github.daparker.checkvalve.R;
 import com.github.daparker.checkvalve.backup.BackupParser;
+import com.github.daparker.checkvalve.exceptions.InvalidBackupFileException;
 
 public class RestoreBackupActivity extends Activity {
     private static final String TAG = RestoreBackupActivity.class.getSimpleName();
 
     private EditText field_backup_file;
     private TextView help_text;
+    private TableLayout file_details_table;
     private File storageDir;
     private ProgressDialog p;
 
@@ -182,6 +190,8 @@ public class RestoreBackupActivity extends Activity {
 
         help_text = (TextView)findViewById(R.id.help_text);
         help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), storageDir.getName()));
+        
+        file_details_table = (TableLayout)findViewById(R.id.backup_file_details_table);
     }
 
     @Override
@@ -211,8 +221,21 @@ public class RestoreBackupActivity extends Activity {
     public void onActivityResult( int request, int result, Intent data ) {
         switch( request ) {
             case Values.ACTIVITY_FILE_CHOOSER:
-                if( result == Activity.RESULT_OK )
-                    field_backup_file.setText(data.getStringExtra(Values.EXTRA_FILE_NAME));
+                if( result == Activity.RESULT_OK ) {
+                    File selectedFile = (File)data.getSerializableExtra(Values.EXTRA_BACKUP_FILE);
+                    String filename = selectedFile.getName();
+                    field_backup_file.setText(filename);
+                    
+                    try {
+                        if( ! showFileDetails(selectedFile) ) {
+                            this.findViewById(R.id.backup_file_details_layout).setVisibility(View.GONE);
+                            UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
+                        }
+                    }
+                    catch( InvalidBackupFileException ibfe ) {
+                        UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_file_invalid);
+                    }
+                }
                 break;
             default:
                 break;
@@ -257,6 +280,115 @@ public class RestoreBackupActivity extends Activity {
         }
         else {
             UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_storage_not_mounted);
+        }
+    }
+    
+    public boolean showFileDetails(File file) throws InvalidBackupFileException {
+        String appVersion = new String();
+        String fileDate = new String();
+        String line = new String();
+        boolean valid = false;
+
+        try {
+            file_details_table.removeAllViews();
+            
+            BufferedReader r = new BufferedReader(new FileReader(file));
+            Log.d(TAG, "Reading file " + file.getAbsolutePath());
+            int lineNum = 0;
+            
+            while( (line = r.readLine()) != null ) {
+                lineNum++;
+                
+                if( line.startsWith("## Version: ") ) {
+                    Log.d(TAG, "Found version header on line " + lineNum);
+                    appVersion = line.replaceFirst("## Version: ", "").trim();
+                    Log.i(TAG, "Backup file is from app version " + appVersion);
+                    continue;
+                }
+                
+                if( line.startsWith("## Created: ") ) {
+                    Log.d(TAG, "Found date header on line " + lineNum);
+                    fileDate = line.replaceFirst("## Created: ", "").trim();
+                    Log.i(TAG, "Backup file was created " + fileDate);
+                    continue;
+                }
+                
+                if( appVersion.length() > 0 && fileDate.length() > 0 ) {
+                    valid = true;
+                    break;
+                }
+            }
+            
+            r.close();
+            
+            if( ! valid ) {
+                Log.e(TAG, "Backup file is not valid!");
+                throw new InvalidBackupFileException();
+            }
+            
+            long sizeInKB = file.length() / 1024;
+            
+            TextView versionLabel = new TextView(RestoreBackupActivity.this);
+            versionLabel.setText(R.string.label_backup_app_version);
+            versionLabel.setTextColor(Color.WHITE);
+            versionLabel.setTextSize(14);
+            versionLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            versionLabel.setPadding(0, 0, 10, 0);
+            
+            TextView versionText = new TextView(RestoreBackupActivity.this);
+            versionText.setText(appVersion);
+            versionText.setTextColor(Color.WHITE);
+            versionText.setTextSize(14);
+            
+            TextView dateLabel = new TextView(RestoreBackupActivity.this);
+            dateLabel.setText(R.string.label_backup_date);
+            dateLabel.setTextColor(Color.WHITE);
+            dateLabel.setTextSize(14);
+            dateLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            dateLabel.setPadding(0, 0, 10, 0);
+            
+            TextView dateText = new TextView(RestoreBackupActivity.this);
+            dateText.setText(fileDate);
+            dateText.setTextColor(Color.WHITE);
+            dateText.setTextSize(14);
+            
+            TextView sizeLabel = new TextView(RestoreBackupActivity.this);
+            sizeLabel.setText(R.string.label_backup_size);
+            sizeLabel.setTextColor(Color.WHITE);
+            sizeLabel.setTextSize(14);
+            sizeLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            sizeLabel.setPadding(0, 0, 10, 0);
+            
+            TextView sizeText = new TextView(RestoreBackupActivity.this);
+            sizeText.setText(Long.valueOf(sizeInKB).toString() + " KB");
+            sizeText.setTextColor(Color.WHITE);
+            sizeText.setTextSize(14);
+            
+            TableRow versionRow = new TableRow(RestoreBackupActivity.this);
+            versionRow.addView(versionLabel);
+            versionRow.addView(versionText);
+            
+            TableRow dateRow = new TableRow(RestoreBackupActivity.this);
+            dateRow.addView(dateLabel);
+            dateRow.addView(dateText);
+            
+            TableRow sizeRow = new TableRow(RestoreBackupActivity.this);
+            sizeRow.addView(sizeLabel);
+            sizeRow.addView(sizeText);
+
+            file_details_table.addView(versionRow);
+            file_details_table.addView(dateRow);
+            file_details_table.addView(sizeRow);
+            
+            this.findViewById(R.id.backup_file_details_layout).setVisibility(View.VISIBLE);
+            
+            return true;
+        }
+        catch( InvalidBackupFileException ibfe ) {
+            throw ibfe;
+        }
+        catch( Exception e ) {
+            return false;
         }
     }
 }
