@@ -52,43 +52,47 @@ public class BackupParser implements Runnable {
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
         Bundle b = new Bundle();
-        int result = 0;
+        boolean result = false;
+        int what = 0;
         
         try {
-            boolean getData = false;
-            boolean restoreData = false;
-
             database = new DatabaseProvider(c);
 
             if( getBackupData() ) {
-                getData = true;
-                
                 if( settings.length > 0 )
                     b = getSettingsData();
                 
                 if( restoreBackupData(b) )
-                    restoreData = true;
+                    result = true;
             }
             
-            result = (getData && restoreData)?0:1;
+            what = (result)?0:1;
         }
         catch( InvalidBackupFileException ibfe ) {
             Log.e(TAG, "run(): Invalid backup file");
-            result = 2;
+            what = 2;
         }
         catch( Exception e ) {
             Log.e(TAG, "run(): Caught an exception:", e);
-            result = 3;
+            what = 3;
         }
         finally {
             database.close();
             database = null;
         }
         
-        h.sendEmptyMessage(result);
+        h.sendEmptyMessage(what);
     }
 
     public boolean getBackupData() throws InvalidBackupFileException {
+        File file = new File(f);
+        
+        // Don't open a file larger than 1 MB
+        if( file.length() > 1048576 )
+            throw new InvalidBackupFileException();
+        
+        file = null;
+        
         String line = new String();
         int numServers = 0;
         int numSettings = 0;
@@ -102,6 +106,7 @@ public class BackupParser implements Runnable {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(f));
 
+            // First pass: count the number of server, setting, version, and flag stanzas
             while( (line = reader.readLine()) != null ) {
                 if( line.equals("[version]") )
                     numVersionBackupRecords++;
@@ -115,6 +120,7 @@ public class BackupParser implements Runnable {
 
             reader.close();
 
+            // If there is not exactly 1 version stanza then the file is invalid
             if( numVersionBackupRecords != 1 ) {
                 Log.e(TAG, "getBackupData(): File must contain exactly ONE version stanza (found " + numVersionBackupRecords + ").");
                 throw new InvalidBackupFileException();
@@ -124,11 +130,13 @@ public class BackupParser implements Runnable {
             Log.i(TAG, "getBackupData(): Found " + numSettings + " settings.");
             Log.i(TAG, "getBackupData(): Found " + numFlags + " flags.");
             
+            // Correctly-sized arrays for the backup data
             servers = new ServerBackupRecord[numServers];
             settings = new SettingBackupRecord[numSettings];
             flags = new String[numFlags];
             versionInfo = new VersionBackupRecord();
 
+            // Counters
             int serverRecordNum = 0;
             int settingRecordNum = 0;
             int flagRecordNum = 0;
@@ -137,7 +145,7 @@ public class BackupParser implements Runnable {
 
             reader = new BufferedReader(new FileReader(f));
 
-            // The heavy lifting
+            // Second pass: do the heavy lifting
             while( (line = reader.readLine()) != null ) {
                 lineNumber++;
                 line = line.trim();
@@ -315,54 +323,41 @@ public class BackupParser implements Runnable {
         String type = new String();
         String name = new String();
 
-        HashMap<String,String> intMap = new HashMap<String,String>();
-        HashMap<String,String> boolMap = new HashMap<String,String>();
-        HashMap<String,String> stringMap = new HashMap<String,String>();
+        HashMap<String,String> map = new HashMap<String,String>();
 
-        intMap.put("rcon_default_font_size", Values.SETTING_RCON_DEFAULT_FONT_SIZE);
-        intMap.put("default_query_port", Values.SETTING_DEFAULT_QUERY_PORT);
-        intMap.put("default_query_timeout", Values.SETTING_DEFAULT_QUERY_TIMEOUT);
-        intMap.put("default_relay_port", Values.SETTING_DEFAULT_RELAY_PORT);
-        boolMap.put("rcon_warn_unsafe", Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
-        boolMap.put("rcon_show_passwords", Values.SETTING_RCON_SHOW_PASSWORDS);
-        boolMap.put("rcon_show_suggestions", Values.SETTING_RCON_SHOW_SUGGESTIONS);
-        boolMap.put("rcon_enable_history", Values.SETTING_RCON_ENABLE_HISTORY);
-        boolMap.put("rcon_volume_buttons", Values.SETTING_RCON_VOLUME_BUTTONS);
-        boolMap.put("rcon_include_sm", Values.SETTING_RCON_INCLUDE_SM);
-        boolMap.put("show_ip", Values.SETTING_SHOW_SERVER_IP);
-        boolMap.put("show_map", Values.SETTING_SHOW_SERVER_MAP_NAME);
-        boolMap.put("show_num_players", Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
-        boolMap.put("show_game_info", Values.SETTING_SHOW_SERVER_GAME_INFO);
-        boolMap.put("show_tags", Values.SETTING_SHOW_SERVER_TAGS);
-        boolMap.put("show_ping", Values.SETTING_SHOW_SERVER_PING);
-        boolMap.put("show_nickname", Values.SETTING_SHOW_SERVER_NICKNAME);
-        boolMap.put("validate_new_servers", Values.SETTING_VALIDATE_NEW_SERVERS);
-        stringMap.put("default_relay_host", Values.SETTING_DEFAULT_RELAY_HOST);
-        stringMap.put("default_relay_password", Values.SETTING_DEFAULT_RELAY_PASSWORD);
+        map.put("rcon_default_font_size", Values.SETTING_RCON_DEFAULT_FONT_SIZE);
+        map.put("default_query_port", Values.SETTING_DEFAULT_QUERY_PORT);
+        map.put("default_query_timeout", Values.SETTING_DEFAULT_QUERY_TIMEOUT);
+        map.put("default_relay_port", Values.SETTING_DEFAULT_RELAY_PORT);
+        map.put("rcon_warn_unsafe", Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
+        map.put("rcon_show_passwords", Values.SETTING_RCON_SHOW_PASSWORDS);
+        map.put("rcon_show_suggestions", Values.SETTING_RCON_SHOW_SUGGESTIONS);
+        map.put("rcon_enable_history", Values.SETTING_RCON_ENABLE_HISTORY);
+        map.put("rcon_volume_buttons", Values.SETTING_RCON_VOLUME_BUTTONS);
+        map.put("rcon_include_sm", Values.SETTING_RCON_INCLUDE_SM);
+        map.put("show_ip", Values.SETTING_SHOW_SERVER_IP);
+        map.put("show_map", Values.SETTING_SHOW_SERVER_MAP_NAME);
+        map.put("show_num_players", Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
+        map.put("show_game_info", Values.SETTING_SHOW_SERVER_GAME_INFO);
+        map.put("show_tags", Values.SETTING_SHOW_SERVER_TAGS);
+        map.put("show_ping", Values.SETTING_SHOW_SERVER_PING);
+        map.put("show_nickname", Values.SETTING_SHOW_SERVER_NICKNAME);
+        map.put("validate_new_servers", Values.SETTING_VALIDATE_NEW_SERVERS);
+        map.put("default_relay_host", Values.SETTING_DEFAULT_RELAY_HOST);
+        map.put("default_relay_password", Values.SETTING_DEFAULT_RELAY_PASSWORD);
         
         for( SettingBackupRecord s : settings ) {
             type = s.getType();
             name = s.getID();
 
             if( type.equals("string") ) {
-                b.putString(stringMap.get(name), s.getValue());
+                b.putString(map.get(name), s.getValue());
             }
             else if( type.equals("int") ) {
-                // Records with the type "int" in the backup file can be either an int or boolean
-                // value in the database, so we sort them out here and put the correct data type
-                // into the Bundle
-                if( intMap.get(name) != null ) {
-                    // This is truly an int
-                    b.putInt(intMap.get(name), Integer.parseInt(s.getValue()));
-                }
-                else if( boolMap.get(name) != null ) {
-                    // This is a boolean pretending to be an int
-                    b.putBoolean(boolMap.get(name), (s.getValue().equals("1"))?true:false);
-                }
-                else {
-                    Log.e(TAG, "getSettingsData(): Setting '" + name + "' has type 'int' but is not a valid int setting!");
-                    throw new InvalidBackupFileException();
-                }
+                b.putInt(map.get(name), Integer.parseInt(s.getValue()));
+            }
+            else if( type.equals("bool") ) {
+                b.putBoolean(map.get(name), Boolean.parseBoolean(s.getValue()));
             }
             else {
                 Log.e(TAG, "getSettingsData(): Setting '" + name + "' has invalid type '" + type + "'!");
