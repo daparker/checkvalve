@@ -61,6 +61,9 @@ along with the CheckValve source code.  If not, see
     <string name="help_text_restore_backup">The backup file must exist in the %1$s folder on your device.</string>
     <string name="hint_chatui_say">Say something&#8230;</string>
     <string name="label_backup_file">Backup File:</string>
+    <string name="label_backup_app_version">Version:</string>
+    <string name="label_backup_date">Date:</string>
+    <string name="label_backup_size">Size:</string>
     <string name="label_chat_relay_password">Chat Relay Password:</string>
     <string name="label_current_folder">Current Folder:</string>
     <string name="label_do_not_show">Don\'t show me this again</string>
@@ -203,6 +206,7 @@ along with the CheckValve source code.  If not, see
     <string name="title_create_backup">Create a Backup</string>
     <string name="title_edit_server">Edit Server Information</string>
     <string name="title_file_chooser">Select a File</string>
+    <string name="title_file_details">File Details</string>
     <string name="title_manage_servers">Manage Servers</string>
     <string name="title_player_info">Player Information</string>
     <string name="title_player_search">Player Search</string>
