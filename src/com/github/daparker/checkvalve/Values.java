@@ -63,6 +63,7 @@ public final class Values {
     public static final String EXTRA_FILE_NAME = "filename";
     public static final String EXTRA_NOTE_ID = "noteString";
     public static final String EXTRA_DEBUG_TEXT = "debugText";
+    public static final String EXTRA_BACKUP_FILE = "backupFile";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
