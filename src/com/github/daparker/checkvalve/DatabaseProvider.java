@@ -135,6 +135,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             
             c.moveToFirst();
             
+            // Dump all table data to logcat for debugging
             for( int i = 0; i < c.getCount(); i++ )
             {
                 Log.d(TAG, "SQLite database table " + i + " is named " + c.getString(0) + " with schema:");
@@ -1018,18 +1019,23 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     }
     
     /**
-     * Creates a new backup file
+     * Puts all server and setting data into a String for saving to a backup file.
+     * 
+     * @param includeServers Boolean indicating whether server data should be included
+     * @param includeSettings Boolean indicating whether setting data should be included
+     * @return A <tt>StringBuilder</tt> containing all of the requested data in backup file format
      */
     @SuppressLint("NewApi")
     public StringBuilder getBackupData(boolean includeServers, boolean includeSettings) {
         StringBuilder sb = new StringBuilder();
-        Cursor c;
+        Cursor c = null;
         
         try {
             if( includeServers ) {
                 synchronized( lock ) {
                     SQLiteDatabase db = this.getReadableDatabase();
     
+                    // Get all servers
                     c = db.query(
                             TABLE_SERVERS,
                             new String[] {
@@ -1057,6 +1063,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                         rconRaw = c.getString(6);
                         rconB64 = (rconRaw.length() > 0)?Base64.encodeToString(rconRaw.getBytes("UTF-8"), Base64.NO_WRAP):"";
                         
+                        // Add this server as a CheckValve backup file stanza
                         sb.append("[server]").append("\r\n")
                           .append("nickname=").append(c.getString(1)).append("\r\n")
                           .append("url=").append(c.getString(2)).append("\r\n")
@@ -1066,17 +1073,19 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                           .append("listpos=").append(c.getInt(5)).append("\r\n")
                           .append("\r\n");
                     }
-                }
+                    
+                    c.close();
+                }                
             }
             
             if( includeSettings ) {
-                String[] cols = new String[] {
+                // Columns which contain boolean values
+                String[] boolCols = new String[] {
                         SETTINGS_RCON_WARN_UNSAFE,
                         SETTINGS_RCON_SHOW_PASSWORDS,
                         SETTINGS_RCON_SHOW_SUGGESTIONS,
                         SETTINGS_RCON_ENABLE_HISTORY,
                         SETTINGS_RCON_VOLUME_BUTTONS,
-                        SETTINGS_RCON_DEFAULT_FONT_SIZE,
                         SETTINGS_RCON_INCLUDE_SM,
                         SETTINGS_SHOW_SERVER_IP,
                         SETTINGS_SHOW_SERVER_MAP,
@@ -1085,37 +1094,71 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                         SETTINGS_SHOW_SERVER_TAGS,
                         SETTINGS_SHOW_SERVER_PING,
                         SETTINGS_SHOW_SERVER_NICKNAME,
-                        SETTINGS_VALIDATE_NEW_SERVERS,
+                        SETTINGS_VALIDATE_NEW_SERVERS };
+                
+                // Columns which contain integer values
+                String[] intCols = new String[] {
+                        SETTINGS_RCON_DEFAULT_FONT_SIZE,
                         SETTINGS_DEFAULT_QUERY_PORT,
                         SETTINGS_DEFAULT_QUERY_TIMEOUT,
+                        SETTINGS_DEFAULT_RELAY_PORT };
+                
+                // Columns which contain stroing values
+                String[] stringCols = new String[] {
                         SETTINGS_DEFAULT_RELAY_HOST,
-                        SETTINGS_DEFAULT_RELAY_PORT,
                         SETTINGS_DEFAULT_RELAY_PASSWORD };
                 
                 synchronized( lock ) {
                     SQLiteDatabase db = this.getReadableDatabase();
+                    int columnCount = 0;
     
-                    c = db.query(TABLE_SETTINGS, cols, null, null, null, null, SETTINGS_ROWID);
-    
-                    int columnCount = c.getColumnCount();
-                    String type = new String();
-                    
+                    // Get settings with boolean values
+                    c = db.query(TABLE_SETTINGS, boolCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
                     c.moveToFirst();
                     
-                    for( int i = 0; i < columnCount; i++ ) {
-                        type = (c.getType(i) == Cursor.FIELD_TYPE_INTEGER)?"int":"string";
-                        
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this string setting as a CheckValve backup file stanza
                         sb.append("[setting]\r\n")
-                          .append("type=").append(type).append("\r\n")
-                          .append("id=").append(c.getColumnName(i)).append("\r\n");
-                        
-                        if( type.equals("string") )
-                            sb.append("value=").append(c.getString(i)).append("\r\n");
-                        else
-                            sb.append("value=").append(c.getInt(i)).append("\r\n");
-                        
-                        sb.append("\r\n");
+                          .append("type=bool").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append((c.getInt(i)==0)?"false":"true").append("\r\n")
+                          .append("\r\n");
                     }
+                    
+                    c.close();
+                    
+                    // Get settings with string values
+                    c = db.query(TABLE_SETTINGS, stringCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this string setting as a CheckValve backup file stanza
+                        sb.append("[setting]\r\n")
+                          .append("type=string").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append(c.getString(i)).append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
+                    
+                    // Get settings with integer values
+                    c = db.query(TABLE_SETTINGS, intCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this integer setting as a CheckValve backup file stanza
+                        sb.append("[setting]\r\n")
+                          .append("type=int").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append(c.getString(i)).append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
                 }
             }
             
@@ -1123,6 +1166,11 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         }
         catch( Exception e ) {
             Log.e(TAG, "createBackupFile(): Caught an exception:", e);
+            
+            if( c != null ) {
+                c.close();
+            }
+            
             return null;
         }
     }
