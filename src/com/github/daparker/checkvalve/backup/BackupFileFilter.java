@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 public class BackupFileFilter implements FileFilter {
-    private String[] extensions = { ".txt", ".bkp" };
+    private String[] extensions = { ".bkp" };
 
     public boolean accept( File pathname ) {
         if( pathname.isDirectory() && !pathname.isHidden() ) {
