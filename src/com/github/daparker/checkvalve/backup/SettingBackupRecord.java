@@ -29,36 +29,45 @@ public class SettingBackupRecord {
     public SettingBackupRecord() {}
 
     public SettingBackupRecord(String type, String id, String val) {
-            this.type = type;
-            this.id = id;
-            this.val = val;
+        this.type = type;
+        this.id = id;
+        this.val = val;
     }
 
     public String getType() {
-            return type;
+        return type;
     }
 
     public String getID() {
-            return id;
+        return id;
     }
 
     public String getValue() {
-            return val;
+        return val;
     }
 
     public void setType(String s) throws InvalidBackupFileException {
-            if( type != null ) throw new InvalidBackupFileException();
-            type = s;
+        if( type != null ) {
+            throw new InvalidBackupFileException();
+        }
+            
+        type = s;
     }
 
     public void setID(String s) throws InvalidBackupFileException {
-            if( id != null ) throw new InvalidBackupFileException();
-            id = s;
+        if( id != null ) {
+            throw new InvalidBackupFileException();
+        }
+            
+        id = s;
     }
 
     public void setValue(String s) throws InvalidBackupFileException {
-            if( val != null ) throw new InvalidBackupFileException();
-            val = s;
+        if( val != null ) {
+            throw new InvalidBackupFileException();
+        }
+            
+        val = s;
     }
 
     public boolean isValid() {
@@ -86,11 +95,11 @@ public class SettingBackupRecord {
         if( type.equals("int") ) {
             // Make sure the value is really a number
             try {
-                    Integer.parseInt(val);
-                    return true;
+                Integer.parseInt(val);
+                return true;
             }
             catch( NumberFormatException nfe ) {
-                    return false;
+                return false;
             }
         }
         

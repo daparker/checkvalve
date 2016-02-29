@@ -26,34 +26,40 @@ public class VersionBackupRecord {
     private int fileVersion;
 
     public VersionBackupRecord() {
-            this.appVersion = -1;
-            this.fileVersion = -1;
+        this.appVersion = -1;
+        this.fileVersion = -1;
     }
 
-    public VersionBackupRecord(int appVersion, int fileVersion) {
-            this.appVersion = appVersion;
-            this.fileVersion = fileVersion;
+    public VersionBackupRecord( int appVersion, int fileVersion ) {
+        this.appVersion = appVersion;
+        this.fileVersion = fileVersion;
     }
 
     public int getAppVersion() {
-            return appVersion;
+        return appVersion;
     }
 
     public int getFileVersion() {
-            return fileVersion;
+        return fileVersion;
     }
 
-    public void setAppVersion(int i) throws InvalidBackupFileException {
-            if( appVersion >= 0 ) throw new InvalidBackupFileException();
-            appVersion = i;
+    public void setAppVersion( int i ) throws InvalidBackupFileException {
+        if( appVersion >= 0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        appVersion = i;
     }
 
-    public void setFileVersion(int i) throws InvalidBackupFileException {
-            if( fileVersion >= 0 ) throw new InvalidBackupFileException();
-            fileVersion = i;
+    public void setFileVersion( int i ) throws InvalidBackupFileException {
+        if( fileVersion >= 0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        fileVersion = i;
     }
 
     public boolean isValid() {
-            return (appVersion > 0 && fileVersion > 0);
+        return (appVersion > 0 && fileVersion > 0);
     }
 }

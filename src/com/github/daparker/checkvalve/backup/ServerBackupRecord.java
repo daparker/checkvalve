@@ -37,78 +37,95 @@ public class ServerBackupRecord {
     }
 
     public ServerBackupRecord(String name, String url, int port, int timeout, int listpos, String rcon) {
-            this.name = name;
-            this.url = url;
-            this.port = port;
-            this.timeout = timeout;
-            this.listpos = listpos;
-            this.rcon = rcon;
+        this.name = name;
+        this.url = url;
+        this.port = port;
+        this.timeout = timeout;
+        this.listpos = listpos;
+        this.rcon = rcon;
     }
 
     public String getName() {
-            return name;
+        return name;
     }
 
     public String getURL() {
-            return url;
+        return url;
     }
 
     public int getPort() {
-            return port;
+        return port;
     }
 
     public int getTimeout() {
-            return timeout;
+        return timeout;
     }
 
     public int getListPos() {
-            return listpos;
+        return listpos;
     }
 
     public String getRCONPassword() {
-            return rcon;
+        return rcon;
     }
 
     public void setName(String s) throws InvalidBackupFileException {
-            if( name != null ) throw new InvalidBackupFileException();
-            name = s;
+        if( name != null ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        name = s;
     }
 
     public void setURL(String s) throws InvalidBackupFileException {
-            if( url != null ) throw new InvalidBackupFileException();
-            url = s;
+        if( url != null ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        url = s;
     }
 
     public void setPort(int i) throws InvalidBackupFileException {
-            if( port >=0 ) throw new InvalidBackupFileException();
-            port = i;
+        if( port >=0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        port = i;
     }
 
     public void setTimeout(int i) throws InvalidBackupFileException {
-            if( timeout >= 0 ) throw new InvalidBackupFileException();
-            timeout = i;
+        if( timeout >= 0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        timeout = i;
     }
 
     public void setListPos(int i) throws InvalidBackupFileException {
-            if( listpos >= 0 ) throw new InvalidBackupFileException();
-            listpos = i;
+        if( listpos >= 0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        listpos = i;
     }
 
     public void setRCONPassword(String s) throws InvalidBackupFileException {
-            if( rcon != null ) throw new InvalidBackupFileException();
+        if( rcon != null ) {
+            throw new InvalidBackupFileException();
+        }
 
-            try {
-                    if( s.length() > 0 )
-                            rcon = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
-                    else
-                            rcon = s;
-            }
-            catch( Exception e ) {
-                    e.printStackTrace();
-            }
+        try {
+            if( s.length() > 0 )
+                rcon = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
+            else
+                rcon = s;
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isValid() {
-            return (url != null && port >= 0 && timeout >= 0 && listpos >= 0);
+        return (url != null && port >= 0 && timeout >= 0 && listpos >= 0);
     }
 }
