@@ -112,7 +112,7 @@ along with the CheckValve source code.  If not, see
     <string name="msg_backup_file_invalid">The backup file is invalid.</string>
     <string name="msg_backup_file_restored">The backup data has been restored.</string>
     <string name="msg_backup_storage_not_mounted">External storage is not mounted.</string>
-    <string name="msg_backup_no_files">This folder does not contain any backup files.</string>
+    <string name="msg_backup_no_files">This folder does not contain any backup files or subfolders.</string>
     <string name="msg_bad_port_value">Invalid port value. Please try again.</string>
     <string name="msg_bad_timeout_value">Invalid timeout value. Please try again.</string>
     <string name="msg_chat_connect_failure">Failed to open a connection to the Chat Relay.</string>
