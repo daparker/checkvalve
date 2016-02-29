@@ -48,7 +48,9 @@ along with the CheckValve source code.  If not, see
         android:gravity="center|center_vertical"
         android:padding="10dp"
         android:text=""
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:drawableLeft="@android:drawable/ic_dialog_info"
+        android:drawablePadding="10dp" />
 
     <RelativeLayout
         android:id="@+id/edittext_layout"
