@@ -245,7 +245,6 @@ public class ServerQuery implements Runnable {
                     
                     if( debug == true ) {
                         debugLog.addMessage("> Response type: Source");
-                        debugLog.addMessage("> Parsing Source Engine response");
                     }
                     
                     parseStart = System.currentTimeMillis();
@@ -271,7 +270,6 @@ public class ServerQuery implements Runnable {
                     
                     if( debug == true ) {
                     	debugLog.addMessage("> Response type: GoldSrc");
-                    	debugLog.addMessage("> Parsing GoldSrc Engine response");
                     }
                     
                     parseStart = System.currentTimeMillis();
