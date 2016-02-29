@@ -98,5 +98,13 @@ along with the CheckValve source code.  If not, see
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>
-
+    
+    <TextView 
+        android:id="@+id/textview_no_files"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/msg_backup_no_files"
+        android:visibility="gone" />
 </RelativeLayout>
