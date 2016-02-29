@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -39,6 +37,7 @@ import com.github.daparker.checkvalve.Values;
 public class FileChooserActivity extends Activity {
     private LinearLayout file_list_layout;
     private TextView current_folder;
+    private TextView no_files;
     private File storageDir;
     private ArrayList<String> breadcrumbs = new ArrayList<String>();
     
@@ -94,6 +93,7 @@ public class FileChooserActivity extends Activity {
         
         file_list_layout = (LinearLayout)findViewById(R.id.file_list_layout);
         current_folder = (TextView)findViewById(R.id.current_folder); 
+        no_files = (TextView)findViewById(R.id.textview_no_files);
         
         this.findViewById(R.id.dismiss_button).setOnClickListener(dismissButtonListener);
         
@@ -135,6 +135,8 @@ public class FileChooserActivity extends Activity {
         // Clear the current list if one is showing
         file_list_layout.removeAllViews();
         
+        no_files.setVisibility(View.GONE);
+        
         // If this is not the Download directory then allow upward navigation
         if( ! directory.equals(storageDir) ) {
             TextView t = new TextView(FileChooserActivity.this);
@@ -165,13 +167,7 @@ public class FileChooserActivity extends Activity {
         }
         // If the file list is empty then show a message
         else {
-            TextView t = new TextView(FileChooserActivity.this);
-            t.setText(R.string.msg_backup_no_files);
-            t.setTextSize(18);
-            t.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            t.setGravity(Gravity.CENTER);
-            t.setPadding(0, 100, 0, 0);
-            file_list_layout.addView(t);
+            no_files.setVisibility(View.VISIBLE);
         }
     }
 }
