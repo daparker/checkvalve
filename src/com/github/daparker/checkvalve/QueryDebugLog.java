@@ -19,6 +19,9 @@
 
 package com.github.daparker.checkvalve;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
+
 /*
  * Define the ServerRecord class
  */
@@ -30,8 +33,45 @@ public class QueryDebugLog {
      */
     public QueryDebugLog() {
     	sb = new StringBuilder();
+    	this.addDebugHeader();
     }
 
+    /**
+     * Adds a header with device and serial information to the debug log
+     */
+    @SuppressLint("NewApi")
+    private void addDebugHeader() {
+        String brand = Build.BRAND;
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+
+        sb.append("Device: ");
+        
+        if( brand != null && brand.length() > 0 ) {
+            sb.append(brand).append(" ");
+        }
+        
+        if( manufacturer != null && manufacturer.length() > 0 ) {
+            sb.append(manufacturer).append(" ");
+        }
+        
+        if( model != null && model.length() > 0 ) {
+            sb.append(model).append(" ");
+        }
+        
+        sb.append('\n');
+        
+        if( Build.VERSION.SDK_INT > 8 ) {
+            String serial = Build.SERIAL;
+            
+            if( serial != null && serial.length() > 0 ) {
+                sb.append("Serial: ").append(serial).append('\n');
+            }
+        }
+        
+        sb.append('\n');
+    }
+    
     /**
      * Add a message line to the debug log.
      * 
