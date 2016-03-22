@@ -132,16 +132,16 @@ public class CreateBackupActivity extends Activity {
         String defaultFilename = "checkvalve_backup_" + timestamp + ".bkp";
         storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.createbackup_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
         
-        saveButton = (Button)findViewById(R.id.saveButton);
+        saveButton = (Button)findViewById(R.id.createbackup_save_button);
         saveButton.setOnClickListener(saveButtonListener);
         
-        field_save_as = (EditText)findViewById(R.id.field_save_as);
+        field_save_as = (EditText)findViewById(R.id.createbackup_field_save_as);
         field_save_as.setText(defaultFilename);
 
-        help_text = (TextView)findViewById(R.id.help_text);
+        help_text = (TextView)findViewById(R.id.createbackup_help_text);
         help_text.setText(String.format(this.getString(R.string.help_text_create_backup), storageDir.getName()));
         
         includeServers = true;
@@ -177,7 +177,7 @@ public class CreateBackupActivity extends Activity {
 
         Log.i(TAG, "checkboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked=" + checkState);
 
-        if( view.getId() == R.id.checkbox_include_servers )
+        if( view.getId() == R.id.createbackup_checkbox_include_servers )
             includeServers = checkState;
         else
             includeSettings = checkState;
