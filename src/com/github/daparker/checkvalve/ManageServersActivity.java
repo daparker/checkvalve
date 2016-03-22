@@ -174,9 +174,9 @@ public class ManageServersActivity extends Activity {
 
         setContentView(R.layout.manageservers);
 
-        x_button = (Button)findViewById(R.id.manage_servers_x_button);
+        x_button = (Button)findViewById(R.id.manageservers_x_button);
         x_button.setOnClickListener(xButtonListener);
-        server_table = (TableLayout)findViewById(R.id.serverTable);
+        server_table = (TableLayout)findViewById(R.id.manageservers_server_table);
 
         showServerList();
     }
@@ -187,6 +187,8 @@ public class ManageServersActivity extends Activity {
 
         if( database == null )
             database = new DatabaseProvider(ManageServersActivity.this);
+        
+        showServerList();
     }
 
     @Override
@@ -260,7 +262,7 @@ public class ManageServersActivity extends Activity {
             
             // If there's no nickname then use the URL as the server name 
             if( server.length() == 0 ) {
-                server = sr.getServerURL() + ":" + port;
+                server = sr.getServerURL() + ":" + Integer.toString(port);
             }
 
             View v = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
@@ -270,19 +272,19 @@ public class ManageServersActivity extends Activity {
             serverName.setText(server);
             serverName.setId(i);
 
-            Button editButton = (Button)v.findViewById(R.id.edit_button);
+            Button editButton = (Button)v.findViewById(R.id.buttonbar_edit_button);
             editButton.setId(rowId);
             editButton.setOnClickListener(editButtonListener);
 
-            Button deleteButton = (Button)v.findViewById(R.id.delete_button);
+            Button deleteButton = (Button)v.findViewById(R.id.buttonbar_delete_button);
             deleteButton.setId(rowId);
             deleteButton.setOnClickListener(deleteButtonListener);
 
-            Button moveUpButton = (Button)v.findViewById(R.id.up_button);
+            Button moveUpButton = (Button)v.findViewById(R.id.buttonbar_up_button);
             moveUpButton.setId(rowId);
             moveUpButton.setOnClickListener(moveUpButtonListener);
 
-            Button moveDownButton = (Button)v.findViewById(R.id.down_button);
+            Button moveDownButton = (Button)v.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
 
