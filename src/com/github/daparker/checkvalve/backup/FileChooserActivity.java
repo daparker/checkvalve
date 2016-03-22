@@ -91,11 +91,11 @@ public class FileChooserActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.file_chooser);
         
-        file_list_layout = (LinearLayout)findViewById(R.id.file_list_layout);
-        current_folder = (TextView)findViewById(R.id.current_folder); 
-        no_files = (TextView)findViewById(R.id.textview_no_files);
+        file_list_layout = (LinearLayout)findViewById(R.id.filechooser_file_list_layout);
+        current_folder = (TextView)findViewById(R.id.filechooser_current_folder); 
+        no_files = (TextView)findViewById(R.id.filechooser_textview_no_files);
         
-        this.findViewById(R.id.dismiss_button).setOnClickListener(dismissButtonListener);
+        this.findViewById(R.id.filechooser_dismiss_button).setOnClickListener(dismissButtonListener);
         
         storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);        
         breadcrumbs.add(storageDir.getName());
