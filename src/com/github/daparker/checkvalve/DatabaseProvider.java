@@ -35,7 +35,7 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -58,13 +58,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_RCON_VOLUME_BUTTONS = "rcon_volume_buttons";
     public static final String SETTINGS_RCON_DEFAULT_FONT_SIZE = "rcon_default_font_size";
     public static final String SETTINGS_RCON_INCLUDE_SM = "rcon_include_sm";
+    public static final String SETTINGS_SHOW_SERVER_NAME = "show_name";
     public static final String SETTINGS_SHOW_SERVER_IP = "show_ip";
     public static final String SETTINGS_SHOW_SERVER_MAP = "show_map";
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
     public static final String SETTINGS_SHOW_SERVER_GAME = "show_game_info";
     public static final String SETTINGS_SHOW_SERVER_TAGS = "show_tags";
     public static final String SETTINGS_SHOW_SERVER_PING = "show_ping";
-    public static final String SETTINGS_SHOW_SERVER_NICKNAME = "show_nickname";
+    public static final String SETTINGS_USE_SERVER_ALIAS = "show_nickname";
     public static final String SETTINGS_DEFAULT_QUERY_PORT = "default_query_port";
     public static final String SETTINGS_DEFAULT_QUERY_TIMEOUT = "default_query_timeout";
     public static final String SETTINGS_DEFAULT_RELAY_HOST = "default_relay_host";
@@ -95,13 +96,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9, "
             + SETTINGS_RCON_INCLUDE_SM + " INTEGER NOT NULL DEFAULT 0, "
+            + SETTINGS_SHOW_SERVER_NAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_SHOW_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_USE_SERVER_ALIAS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
@@ -171,13 +173,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_RCON_SHOW_PASSWORDS, 1);
             values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, 1);
             values.put(SETTINGS_RCON_ENABLE_HISTORY, 1);
+            values.put(SETTINGS_SHOW_SERVER_NAME, 1);
             values.put(SETTINGS_SHOW_SERVER_IP, 1);
             values.put(SETTINGS_SHOW_SERVER_MAP, 1);
             values.put(SETTINGS_SHOW_SERVER_PLAYERS, 1);
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
             values.put(SETTINGS_SHOW_SERVER_PING, 1);
-            values.put(SETTINGS_SHOW_SERVER_NICKNAME, 1);
+            values.put(SETTINGS_USE_SERVER_ALIAS, 1);
             values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
@@ -366,14 +369,32 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT '';");
                 
                 // Add the show_nickname column to the settings table
-                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_NICKNAME + " to table " + TABLE_SETTINGS);
-                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1;");
+                Log.i(TAG, "Adding column " + SETTINGS_USE_SERVER_ALIAS + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_USE_SERVER_ALIAS + " INTEGER NOT NULL DEFAULT 1;");
                 
                 // Set the default value
                 ContentValues values = new ContentValues();
-                values.put(SETTINGS_SHOW_SERVER_NICKNAME, 1);
+                values.put(SETTINGS_USE_SERVER_ALIAS, 1);
     
-                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_NICKNAME + " default value to 1");
+                Log.i(TAG, "Setting " + SETTINGS_USE_SERVER_ALIAS + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 10 ) {
+            try {
+                // Add the show_name column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_NAME + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_NAME + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_SHOW_SERVER_NAME, 1);
+
+                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_NAME + " default value to 1");
                 db.update(TABLE_SETTINGS, values, null, null);
             }
             catch( Exception e ) {
@@ -803,13 +824,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_RCON_VOLUME_BUTTONS,
                 SETTINGS_RCON_DEFAULT_FONT_SIZE,
                 SETTINGS_RCON_INCLUDE_SM,
+                SETTINGS_SHOW_SERVER_NAME,
                 SETTINGS_SHOW_SERVER_IP,
                 SETTINGS_SHOW_SERVER_MAP,
                 SETTINGS_SHOW_SERVER_PLAYERS,
                 SETTINGS_SHOW_SERVER_GAME,
                 SETTINGS_SHOW_SERVER_TAGS,
                 SETTINGS_SHOW_SERVER_PING,
-                SETTINGS_SHOW_SERVER_NICKNAME,
+                SETTINGS_USE_SERVER_ALIAS,
                 SETTINGS_VALIDATE_NEW_SERVERS,
                 SETTINGS_DEFAULT_QUERY_PORT,
                 SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -840,6 +862,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
                 else if( column.equals(SETTINGS_RCON_INCLUDE_SM) )
                     result.putBoolean(Values.SETTING_RCON_INCLUDE_SM, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_SHOW_SERVER_NAME) )
+                    result.putBoolean(Values.SETTING_SHOW_SERVER_NAME, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
@@ -852,8 +876,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1)?true:false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_NICKNAME) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_USE_SERVER_ALIAS) )
+                    result.putBoolean(Values.SETTING_USE_SERVER_ALIAS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
                     result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
@@ -891,13 +915,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int enableHistory = (settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY, true))?1:0;
         int volumeButtons = (settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, true))?1:0;
         int includeSM = (settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM, true))?1:0;
+        int showName = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NAME, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
         int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
-        int showNickname = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, true))?1:0;
+        int showNickname = (settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
 
         // Get int values from the Bundle
@@ -918,13 +943,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_VOLUME_BUTTONS, volumeButtons);
         values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, defaultRconFontSize);
         values.put(SETTINGS_RCON_INCLUDE_SM, includeSM);
+        values.put(SETTINGS_SHOW_SERVER_NAME, showName);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
         values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
         values.put(SETTINGS_SHOW_SERVER_PING, showPing);
-        values.put(SETTINGS_SHOW_SERVER_NICKNAME, showNickname);
+        values.put(SETTINGS_USE_SERVER_ALIAS, showNickname);
         values.put(SETTINGS_VALIDATE_NEW_SERVERS, validate);
         values.put(SETTINGS_DEFAULT_QUERY_PORT, defaultQueryPort);
         values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
@@ -1087,13 +1113,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                         SETTINGS_RCON_ENABLE_HISTORY,
                         SETTINGS_RCON_VOLUME_BUTTONS,
                         SETTINGS_RCON_INCLUDE_SM,
+                        SETTINGS_SHOW_SERVER_NAME,
                         SETTINGS_SHOW_SERVER_IP,
                         SETTINGS_SHOW_SERVER_MAP,
                         SETTINGS_SHOW_SERVER_PLAYERS,
                         SETTINGS_SHOW_SERVER_GAME,
                         SETTINGS_SHOW_SERVER_TAGS,
                         SETTINGS_SHOW_SERVER_PING,
-                        SETTINGS_SHOW_SERVER_NICKNAME,
+                        SETTINGS_USE_SERVER_ALIAS,
                         SETTINGS_VALIDATE_NEW_SERVERS };
                 
                 // Columns which contain integer values
@@ -1103,7 +1130,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                         SETTINGS_DEFAULT_QUERY_TIMEOUT,
                         SETTINGS_DEFAULT_RELAY_PORT };
                 
-                // Columns which contain stroing values
+                // Columns which contain string values
                 String[] stringCols = new String[] {
                         SETTINGS_DEFAULT_RELAY_HOST,
                         SETTINGS_DEFAULT_RELAY_PASSWORD };
