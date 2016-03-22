@@ -132,9 +132,9 @@ public class ChatRelayDetailsActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
-        field_server = (AutoCompleteTextView)findViewById(R.id.field_server);
-        field_port = (EditText)findViewById(R.id.field_port);
-        field_password = (EditText)findViewById(R.id.field_password);
+        field_server = (AutoCompleteTextView)findViewById(R.id.chatrelaydetails_field_server);
+        field_port = (EditText)findViewById(R.id.chatrelaydetails_field_port);
+        field_password = (EditText)findViewById(R.id.chatrelaydetails_field_password);
 
         if( thisIntent.getStringExtra(Values.EXTRA_SERVER).length() != 0 )
             field_server.setText(thisIntent.getStringExtra(Values.EXTRA_SERVER));
@@ -145,16 +145,16 @@ public class ChatRelayDetailsActivity extends Activity {
         if( thisIntent.getStringExtra(Values.EXTRA_PASSWORD).length() != 0 )
             field_password.setText(thisIntent.getStringExtra(Values.EXTRA_PASSWORD));
 
-        connectButton = (Button)findViewById(R.id.connectButton);
+        connectButton = (Button)findViewById(R.id.chatrelaydetails_connect_button);
         connectButton.setOnClickListener(connectButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.chatrelaydetails_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
         
         previousHosts = database.getRelayHosts();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, previousHosts);
 
-        field_server = (AutoCompleteTextView)findViewById(R.id.field_server);
+        field_server = (AutoCompleteTextView)findViewById(R.id.chatrelaydetails_field_server);
         field_server.setAdapter(adapter);
         field_server.setThreshold(1);
     }
@@ -176,10 +176,10 @@ public class ChatRelayDetailsActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
-        connectButton = (Button)findViewById(R.id.connectButton);
+        connectButton = (Button)findViewById(R.id.chatrelaydetails_connect_button);
         connectButton.setOnClickListener(connectButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.chatrelaydetails_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
     }
 
