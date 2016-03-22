@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/updateserver_scroll_pane"
+    android:id="@+id/editserver_scroll_pane"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#262626"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/updateserver_parent_layout"
+        android:id="@+id/editserver_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -36,7 +36,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="10dp" >
 
         <TextView
-            android:id="@+id/updateserver_title"
+            android:id="@+id/editserver_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -46,7 +46,7 @@ along with the CheckValve source code.  If not, see
             android:textSize="18sp" />
 
         <TableLayout
-            android:id="@+id/updateserver_main_table"
+            android:id="@+id/editserver_main_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="15dp"
@@ -56,10 +56,11 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
-                    android:id="@+id/label_nickname"
+                    android:id="@+id/editserver_label_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
+                    android:paddingTop="15dp"
                     android:singleLine="true"
                     android:text="@string/label_nickname_field"
                     android:textSize="12sp"
@@ -69,7 +70,7 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <EditText
-                    android:id="@+id/field_nickname"
+                    android:id="@+id/editserver_field_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
@@ -82,11 +83,11 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
-                    android:id="@+id/label_server"
+                    android:id="@+id/editserver_label_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
+                    android:paddingTop="15dp"
                     android:singleLine="true"
                     android:text="@string/label_server"
                     android:textSize="12sp"
@@ -96,7 +97,7 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <EditText
-                    android:id="@+id/field_server"
+                    android:id="@+id/editserver_field_server"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
@@ -109,11 +110,11 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
-                    android:id="@+id/label_port"
+                    android:id="@+id/editserver_label_port"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
+                    android:paddingTop="15dp"
                     android:singleLine="true"
                     android:text="@string/label_port"
                     android:textSize="12sp"
@@ -123,7 +124,7 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <EditText
-                    android:id="@+id/field_port"
+                    android:id="@+id/editserver_field_port"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
@@ -136,11 +137,11 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
-                    android:id="@+id/label_timeout"
+                    android:id="@+id/editserver_label_timeout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
+                    android:paddingTop="15dp"
                     android:singleLine="true"
                     android:text="@string/label_timeout"
                     android:textSize="12sp"
@@ -150,7 +151,7 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <EditText
-                    android:id="@+id/field_timeout"
+                    android:id="@+id/editserver_field_timeout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
@@ -163,11 +164,11 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <TextView
-                    android:id="@+id/label_rcon_password"
+                    android:id="@+id/editserver_label_rcon_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
-                    android:paddingTop="10dp"
+                    android:paddingTop="15dp"
                     android:singleLine="true"
                     android:text="@string/label_rcon_password"
                     android:textSize="12sp"
@@ -177,7 +178,7 @@ along with the CheckValve source code.  If not, see
             <TableRow>
 
                 <EditText
-                    android:id="@+id/field_rcon_password"
+                    android:id="@+id/editserver_field_rcon_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
@@ -189,7 +190,7 @@ along with the CheckValve source code.  If not, see
         </TableLayout>
 
         <LinearLayout
-            android:id="@+id/show_password_layout"
+            android:id="@+id/editserver_show_password_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -198,7 +199,7 @@ along with the CheckValve source code.  If not, see
             android:paddingTop="5dp" >
 
             <CheckBox
-                android:id="@+id/checkbox_show_password"
+                android:id="@+id/editserver_checkbox_show_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showPasswordCheckboxHandler"
@@ -207,34 +208,36 @@ along with the CheckValve source code.  If not, see
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/buttonTable"
+            android:id="@+id/editserver_button_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:background="@color/steam_gray"
             android:orientation="horizontal"
-            android:paddingTop="10dp" >
+            android:paddingTop="30dp" >
 
             <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="100dp"
+                android:id="@+id/editserver_cancel_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:focusable="true"
                 android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/button_cancel" />
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="@string/button_cancel"
+                android:textColor="#ffffff" />
 
             <Button
-                android:id="@+id/saveButton"
-                android:layout_width="100dp"
+                android:id="@+id/editserver_save_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:focusable="true"
                 android:gravity="center"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/button_save" />
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="@string/button_save"
+                android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
 
