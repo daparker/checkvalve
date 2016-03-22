@@ -138,13 +138,13 @@ public class AddServerActivity extends Activity {
                                 finish();
                                 break;
                             case 1:
-                                errorMsg = (String)AddServerActivity.this.getText(R.string.msg_unknown_host) + " " + server;
+                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unknown_host), server);
                                 UserVisibleMessage.showMessage(AddServerActivity.this, errorMsg);
                                 break;
                             case 2:
                             case 3:
                             case 4:
-                                errorMsg = (String)AddServerActivity.this.getText(R.string.msg_unable_to_connect_to) + " " + server;
+                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unable_to_connect), server);
                                 UserVisibleMessage.showMessage(AddServerActivity.this, errorMsg);
                                 break;
                             case 5:
@@ -204,26 +204,27 @@ public class AddServerActivity extends Activity {
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
 
-        addButton = (Button)findViewById(R.id.addServerButton);
+        addButton = (Button)findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        field_server = (EditText)findViewById(R.id.field_server);
-        field_port = (EditText)findViewById(R.id.field_port);
-        field_timeout = (EditText)findViewById(R.id.field_timeout);
-        field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
-
+        field_server = (EditText)findViewById(R.id.addnewserver_field_server);
+        field_port = (EditText)findViewById(R.id.addnewserver_field_port);
+        field_timeout = (EditText)findViewById(R.id.addnewserver_field_timeout);
+        field_rcon_password = (EditText)findViewById(R.id.addnewserver_field_rcon_password);
+        field_nickname = (EditText)findViewById(R.id.addnewserver_field_nickname);
+        
         field_port.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_timeout.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            ((CheckBox)findViewById(R.id.addnewserver_checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
         else {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            ((CheckBox)findViewById(R.id.addnewserver_checkbox_show_password)).setChecked(false);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }
@@ -242,10 +243,10 @@ public class AddServerActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        addButton = (Button)findViewById(R.id.addServerButton);
+        addButton = (Button)findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
