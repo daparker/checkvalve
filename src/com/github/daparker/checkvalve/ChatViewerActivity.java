@@ -331,7 +331,7 @@ public class ChatViewerActivity extends Activity {
     // Handler for the "Sending" pop-up thread
     private Handler popUpHandler = new Handler() {
         public void handleMessage( Message msg ) {
-            // sending.setVisibility(-1);
+            // sending.setVisibility(View.GONE);
             runFadeOutAnimation(ChatViewerActivity.this, sending);
 
             switch( msg.what ) {
@@ -413,7 +413,7 @@ public class ChatViewerActivity extends Activity {
                         getChatRelayConnection();
                     }
                     catch( UnknownHostException u ) {
-                        String errorMsg = (String)ChatViewerActivity.this.getText(R.string.msg_unknown_host) + " " + chatRelayIP;
+                        String errorMsg = String.format(ChatViewerActivity.this.getString(R.string.msg_unknown_host), chatRelayIP);
                         UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
                         getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
                     }
@@ -534,10 +534,8 @@ public class ChatViewerActivity extends Activity {
             gameServerPort = Integer.toString(thisIntent.getIntExtra(Values.EXTRA_PORT, 27015));
         }
         catch( UnknownHostException e ) {
-            String errorMsg = new String();
-
-            errorMsg += (String)ChatViewerActivity.this.getText(R.string.msg_unknown_host) + " ";
-            errorMsg += thisIntent.getStringExtra(Values.EXTRA_SERVER);
+            String errorMsg = String.format(ChatViewerActivity.this.getString(R.string.msg_unknown_host),
+                    thisIntent.getStringExtra(Values.EXTRA_SERVER));
 
             UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
 
@@ -581,21 +579,27 @@ public class ChatViewerActivity extends Activity {
                 TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.MATCH_PARENT);
 
-        chat_table = (TableLayout)findViewById(R.id.chat_table);
+        chat_table = (TableLayout)findViewById(R.id.chatui_chat_table);
 
-        layout = (ScrollView)findViewById(R.id.scrollview);
+        layout = (ScrollView)findViewById(R.id.chatui_scrollview);
         layout.setOnTouchListener(touchListener);
 
-        subtitle = (TextView)findViewById(R.id.subtitle);
-        subtitle.setText(gameServerIP + ":" + gameServerPort);
+        subtitle = (TextView)findViewById(R.id.chatui_subtitle);
+        
+        if( thisIntent.getStringExtra(Values.EXTRA_ALIAS) != null ) {
+            subtitle.setText(thisIntent.getStringExtra(Values.EXTRA_ALIAS));
+        }
+        else {
+            subtitle.setText(gameServerIP + ":" + gameServerPort);
+        }
 
-        sending = (TextView)findViewById(R.id.sending);
-        sending.setVisibility(-1);
+        sending = (TextView)findViewById(R.id.chatui_sending);
+        sending.setVisibility(View.GONE);
 
-        message_field = (EditText)findViewById(R.id.message_field);
+        message_field = (EditText)findViewById(R.id.chatui_message_field);
         message_field.setOnKeyListener(enterKeyListener);
 
-        say_button = (Button)findViewById(R.id.say_button);
+        say_button = (Button)findViewById(R.id.chatui_say_button);
         say_button.setOnClickListener(sayButtonListener);
 
         receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
@@ -696,7 +700,7 @@ public class ChatViewerActivity extends Activity {
                     getChatRelayConnection();
                 }
                 catch( UnknownHostException u ) {
-                    String errorMsg = (String)ChatViewerActivity.this.getText(R.string.msg_unknown_host) + " " + chatRelayIP;
+                    String errorMsg = String.format(ChatViewerActivity.this.getString(R.string.msg_unknown_host), chatRelayIP);
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
                     getChatRelayDetails(chatRelayIP, chatRelayPort, null);
                 }
@@ -811,7 +815,7 @@ public class ChatViewerActivity extends Activity {
             }
         }
         catch( UnknownHostException uhe ) {
-            String errorMsg = (String)ChatViewerActivity.this.getText(R.string.msg_unknown_host) + " " + chatRelayIP;
+            String errorMsg = String.format(ChatViewerActivity.this.getString(R.string.msg_unknown_host), chatRelayIP);
             UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
             getChatRelayDetails(chatRelayIP, chatRelayPort, null);
         }
