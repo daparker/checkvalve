@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -31,6 +32,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import com.github.daparker.checkvalve.R;
 
+@SuppressLint("DefaultLocale")
 public class ServerQuery implements Runnable {
     private DatagramSocket socket;
     private Handler handler;
@@ -131,6 +133,7 @@ public class ServerQuery implements Runnable {
             
             ServerRecord sr = serverList[i];
 
+            String serverName = new String();
             String serverURL = sr.getServerURL();
             String serverNickname = sr.getServerNickname();
             long serverRowId = sr.getServerRowID();
@@ -140,8 +143,19 @@ public class ServerQuery implements Runnable {
             
             int socketTimeout = 0;
             
+            // Use the nickname in error rows if there is one, otherwise use
+            // the URL and port 
+            if( serverNickname.length() > 0 ) {
+                serverName = serverNickname;
+            }
+            else {
+                serverName = serverURL
+                        .concat(":")
+                        .concat(Integer.toString(serverPort));
+            }
+            
             if( debug == true ) {
-            	debugLog.addMessage("> Server: " + serverURL + ":" + serverPort);
+            	debugLog.addMessage("> Server: " + serverURL + ":" + Integer.toString(serverPort));
             }
             
             try {
@@ -165,7 +179,7 @@ public class ServerQuery implements Runnable {
                 // Show an error if the connection attempt failed
                 if( !socket.isConnected() ) {
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
                     
                     if( debug == true ) {
                     	debugLog.addMessage("> Socket connect failed!");
@@ -186,7 +200,7 @@ public class ServerQuery implements Runnable {
                     debugLog.addMessage(">   Local addr: " + localAddr);
                     debugLog.addMessage(">   Local port: " + localPort);
                     debugLog.addMessage(">   Remote addr: " + serverIP);
-                    debugLog.addMessage(">   Remote port: " + serverPort);
+                    debugLog.addMessage(">   Remote port: " + Integer.toString(serverPort));
                     debugLog.addMessage(">   Timeout: " + timeout);
                 }
 
@@ -197,14 +211,14 @@ public class ServerQuery implements Runnable {
                 socket.send(packetOut);
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Sent query to " + serverIP + ":" + serverPort);
+                	debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
                 }
 
                 // Receive the response packet from the server
                 socket.receive(packetIn);
                 
                 if( debug == true ) {
-                    debugLog.addMessage("> Received response from " + serverIP + ":" + serverPort);
+                    debugLog.addMessage("> Received response from " + serverIP + ":" + Integer.toString(serverPort));
                 }
                 
                 // Get the end time of the request
@@ -217,7 +231,7 @@ public class ServerQuery implements Runnable {
                 socket.close();
                 
                 if( debug == true ) {
-                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + serverPort);
+                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + Integer.toString(serverPort));
                     debugLog.addMessage("> Request took " + requestTime + " ms");
                 }
                 
@@ -228,7 +242,7 @@ public class ServerQuery implements Runnable {
                     String rcv = "0x" + String.format("%8s", Integer.toHexString(packetHeader)).replace(' ','0').toUpperCase();
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
                     
                     if( debug == true ) {
                     	debugLog.addMessage("> ERROR: Invalid response header: " + rcv);
@@ -241,7 +255,7 @@ public class ServerQuery implements Runnable {
                 
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
-                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + serverPort);
+                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + Integer.toString(serverPort));
                     
                     if( debug == true ) {
                         debugLog.addMessage("> Response type: Source");
@@ -266,7 +280,7 @@ public class ServerQuery implements Runnable {
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
-                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + serverPort);
+                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + Integer.toString(serverPort));
                     
                     if( debug == true ) {
                     	debugLog.addMessage("> Response type: GoldSrc");
@@ -292,10 +306,10 @@ public class ServerQuery implements Runnable {
                 else {
                     // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ','0').toUpperCase();
-                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort 
+                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + Integer.toString(serverPort) 
                             + " does not match expected values 0x49 or 0x6d");
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
                     
                     if( debug == true ) {
                     	debugLog.addMessage("> ERROR: Invalid response type: " + rcv);
@@ -309,14 +323,14 @@ public class ServerQuery implements Runnable {
                     debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
                 }
                 serverInfo[i] = null;
-                addErrorRow(serverURL, serverPort, serverListPos);
+                addErrorRow(serverName, serverListPos);
             }
             catch( Exception e ) {
                 if( debug == true ) {
                     debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
                 }
                 serverInfo[i] = null;
-                addErrorRow(serverURL, serverPort, serverListPos);
+                addErrorRow(serverName, serverListPos);
             }
 
             queryEnd = System.currentTimeMillis();
@@ -339,10 +353,8 @@ public class ServerQuery implements Runnable {
         }
     }
     
-    public void addErrorRow( String server, int port, int pos ) {
-        String message = new String();
-        message += context.getText(R.string.msg_no_response);
-        message += " " + server + ":" + port;
+    public void addErrorRow( String host, int pos ) {
+        String message = String.format(context.getString(R.string.msg_no_response), host);
         messages.add(message);
     }
     
