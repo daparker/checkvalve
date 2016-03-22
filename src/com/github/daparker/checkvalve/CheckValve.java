@@ -87,13 +87,13 @@ public class CheckValve extends Activity {
         	database = new DatabaseProvider(CheckValve.this);
 
         selectedServerRowId = 0;
-        server_info_table = (TableLayout)findViewById(R.id.server_info_table);
-        message_table = (TableLayout)findViewById(R.id.message_table);
+        server_info_table = (TableLayout)findViewById(R.id.checkvalve_server_info_table);
+        message_table = (TableLayout)findViewById(R.id.checkvalve_message_table);
         message_table.setVisibility(View.INVISIBLE);
         
-        this.findViewById(R.id.debug_button).setOnClickListener(debugButtonListener);
+        this.findViewById(R.id.checkvalve_debug_button).setOnClickListener(debugButtonListener);
         
-        TextView titleBar = (TextView)findViewById(R.id.title);
+        TextView titleBar = (TextView)findViewById(R.id.checkvalve_title);
         titleBar.setOnLongClickListener(titleBarClickListener);
         
         getSettings();
@@ -344,12 +344,12 @@ public class CheckValve extends Activity {
     //@SuppressWarnings("deprecation")
     public void queryServers() {
     	if( debugMode )
-    		debugLog = new QueryDebugLog();
+    	    debugLog = new QueryDebugLog();
     	
         // Clear the server info table
-        server_info_table.setVisibility(-1);
+        server_info_table.setVisibility(View.INVISIBLE);
         server_info_table.removeAllViews();
-        server_info_table.setVisibility(1);
+        server_info_table.setVisibility(View.VISIBLE);
 
         // Clear the messages table
         message_table.removeAllViews();
@@ -417,8 +417,9 @@ public class CheckValve extends Activity {
              * Build and display the query results table
              */
             for( int i = 0; i < serverInfo.length; i++ ) {
-                if( serverInfo[i] != null ) {
+                if( serverInfo[i] != null ) {                    
                     // Create TextViews for table rows
+                    /*
                     String serverNickname = serverInfo[i].getNickame();
                     TextView nicknameLabel = new TextView(CheckValve.this);
                     TextView nicknameValue = new TextView(CheckValve.this);
@@ -433,7 +434,9 @@ public class CheckValve extends Activity {
                     nicknameValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
                     nicknameValue.setPadding(3, 0, 3, 0);
                     nicknameValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    */
                     
+                    String serverNickname = serverInfo[i].getNickame();
                     String serverName = serverInfo[i].getName();
                     TextView serverLabel = new TextView(CheckValve.this);
                     TextView serverValue = new TextView(CheckValve.this);
@@ -444,7 +447,14 @@ public class CheckValve extends Activity {
                     serverLabel.setTypeface(null, Typeface.BOLD);
                     serverLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     serverValue.setId(i * 300);
-                    serverValue.setText(serverName);
+                    
+                    if( settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS) ) {
+                        serverValue.setText((serverNickname.length() > 0)?serverNickname:serverName);
+                    }
+                    else {
+                        serverValue.setText(serverName);
+                    }
+                    
                     serverValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
                     serverValue.setPadding(3, 0, 3, 0);
                     serverValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -460,7 +470,7 @@ public class CheckValve extends Activity {
                     ipLabel.setTypeface(null, Typeface.BOLD);
                     ipLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     ipValue.setId(i * 500);
-                    ipValue.setText(serverIP + ":" + serverPort);
+                    ipValue.setText(serverIP + ":" + Integer.toString(serverPort));
                     ipValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
                     ipValue.setPadding(3, 0, 3, 0);
                     ipValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -564,22 +574,11 @@ public class CheckValve extends Activity {
                     spacerRow.addView(spacer);
 
                     // Create TableRows
-                    TableRow nicknameRow = new TableRow(CheckValve.this);
-                    nicknameRow.setId(serverRowId);
-                    nicknameRow.setTag(Values.TAG_SERVER_NICKNAME);
-                    nicknameRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                    nicknameRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME))?View.VISIBLE:View.GONE);
-                    nicknameRow.setOnFocusChangeListener(tableRowFocusChangeListener);
-                    nicknameRow.setOnTouchListener(tableRowTouchListener);
-                    nicknameRow.setFocusable(false);
-                    nicknameRow.addView(nicknameLabel);
-                    nicknameRow.addView(nicknameValue);
-                    registerForContextMenu(nicknameRow);
-                    
                     TableRow serverRow = new TableRow(CheckValve.this);
                     serverRow.setId(serverRowId);
                     serverRow.setTag(Values.TAG_SERVER_NAME);
                     serverRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                    serverRow.setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NAME))?View.VISIBLE:View.GONE);
                     serverRow.setOnFocusChangeListener(tableRowFocusChangeListener);
                     serverRow.setOnTouchListener(tableRowTouchListener);
                     serverRow.setFocusable(false);
@@ -652,16 +651,18 @@ public class CheckValve extends Activity {
                     pingRow.addView(pingLabel);
                     pingRow.addView(pingValue);
                     registerForContextMenu(pingRow);
-              
+                    
                     // Add these rows to the server info table
                     server_info_table.addView(
                             spacerRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
+                    /*
                     server_info_table.addView(
                             nicknameRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
+                    */
                     server_info_table.addView(
                             serverRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -708,9 +709,9 @@ public class CheckValve extends Activity {
             tag = (String)server_info_table.getChildAt(i).getTag();
 
             if( tag != null ) {
-                if( tag.equals(Values.TAG_SERVER_NICKNAME) )
-                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME))?View.VISIBLE:View.GONE);
-                if( tag.equals(Values.TAG_SERVER_IP) )
+                if( tag.equals(Values.TAG_SERVER_NAME) )
+                    server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_NAME))?View.VISIBLE:View.GONE);
+                else if( tag.equals(Values.TAG_SERVER_IP) )
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_IP))?View.VISIBLE:View.GONE);
                 else if( tag.equals(Values.TAG_SERVER_GAME) )
                     server_info_table.getChildAt(i).setVisibility((settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO))?View.VISIBLE:View.GONE);
@@ -798,9 +799,8 @@ public class CheckValve extends Activity {
 
                     if( challengeResponse == null ) {
                         p.dismiss();
-                        String message = new String();
-                        message += CheckValve.this.getText(R.string.msg_no_challenge_response);
-                        message += " " + server + ":" + port;
+                        String host = server + ":" + Integer.toString(port);
+                        String message = String.format(CheckValve.this.getString(R.string.msg_no_challenge_response), host);
                         UserVisibleMessage.showMessage(CheckValve.this, message);
                     }
                     else {
@@ -891,6 +891,7 @@ public class CheckValve extends Activity {
 
         String s = sr.getServerURL();
         String r = sr.getServerRCONPassword();
+        String n = sr.getServerNickname();
         int p = sr.getServerPort();
         int t = sr.getServerTimeout();
 
@@ -900,6 +901,10 @@ public class CheckValve extends Activity {
         chatIntent.putExtra(Values.EXTRA_PORT, p);
         chatIntent.putExtra(Values.EXTRA_TIMEOUT, t);
         chatIntent.putExtra(Values.EXTRA_PASSWORD, r);
+        
+        if( n != null && n.length() > 0 ) {
+            chatIntent.putExtra(Values.EXTRA_ALIAS, n);
+        }
         startActivityForResult(chatIntent, Values.ACTIVITY_CHAT);
     }
 
@@ -936,7 +941,7 @@ public class CheckValve extends Activity {
             if( android.os.Build.VERSION.SDK_INT >= 11 )
                 invalidateOptionsMenu();
             else
-                this.findViewById(R.id.debug_button_layout).setVisibility(View.VISIBLE);
+                this.findViewById(R.id.checkvalve_debug_button_layout).setVisibility(View.VISIBLE);
         }
         else {
             debugMode = false;
@@ -945,7 +950,7 @@ public class CheckValve extends Activity {
             if( android.os.Build.VERSION.SDK_INT >= 11 )
                 invalidateOptionsMenu();
             else
-                this.findViewById(R.id.debug_button_layout).setVisibility(View.GONE);
+                this.findViewById(R.id.checkvalve_debug_button_layout).setVisibility(View.GONE);
         }
     }
 }
