@@ -182,16 +182,16 @@ public class RestoreBackupActivity extends Activity {
         storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         
         // Set button listeners
-        this.findViewById(R.id.cancelButton).setOnClickListener(cancelButtonListener);
-        this.findViewById(R.id.restoreButton).setOnClickListener(restoreButtonListener);
-        this.findViewById(R.id.chooserButton).setOnClickListener(chooserButtonListener);
+        this.findViewById(R.id.restorebackup_cancel_button).setOnClickListener(cancelButtonListener);
+        this.findViewById(R.id.restorebackup_restore_button).setOnClickListener(restoreButtonListener);
+        this.findViewById(R.id.restorebackup_chooser_button).setOnClickListener(chooserButtonListener);
         
-        field_backup_file = (EditText)findViewById(R.id.field_backup_file);
+        field_backup_file = (EditText)findViewById(R.id.restorebackup_field_backup_file);
 
-        help_text = (TextView)findViewById(R.id.help_text);
+        help_text = (TextView)findViewById(R.id.restorebackup_help_text);
         help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), storageDir.getName()));
         
-        file_details_table = (TableLayout)findViewById(R.id.backup_file_details_table);
+        file_details_table = (TableLayout)findViewById(R.id.restorebackup_file_details_table);
     }
 
     @Override
@@ -228,7 +228,7 @@ public class RestoreBackupActivity extends Activity {
                     
                     try {
                         if( ! showFileDetails(selectedFile) ) {
-                            this.findViewById(R.id.backup_file_details_layout).setVisibility(View.GONE);
+                            this.findViewById(R.id.restorebackup_file_details_layout).setVisibility(View.GONE);
                             UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
                         }
                     }
@@ -380,7 +380,7 @@ public class RestoreBackupActivity extends Activity {
             file_details_table.addView(dateRow);
             file_details_table.addView(sizeRow);
             
-            this.findViewById(R.id.backup_file_details_layout).setVisibility(View.VISIBLE);
+            this.findViewById(R.id.restorebackup_file_details_layout).setVisibility(View.VISIBLE);
             
             return true;
         }

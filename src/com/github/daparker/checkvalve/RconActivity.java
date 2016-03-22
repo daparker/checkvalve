@@ -326,6 +326,7 @@ public class RconActivity extends Activity {
         }
     };
     
+    @SuppressLint("NewApi")
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         
@@ -358,8 +359,8 @@ public class RconActivity extends Activity {
         fade_out = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_out);
 
         rcon_console = (TextView)findViewById(R.id.rcon_console);
-        sending = (TextView)findViewById(R.id.sending);
-        send_button = (Button)findViewById(R.id.send_button);
+        sending = (TextView)findViewById(R.id.rcon_sending);
+        send_button = (Button)findViewById(R.id.rcon_send_button);
 
         send_button.setOnClickListener(sendButtonListener);
         rcon_console.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -371,7 +372,7 @@ public class RconActivity extends Activity {
         String[] commandList = getCommandList();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, commandList);
 
-        field_command = (AutoCompleteTextView)findViewById(R.id.field_command);
+        field_command = (AutoCompleteTextView)findViewById(R.id.rcon_field_command);
         field_command.setAdapter(adapter);
         field_command.setOnKeyListener(keyListener);
 
@@ -576,7 +577,7 @@ public class RconActivity extends Activity {
         getPassword();
     }
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint({ "InlinedApi", "NewApi" })
     public void confirmUnsafeCommand() {
         AlertDialog.Builder alertDialogBuilder;
 
