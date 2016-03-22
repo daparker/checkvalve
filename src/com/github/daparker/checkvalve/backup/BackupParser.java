@@ -141,6 +141,7 @@ public class BackupParser implements Runnable {
             int settingRecordNum = 0;
             int flagRecordNum = 0;
             int lineNumber = 0;
+            int dataLine = 0;
             int x = 0;
 
             reader = new BufferedReader(new FileReader(f));
@@ -152,7 +153,23 @@ public class BackupParser implements Runnable {
 
                 if( line.length() == 0 || line.charAt(0) == '#' ) continue;
 
-                if( line.equals("[server]") ) {
+                dataLine++;
+                
+                // If this is the first line of backup data then make sure it's the version stanza
+                if( dataLine == 1 ) {
+                    if( line.equals("[version]") ) {
+                        PARSING_SERVER = false;
+                        PARSING_SETTING = false;
+                        PARSING_VERSION = true;
+                        PARSING_FLAG = false;
+                    }
+                    else {
+                        reader.close();
+                        Log.e(TAG, "Backup data does not start with a version stanza");
+                        throw new InvalidBackupFileException();
+                    }
+                }
+                else if( line.equals("[server]") ) {
                     PARSING_SERVER = true;
                     PARSING_SETTING = false;
                     PARSING_VERSION = false;
@@ -167,12 +184,6 @@ public class BackupParser implements Runnable {
                     PARSING_FLAG = false;
                     x = settingRecordNum++;
                     settings[x] = new SettingBackupRecord();
-                }
-                else if( line.equals("[version]") ) {
-                    PARSING_SERVER = false;
-                    PARSING_SETTING = false;
-                    PARSING_VERSION = true;
-                    PARSING_FLAG = false;
                 }
                 else if( line.equals("[flag]") ) {
                     PARSING_SERVER = false;
@@ -341,7 +352,7 @@ public class BackupParser implements Runnable {
         map.put("show_game_info", Values.SETTING_SHOW_SERVER_GAME_INFO);
         map.put("show_tags", Values.SETTING_SHOW_SERVER_TAGS);
         map.put("show_ping", Values.SETTING_SHOW_SERVER_PING);
-        map.put("show_nickname", Values.SETTING_SHOW_SERVER_NICKNAME);
+        map.put("show_nickname", Values.SETTING_USE_SERVER_ALIAS);
         map.put("validate_new_servers", Values.SETTING_VALIDATE_NEW_SERVERS);
         map.put("default_relay_host", Values.SETTING_DEFAULT_RELAY_HOST);
         map.put("default_relay_password", Values.SETTING_DEFAULT_RELAY_PASSWORD);
