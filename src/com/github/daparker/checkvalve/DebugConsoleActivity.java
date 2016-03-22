@@ -19,6 +19,7 @@
 
 package com.github.daparker.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -46,6 +47,7 @@ public class DebugConsoleActivity extends Activity {
         }
     };
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
@@ -64,9 +66,9 @@ public class DebugConsoleActivity extends Activity {
 
         setContentView(R.layout.debug_console);
 
-        dismiss_button = (Button)findViewById(R.id.dismiss_button);
+        dismiss_button = (Button)findViewById(R.id.debugconsole_dismiss_button);
         dismiss_button.setOnClickListener(dismissButtonListener);
-        debug_console = (TextView)findViewById(R.id.debug_console);
+        debug_console = (TextView)findViewById(R.id.debugconsole_textview);
         debug_console.setText(debugText);
     }
 
