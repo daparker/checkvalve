@@ -20,7 +20,7 @@ along with the CheckValve source code.  If not, see
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/updateserver_parent_layout"
+    android:id="@+id/createbackup_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
@@ -31,7 +31,7 @@ along with the CheckValve source code.  If not, see
     android:paddingTop="10dp" >
 
     <TextView
-        android:id="@+id/create_backup_title"
+        android:id="@+id/createbackup_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -41,19 +41,19 @@ along with the CheckValve source code.  If not, see
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/help_text"
+        android:id="@+id/createbackup_help_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/steam_gray"
+        android:drawableLeft="@android:drawable/ic_dialog_info"
+        android:drawablePadding="10dp"
         android:gravity="center|center_vertical"
         android:padding="10dp"
         android:text=""
-        android:textSize="16sp"
-        android:drawableLeft="@android:drawable/ic_dialog_info"
-        android:drawablePadding="10dp" />
+        android:textSize="16sp" />
 
     <LinearLayout
-        android:id="@+id/edittext_layout"
+        android:id="@+id/createbackup_edittext_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left"
@@ -61,7 +61,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="25dp" >
 
         <TextView
-            android:id="@+id/label_save_as"
+            android:id="@+id/createbackup_label_save_as"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
@@ -71,7 +71,7 @@ along with the CheckValve source code.  If not, see
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/field_save_as"
+            android:id="@+id/createbackup_field_save_as"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
@@ -82,7 +82,7 @@ along with the CheckValve source code.  If not, see
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/checkbox_layout"
+        android:id="@+id/createbackup_checkbox_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left"
@@ -90,7 +90,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="15dp" >
 
         <CheckBox
-            android:id="@+id/checkbox_include_servers"
+            android:id="@+id/createbackup_checkbox_include_servers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
@@ -99,7 +99,7 @@ along with the CheckValve source code.  If not, see
             android:textSize="14sp" />
 
         <CheckBox
-            android:id="@+id/checkbox_include_settings"
+            android:id="@+id/createbackup_checkbox_include_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
@@ -109,7 +109,7 @@ along with the CheckValve source code.  If not, see
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/buttonTable"
+        android:id="@+id/createbackup_button_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -117,7 +117,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="50dp" >
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/createbackup_cancel_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -128,7 +128,7 @@ along with the CheckValve source code.  If not, see
             android:text="@string/button_cancel" />
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/createbackup_save_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"

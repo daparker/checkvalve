@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
+    android:id="@+id/filechooser_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/button_layout"
+        android:id="@+id/filechooser_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -41,7 +41,7 @@ along with the CheckValve source code.  If not, see
             android:gravity="center" />
 
         <Button
-            android:id="@+id/dismiss_button"
+            android:id="@+id/filechooser_dismiss_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -55,7 +55,7 @@ along with the CheckValve source code.  If not, see
     </LinearLayout>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/filechooser_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -66,12 +66,12 @@ along with the CheckValve source code.  If not, see
         android:text="@string/title_file_chooser"
         android:textColor="#FFFFFF"
         android:textSize="20sp" />
-    
+
     <TextView
-        android:id="@+id/current_folder"
+        android:id="@+id/filechooser_current_folder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/filechooser_title"
         android:background="#262626"
         android:gravity="center"
         android:paddingBottom="10dp"
@@ -79,32 +79,33 @@ along with the CheckValve source code.  If not, see
         android:text=""
         android:textColor="#FFFFFF"
         android:textSize="12sp" />
-    
+
     <ScrollView
-        android:id="@+id/scrollview"
+        android:id="@+id/filechooser_scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/button_layout"
-        android:layout_below="@id/current_folder"
+        android:layout_above="@id/filechooser_button_layout"
+        android:layout_below="@id/filechooser_current_folder"
         android:orientation="vertical"
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical" >
 
         <LinearLayout
-            android:id="@+id/file_list_layout"
+            android:id="@+id/filechooser_file_list_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>
-    
-    <TextView 
-        android:id="@+id/textview_no_files"
+
+    <TextView
+        android:id="@+id/filechooser_textview_no_files"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
         android:text="@string/msg_backup_no_files"
         android:visibility="gone" />
+
 </RelativeLayout>

@@ -21,13 +21,13 @@ along with the CheckValve source code.  If not, see
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
     android:gravity="right"
     android:orientation="horizontal" >
 
     <Button
-        android:id="@+id/edit_button"
+        android:id="@+id/buttonbar_edit_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/delete_button"
+        android:id="@+id/buttonbar_delete_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/up_button"
+        android:id="@+id/buttonbar_up_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,7 +99,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/down_button"
+        android:id="@+id/buttonbar_down_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

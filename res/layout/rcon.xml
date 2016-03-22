@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
+    android:id="@+id/rcon_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/steam_gray"
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/command_table"
+        android:id="@+id/rcon_command_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -37,10 +37,10 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="5dp" >
 
         <Button
-            android:id="@+id/send_button"
+            android:id="@+id/rcon_send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/field_command"
+            android:layout_alignBaseline="@+id/rcon_field_command"
             android:layout_alignParentRight="true"
             android:gravity="center_horizontal|center_vertical"
             android:paddingLeft="10dp"
@@ -48,10 +48,10 @@ along with the CheckValve source code.  If not, see
             android:text="@string/button_send" />
 
         <AutoCompleteTextView
-            android:id="@id/field_command"
+            android:id="@id/rcon_field_command"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/send_button"
+            android:layout_toLeftOf="@id/rcon_send_button"
             android:dropDownSelector="@color/steam_blue"
             android:gravity="start|center_vertical"
             android:inputType="text"
@@ -61,7 +61,7 @@ along with the CheckValve source code.  If not, see
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/rcon_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -77,8 +77,8 @@ along with the CheckValve source code.  If not, see
         android:id="@+id/rcon_console"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/command_table"
-        android:layout_below="@id/title"
+        android:layout_above="@id/rcon_command_table"
+        android:layout_below="@id/rcon_title"
         android:background="#000000"
         android:gravity="start"
         android:paddingBottom="5dp"
@@ -86,11 +86,11 @@ along with the CheckValve source code.  If not, see
         android:scrollbars="horizontal|vertical"
         android:text=""
         android:textColor="#FFFFFF"
-        android:textSize="9sp"
+        android:textSize="12sp"
         android:typeface="monospace" />
 
     <TextView
-        android:id="@+id/sending"
+        android:id="@+id/rcon_sending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/rcon_console"

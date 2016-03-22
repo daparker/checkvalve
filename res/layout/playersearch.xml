@@ -20,7 +20,7 @@ along with the CheckValve source code.  If not, see
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parentLayout"
+    android:id="@+id/playersearch_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -31,7 +31,7 @@ along with the CheckValve source code.  If not, see
     android:paddingTop="10dp" >
 
     <TextView
-        android:id="@+id/search_title"
+        android:id="@+id/playersearch_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
@@ -41,7 +41,7 @@ along with the CheckValve source code.  If not, see
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/label_playersearch"
+        android:id="@+id/playersearch_label_search_for"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
@@ -51,7 +51,7 @@ along with the CheckValve source code.  If not, see
         android:textStyle="bold" />
 
     <EditText
-        android:id="@+id/field_playersearch"
+        android:id="@+id/playersearch_field_search_for"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="0dp"
@@ -73,7 +73,7 @@ along with the CheckValve source code.  If not, see
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/cancel_button"
+            android:id="@+id/playersearch_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -85,7 +85,7 @@ along with the CheckValve source code.  If not, see
             android:text="@string/button_cancel" />
 
         <Button
-            android:id="@+id/search_button"
+            android:id="@+id/playersearch_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"

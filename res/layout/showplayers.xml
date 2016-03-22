@@ -19,7 +19,7 @@ along with the CheckValve source code.  If not, see
 <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/player_information"
+    android:id="@+id/showplayers_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/steam_gray"
@@ -27,14 +27,14 @@ along with the CheckValve source code.  If not, see
     android:padding="5dp" >
 
     <LinearLayout
-        android:id="@+id/player_information_title_bar"
+        android:id="@+id/showplayers_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/steam_gray"
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/player_information_x_button"
+            android:id="@+id/showplayers_x_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
@@ -47,7 +47,7 @@ along with the CheckValve source code.  If not, see
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/player_information_title"
+            android:id="@+id/showplayers_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
@@ -62,26 +62,26 @@ along with the CheckValve source code.  If not, see
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/scroll_pane"
+        android:id="@+id/showplayers_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
         <LinearLayout
-            android:id="@+id/parent_layout"
+            android:id="@+id/showplayers_inside_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
             <TableLayout
-                android:id="@+id/message_table"
+                android:id="@+id/showplayers_message_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:shrinkColumns="*" >
             </TableLayout>
 
             <TableLayout
-                android:id="@+id/player_info_table"
+                android:id="@+id/showplayers_player_info_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:shrinkColumns="0"
@@ -90,7 +90,7 @@ along with the CheckValve source code.  If not, see
                 <TableRow>
 
                     <TextView
-                        android:id="@+id/player_header"
+                        android:id="@+id/showplayers_player_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="left"
@@ -103,7 +103,7 @@ along with the CheckValve source code.  If not, see
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/kills_header"
+                        android:id="@+id/showplayers_kills_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -116,7 +116,7 @@ along with the CheckValve source code.  If not, see
                         android:textSize="13sp" />
 
                     <TextView
-                        android:id="@+id/time_header"
+                        android:id="@+id/showplayers_time_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
