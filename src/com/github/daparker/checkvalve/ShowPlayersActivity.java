@@ -52,10 +52,10 @@ public class ShowPlayersActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.showplayers);
 
-        x_button = (Button)this.findViewById(R.id.player_information_x_button);
+        x_button = (Button)this.findViewById(R.id.showplayers_x_button);
         x_button.setOnClickListener(xButtonListener);
 
-        player_info_table = (TableLayout)findViewById(R.id.player_info_table);
+        player_info_table = (TableLayout)findViewById(R.id.showplayers_player_info_table);
 
         if( database == null )
             database = new DatabaseProvider(ShowPlayersActivity.this);
