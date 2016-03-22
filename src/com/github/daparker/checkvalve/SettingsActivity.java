@@ -47,13 +47,14 @@ public class SettingsActivity extends Activity {
     private boolean rconEnableHistory;
     private boolean rconVolumeButtons;
     private boolean rconIncludeSM;
+    private boolean showServerName;
     private boolean showServerIP;
     private boolean showServerGameInfo;
     private boolean showServerMapName;
     private boolean showServerNumPlayers;
     private boolean showServerTags;
     private boolean showServerPing;
-    private boolean showServerNickname;
+    private boolean useServerAlias;
     private boolean validateNewServers;
     private boolean refreshServers;
 
@@ -67,13 +68,14 @@ public class SettingsActivity extends Activity {
     private CheckBox checkbox_rcon_enable_history;
     private CheckBox checkbox_rcon_volume_buttons;
     private CheckBox checkbox_rcon_include_sm;
+    private CheckBox checkbox_show_server_name;
     private CheckBox checkbox_show_server_ip;
     private CheckBox checkbox_show_server_game_info;
     private CheckBox checkbox_show_server_map_name;
     private CheckBox checkbox_show_server_num_players;
     private CheckBox checkbox_show_server_tags;
     private CheckBox checkbox_show_server_ping;
-    private CheckBox checkbox_show_server_nickname;
+    private CheckBox checkbox_use_server_alias;
     private CheckBox checkbox_validate_new_servers;
     private EditText field_default_query_port;
     private EditText field_default_query_timeout;
@@ -157,6 +159,10 @@ public class SettingsActivity extends Activity {
              * "Save" button was clicked
              */
 
+            // Refresh the server list if the "User server alias" option has been toggled
+            if( checkbox_use_server_alias.isChecked() != CheckValve.settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS) )
+                refreshServers = true;
+            
             saveSettings();
             setResult((refreshServers)?1:0);
             finish();
@@ -187,7 +193,7 @@ public class SettingsActivity extends Activity {
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
         
-        this.setContentView(R.layout.settings2);
+        this.setContentView(R.layout.settings);
         this.setResult(0);
         
         // Flag to main Activity to refresh the server list if necessary
@@ -206,38 +212,39 @@ public class SettingsActivity extends Activity {
         saveButton.setOnClickListener(saveButtonListener);
         saveButton.setOnTouchListener(buttonTouchListener);
         
-        plusButton = (Button)findViewById(R.id.rcon_font_size_plus);
-        minusButton = (Button)findViewById(R.id.rcon_font_size_minus);
+        plusButton = (Button)findViewById(R.id.settings_rcon_font_size_plus);
+        minusButton = (Button)findViewById(R.id.settings_rcon_font_size_minus);
         
-        checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.checkbox_rcon_show_passwords);
-        checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.checkbox_rcon_warn_unsafe_command);
-        checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.checkbox_rcon_show_suggestions);
-        checkbox_rcon_enable_history = (CheckBox)findViewById(R.id.checkbox_rcon_enable_history);
-        checkbox_rcon_volume_buttons = (CheckBox)findViewById(R.id.checkbox_rcon_volume_buttons);
-        checkbox_rcon_include_sm = (CheckBox)findViewById(R.id.checkbox_rcon_include_sm);
-        checkbox_show_server_ip = (CheckBox)findViewById(R.id.checkbox_servers_show_ip);
-        checkbox_show_server_game_info = (CheckBox)findViewById(R.id.checkbox_servers_show_game);
-        checkbox_show_server_map_name = (CheckBox)findViewById(R.id.checkbox_servers_show_map);
-        checkbox_show_server_num_players = (CheckBox)findViewById(R.id.checkbox_servers_show_players);
-        checkbox_show_server_tags = (CheckBox)findViewById(R.id.checkbox_servers_show_tags);
-        checkbox_show_server_ping = (CheckBox)findViewById(R.id.checkbox_servers_show_ping);
-        checkbox_show_server_nickname = (CheckBox)findViewById(R.id.checkbox_servers_show_nickname);
-        checkbox_validate_new_servers = (CheckBox)findViewById(R.id.checkbox_validate_new_servers);
-        field_default_query_port = (EditText)findViewById(R.id.field_default_query_port);
-        field_default_query_timeout = (EditText)findViewById(R.id.field_default_query_timeout);
-        field_default_relay_host = (EditText)findViewById(R.id.field_default_relay_host);
-        field_default_relay_port = (EditText)findViewById(R.id.field_default_relay_port);
-        field_default_relay_password = (EditText)findViewById(R.id.field_default_relay_password);
-        field_default_rcon_font_size = (TextView)findViewById(R.id.field_default_rcon_font_size);
+        checkbox_rcon_show_passwords = (CheckBox)findViewById(R.id.settings_checkbox_rcon_show_passwords);
+        checkbox_rcon_warn_unsafe_command = (CheckBox)findViewById(R.id.settings_checkbox_rcon_warn_unsafe_command);
+        checkbox_rcon_show_suggestions = (CheckBox)findViewById(R.id.settings_checkbox_rcon_show_suggestions);
+        checkbox_rcon_enable_history = (CheckBox)findViewById(R.id.settings_checkbox_rcon_enable_history);
+        checkbox_rcon_volume_buttons = (CheckBox)findViewById(R.id.settings_checkbox_rcon_volume_buttons);
+        checkbox_rcon_include_sm = (CheckBox)findViewById(R.id.settings_checkbox_rcon_include_sm);
+        checkbox_show_server_name = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_name);
+        checkbox_show_server_ip = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_ip);
+        checkbox_show_server_game_info = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_game);
+        checkbox_show_server_map_name = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_map);
+        checkbox_show_server_num_players = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_players);
+        checkbox_show_server_tags = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_tags);
+        checkbox_show_server_ping = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_ping);
+        checkbox_use_server_alias = (CheckBox)findViewById(R.id.settings_checkbox_servers_use_alias);
+        checkbox_validate_new_servers = (CheckBox)findViewById(R.id.settings_checkbox_validate_new_servers);
+        field_default_query_port = (EditText)findViewById(R.id.settings_field_default_query_port);
+        field_default_query_timeout = (EditText)findViewById(R.id.settings_field_default_query_timeout);
+        field_default_relay_host = (EditText)findViewById(R.id.settings_field_default_relay_host);
+        field_default_relay_port = (EditText)findViewById(R.id.settings_field_default_relay_port);
+        field_default_relay_password = (EditText)findViewById(R.id.settings_field_default_relay_password);
+        field_default_rcon_font_size = (TextView)findViewById(R.id.settings_field_default_rcon_font_size);
 
-        reset_do_not_show = (TextView)findViewById(R.id.reset_do_not_show);
+        reset_do_not_show = (TextView)findViewById(R.id.settings_reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
         
-        clear_saved_relays = (TextView)findViewById(R.id.clear_saved_relays);
+        clear_saved_relays = (TextView)findViewById(R.id.settings_clear_saved_relays);
         clear_saved_relays.setOnTouchListener(clearSavedRelaysTouchListener);
         
-        findViewById(R.id.create_backup).setOnTouchListener(createBackupTouchListener);
-        findViewById(R.id.restore_backup).setOnTouchListener(restoreBackupTouchListener);
+        findViewById(R.id.settings_create_backup).setOnTouchListener(createBackupTouchListener);
+        findViewById(R.id.settings_restore_backup).setOnTouchListener(restoreBackupTouchListener);
         
         plusButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -319,13 +326,14 @@ public class SettingsActivity extends Activity {
         rconEnableHistory = b.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
         rconVolumeButtons = b.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS);
         rconIncludeSM = b.getBoolean(Values.SETTING_RCON_INCLUDE_SM);
+        showServerName = b.getBoolean(Values.SETTING_SHOW_SERVER_NAME);
         showServerIP = b.getBoolean(Values.SETTING_SHOW_SERVER_IP);
         showServerGameInfo = b.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO);
         showServerMapName = b.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME);
         showServerNumPlayers = b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
         showServerTags = b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS);
         showServerPing = b.getBoolean(Values.SETTING_SHOW_SERVER_PING);
-        showServerNickname = b.getBoolean(Values.SETTING_SHOW_SERVER_NICKNAME);
+        useServerAlias = b.getBoolean(Values.SETTING_USE_SERVER_ALIAS);
         validateNewServers = b.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS);
 
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
@@ -334,13 +342,14 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_enable_history.setChecked(rconEnableHistory);
         checkbox_rcon_volume_buttons.setChecked(rconVolumeButtons);
         checkbox_rcon_include_sm.setChecked(rconIncludeSM);
+        checkbox_show_server_name.setChecked(showServerName);
         checkbox_show_server_ip.setChecked(showServerIP);
         checkbox_show_server_game_info.setChecked(showServerGameInfo);
         checkbox_show_server_map_name.setChecked(showServerMapName);
         checkbox_show_server_num_players.setChecked(showServerNumPlayers);
         checkbox_show_server_tags.setChecked(showServerTags);
         checkbox_show_server_ping.setChecked(showServerPing);
-        checkbox_show_server_nickname.setChecked(showServerNickname);
+        checkbox_use_server_alias.setChecked(useServerAlias);
         checkbox_validate_new_servers.setChecked(validateNewServers);
 
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
@@ -357,46 +366,51 @@ public class SettingsActivity extends Activity {
         Log.i(TAG, "settingCheckboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked=" + checked);
 
         switch( view.getId() ) {
-            case R.id.checkbox_rcon_show_passwords:
+            case R.id.settings_checkbox_rcon_show_passwords:
                 rconShowPasswords = checked;
                 break;
-            case R.id.checkbox_rcon_warn_unsafe_command:
+            case R.id.settings_checkbox_rcon_warn_unsafe_command:
                 rconWarnUnsafeCommand = checked;
                 break;
-            case R.id.checkbox_rcon_show_suggestions:
+            case R.id.settings_checkbox_rcon_show_suggestions:
                 rconShowSuggestions = checked;
+                checkbox_rcon_include_sm.setEnabled(rconShowSuggestions);
                 break;
-            case R.id.checkbox_rcon_enable_history:
+            case R.id.settings_checkbox_rcon_enable_history:
                 rconEnableHistory = checked;
                 break;
-            case R.id.checkbox_rcon_volume_buttons:
+            case R.id.settings_checkbox_rcon_volume_buttons:
                 rconVolumeButtons = checked;
                 break;
-            case R.id.checkbox_rcon_include_sm:
+            case R.id.settings_checkbox_rcon_include_sm:
                 rconIncludeSM = checked;
                 break;
-            case R.id.checkbox_servers_show_ip:
+            case R.id.settings_checkbox_servers_show_name:
+                showServerName = checked;
+                checkbox_use_server_alias.setEnabled(showServerName);
+                break;
+            case R.id.settings_checkbox_servers_show_ip:
                 showServerIP = checked;
                 break;
-            case R.id.checkbox_servers_show_game:
+            case R.id.settings_checkbox_servers_show_game:
                 showServerGameInfo = checked;
                 break;
-            case R.id.checkbox_servers_show_map:
+            case R.id.settings_checkbox_servers_show_map:
                 showServerMapName = checked;
                 break;
-            case R.id.checkbox_servers_show_players:
+            case R.id.settings_checkbox_servers_show_players:
                 showServerNumPlayers = checked;
                 break;
-            case R.id.checkbox_servers_show_tags:
+            case R.id.settings_checkbox_servers_show_tags:
                 showServerTags = checked;
                 break;
-            case R.id.checkbox_servers_show_ping:
+            case R.id.settings_checkbox_servers_show_ping:
                 showServerPing = checked;
                 break;
-            case R.id.checkbox_servers_show_nickname:
-                showServerNickname = checked;
+            case R.id.settings_checkbox_servers_use_alias:
+                useServerAlias = checked;
                 break;
-            case R.id.checkbox_validate_new_servers:
+            case R.id.settings_checkbox_validate_new_servers:
                 validateNewServers = checked;
         }
     }
@@ -449,13 +463,14 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, rconEnableHistory);
             b.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, rconVolumeButtons);
             b.putBoolean(Values.SETTING_RCON_INCLUDE_SM, rconIncludeSM);
+            b.putBoolean(Values.SETTING_SHOW_SERVER_NAME, showServerName);
             b.putBoolean(Values.SETTING_SHOW_SERVER_IP, showServerIP);
             b.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, showServerGameInfo);
             b.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, showServerMapName);
             b.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, showServerNumPlayers);
             b.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, showServerTags);
             b.putBoolean(Values.SETTING_SHOW_SERVER_PING, showServerPing);
-            b.putBoolean(Values.SETTING_SHOW_SERVER_NICKNAME, showServerNickname);
+            b.putBoolean(Values.SETTING_USE_SERVER_ALIAS, useServerAlias);
             b.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, validateNewServers);
             b.putInt(Values.SETTING_DEFAULT_QUERY_PORT, defaultQueryPort);
             b.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
