@@ -64,6 +64,7 @@ public final class Values {
     public static final String EXTRA_NOTE_ID = "noteString";
     public static final String EXTRA_DEBUG_TEXT = "debugText";
     public static final String EXTRA_BACKUP_FILE = "backupFile";
+    public static final String EXTRA_ALIAS = "alias";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -82,13 +83,14 @@ public final class Values {
     public static final String SETTING_RCON_VOLUME_BUTTONS = "rconVolumeButtons";
     public static final String SETTING_RCON_DEFAULT_FONT_SIZE = "rconDefaultFontSize";
     public static final String SETTING_RCON_INCLUDE_SM = "rconIncludeSM";
+    public static final String SETTING_SHOW_SERVER_NAME = "showServerName";
     public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
     public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
     public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
     public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
     public static final String SETTING_SHOW_SERVER_PING = "showServerPing";
-    public static final String SETTING_SHOW_SERVER_NICKNAME = "showServerNickname";
+    public static final String SETTING_USE_SERVER_ALIAS = "useServerAlias";
     public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
     public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
     public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
