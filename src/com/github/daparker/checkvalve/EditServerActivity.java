@@ -157,17 +157,17 @@ public class EditServerActivity extends Activity {
 
         ServerRecord sr = database.getServer(rowId);
 
-        saveButton = (Button)findViewById(R.id.saveButton);
+        saveButton = (Button)findViewById(R.id.editserver_save_button);
         saveButton.setOnClickListener(saveButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.editserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        field_server = (EditText)findViewById(R.id.field_server);
-        field_port = (EditText)findViewById(R.id.field_port);
-        field_timeout = (EditText)findViewById(R.id.field_timeout);
-        field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
-        field_nickname = (EditText)findViewById(R.id.field_nickname);
+        field_server = (EditText)findViewById(R.id.editserver_field_server);
+        field_port = (EditText)findViewById(R.id.editserver_field_port);
+        field_timeout = (EditText)findViewById(R.id.editserver_field_timeout);
+        field_rcon_password = (EditText)findViewById(R.id.editserver_field_rcon_password);
+        field_nickname = (EditText)findViewById(R.id.editserver_field_nickname);
 
         field_server.setText(sr.getServerURL());
         field_port.setText(Integer.toString(sr.getServerPort()));
@@ -176,11 +176,11 @@ public class EditServerActivity extends Activity {
         field_nickname.setText(sr.getServerNickname());
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            ((CheckBox)findViewById(R.id.editserver_checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
         else {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            ((CheckBox)findViewById(R.id.editserver_checkbox_show_password)).setChecked(false);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }
