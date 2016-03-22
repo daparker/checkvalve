@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
+    android:id="@+id/debugconsole_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/button_layout"
+        android:id="@+id/debugconsole_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -41,7 +41,7 @@ along with the CheckValve source code.  If not, see
             android:gravity="center" />
 
         <Button
-            android:id="@+id/dismiss_button"
+            android:id="@+id/debugconsole_dismiss_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -55,32 +55,33 @@ along with the CheckValve source code.  If not, see
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/scroll_pane"
+        android:id="@+id/debugconsole_scroll_pane"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/button_layout"
+        android:layout_above="@id/debugconsole_button_layout"
         android:background="#000000"
         android:orientation="vertical" >
 
         <LinearLayout
-            android:id="@+id/textview_layout"
+            android:id="@+id/debugconsole_textview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#000000"
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/debug_console"
+                android:id="@+id/debugconsole_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#000000"
                 android:gravity="start"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
-                android:typeface="monospace"
                 android:text=""
                 android:textColor="#FFFFFF"
-                android:textSize="10sp" />
+                android:textIsSelectable="true"
+                android:textSize="10sp"
+                android:typeface="monospace" />
         </LinearLayout>
     </ScrollView>
 
