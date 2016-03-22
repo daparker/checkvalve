@@ -27,7 +27,8 @@ along with the CheckValve source code.  If not, see
     <string name="app_credits">Copyright 2010&#8211;2016 by David A. Parker</string>
     <string name="app_license">CheckValve is free software under the terms of the GNU General Public License version 3.</string>
     <string name="app_name">CheckValve 2.0-dev</string>
-    <string name="app_support">        &#8226; <a href="https://sites.google.com/site/checkvalveapp">Visit the CheckValve website</a>\n\n
+    <string name="app_support">        
+        &#8226; <a href="https://sites.google.com/site/checkvalveapp">Visit the CheckValve website</a>\n\n
         &#8226; <a href="https://groups.google.com/forum/#!forum/checkvalve">Join the CheckValve community forum</a>\n\n
         &#8226; <a href="https://github.com/daparker/checkvalve/issues">Report an issue on GitHub</a>\n\n
         &#8226; <a href="https://sites.google.com/site/checkvalveapp/documentation/app/change-log">View the change log</a>\n\n
@@ -61,7 +62,7 @@ along with the CheckValve source code.  If not, see
     <string name="help_text_restore_backup">The backup file must exist in the %1$s folder on your device.</string>
     <string name="hint_chatui_say">Say something&#8230;</string>
     <string name="label_backup_file">Backup File:</string>
-    <string name="label_backup_app_version">Version:</string>
+    <string name="label_backup_app_version">App:</string>
     <string name="label_backup_date">Date:</string>
     <string name="label_backup_size">Size:</string>
     <string name="label_chat_relay_password">Chat Relay Password:</string>
@@ -136,10 +137,10 @@ along with the CheckValve source code.  If not, see
     <string name="msg_font_size">Font size</string>
     <string name="msg_general_error">Oops! An error has occurred."</string>
     <string name="msg_network_change">A network change has been detected.</string>
-    <string name="msg_no_challenge_response">No challenge response from\n</string>
+    <string name="msg_no_challenge_response">No challenge response from\n%1$s</string>
     <string name="msg_no_players">The server is currently empty.</string>
     <string name="msg_no_rcon_auth">RCON authentication failed.</string>
-    <string name="msg_no_response">No response from</string>
+    <string name="msg_no_response">No response from %1$s</string>
     <string name="msg_no_search_results">No matches were found.</string>
     <string name="msg_no_tags">(None)</string>
     <string name="msg_options_reset">\"Don\'t show me this again\" options have been reset.</string>
@@ -154,10 +155,10 @@ along with the CheckValve source code.  If not, see
     <string name="msg_server_validation_failed">An error occurred while validating the server.</string>
     <string name="msg_success">The server information has been saved.</string>
     <string name="msg_unable_to_connect">Unable to connect.</string>
-    <string name="msg_unable_to_connect_to">Unable to connect to</string>
-    <string name="msg_unknown_host">Unknown host</string>
+    <string name="msg_unable_to_connect_to">Unable to connect to %1$s</string>
+    <string name="msg_unknown_host">Unknown host %1$s</string>
     <string name="note_chat_relay_required">This feature requires the use of a CheckValve Chat Relay.  The Chat Relay receives log messages from the game server and relays player chats to CheckValve.  If you do not currently have a Chat Relay, it\'s easy to set one up and start using this feature.\n\nDocumentation and downloads can be found at the following URL:\n\nhttps://sites.google.com/site/checkvalveapp/chatrelay</string>
-    <string name="playing_on">is playing on</string>
+    <string name="playing_on">%1$s is playing on %2$s</string>
     <string name="settings_create_backup">Create a new backup</string>
     <string name="settings_clear_saved_relays">Clear previous Chat Relay hosts</string>
     <string name="settings_default_chat_relay_host">Chat Relay Host</string>
@@ -174,7 +175,7 @@ along with the CheckValve source code.  If not, see
     <string name="settings_header_server_information">Server Information</string>
     <string name="settings_rcon_default_font_size">Default font size</string>
     <string name="settings_rcon_enable_history">Arrow keys show command history</string>
-    <string name="settings_rcon_include_sm">Include SourceMod in suggested commands</string>
+    <string name="settings_rcon_include_sm">Include SourceMod commands</string>
     <string name="settings_rcon_show_passwords">Show RCON passwords</string>
     <string name="settings_rcon_show_suggestions">Show suggested commands</string>
     <string name="settings_rcon_volume_buttons">Volume buttons adjust font size</string>
@@ -185,9 +186,10 @@ along with the CheckValve source code.  If not, see
     <string name="settings_show_map_name">Show map name</string>
     <string name="settings_show_players">Show number of players</string>
     <string name="settings_show_server_ip">Show IP and port</string>
-    <string name="settings_show_server_nickname">Show server nickname</string>
+    <string name="settings_show_server_name">Show server name</string>
     <string name="settings_show_server_ping">Show server ping</string>
     <string name="settings_show_server_tags">Show server tags</string>
+    <string name="settings_use_server_alias">Use server alias if available</string>
     <string name="settings_validate_new_servers">Validate new servers</string>
     <string name="status_connecting">Connecting&#8230;</string>
     <string name="status_querying_server">Querying server&#8230;</string>
@@ -307,12 +309,14 @@ along with the CheckValve source code.  If not, see
         <item>version</item>
         <item>_restart</item>
     </string-array>
+    
     <string-array name="unsafe_commands">
         <item>exit</item>
         <item>quit</item>
         <item>restart</item>
         <item>_restart</item>
     </string-array>
+    
     <string-array name="sm_commands">
         <item>sm_addban</item>
         <item>sm_admin</item>
