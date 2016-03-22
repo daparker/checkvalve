@@ -42,7 +42,7 @@ public class PlayerSearchActivity extends Activity {
              * "Search" button was clicked
              */
 
-            field_playersearch = (EditText)findViewById(R.id.field_playersearch);
+            field_playersearch = (EditText)findViewById(R.id.playersearch_field_search_for);
 
             // Explicitly hide the soft keyboard because sometimes it doesn't close
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -77,10 +77,10 @@ public class PlayerSearchActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.playersearch);
 
-        field_playersearch = (EditText)findViewById(R.id.field_playersearch);
+        field_playersearch = (EditText)findViewById(R.id.playersearch_field_search_for);
 
-        search_button = (Button)findViewById(R.id.search_button);
-        cancel_button = (Button)findViewById(R.id.cancel_button);
+        search_button = (Button)findViewById(R.id.playersearch_search_button);
+        cancel_button = (Button)findViewById(R.id.playersearch_cancel_button);
 
         search_button.setOnClickListener(searchButtonListener);
         cancel_button.setOnClickListener(cancelButtonListener);
