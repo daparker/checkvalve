@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -265,33 +266,33 @@ public class ManageServersActivity extends Activity {
                 server = sr.getServerURL() + ":" + Integer.toString(port);
             }
 
-            View v = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
-            v.setId(i);
+            View buttonBar = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
+            buttonBar.setId(i);
 
             TextView serverName = (TextView)View.inflate(ManageServersActivity.this, R.layout.manageservers_servername, null);
             serverName.setText(server);
             serverName.setId(i);
 
-            Button editButton = (Button)v.findViewById(R.id.buttonbar_edit_button);
+            Button editButton = (Button)buttonBar.findViewById(R.id.buttonbar_edit_button);
             editButton.setId(rowId);
             editButton.setOnClickListener(editButtonListener);
 
-            Button deleteButton = (Button)v.findViewById(R.id.buttonbar_delete_button);
+            Button deleteButton = (Button)buttonBar.findViewById(R.id.buttonbar_delete_button);
             deleteButton.setId(rowId);
             deleteButton.setOnClickListener(deleteButtonListener);
 
-            Button moveUpButton = (Button)v.findViewById(R.id.buttonbar_up_button);
+            Button moveUpButton = (Button)buttonBar.findViewById(R.id.buttonbar_up_button);
             moveUpButton.setId(rowId);
             moveUpButton.setOnClickListener(moveUpButtonListener);
 
-            Button moveDownButton = (Button)v.findViewById(R.id.buttonbar_down_button);
+            Button moveDownButton = (Button)buttonBar.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);
             serverRow.addView(serverName);
-            serverRow.addView(v);
+            serverRow.addView(buttonBar);
 
             TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                     TableLayout.LayoutParams.MATCH_PARENT,
@@ -299,6 +300,7 @@ public class ManageServersActivity extends Activity {
 
             params.setMargins(0, 50, 0, 0);
             serverRow.setLayoutParams(params);
+            serverRow.setGravity(Gravity.LEFT|Gravity.BOTTOM);
 
             server_table.addView(serverRow, params);
 
