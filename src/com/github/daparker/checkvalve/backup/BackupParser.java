@@ -352,7 +352,7 @@ public class BackupParser implements Runnable {
         map.put("show_game_info", Values.SETTING_SHOW_SERVER_GAME_INFO);
         map.put("show_tags", Values.SETTING_SHOW_SERVER_TAGS);
         map.put("show_ping", Values.SETTING_SHOW_SERVER_PING);
-        map.put("show_nickname", Values.SETTING_USE_SERVER_ALIAS);
+        map.put("show_nickname", Values.SETTING_USE_SERVER_NICKNAME);
         map.put("validate_new_servers", Values.SETTING_VALIDATE_NEW_SERVERS);
         map.put("default_relay_host", Values.SETTING_DEFAULT_RELAY_HOST);
         map.put("default_relay_password", Values.SETTING_DEFAULT_RELAY_PASSWORD);
