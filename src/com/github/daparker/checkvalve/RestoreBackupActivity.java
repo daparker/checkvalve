@@ -275,7 +275,7 @@ public class RestoreBackupActivity extends Activity {
     public void runFileChooser() {
         if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
             Intent settingsIntent = new Intent();
-            settingsIntent.setClassName("com.github.daparker.checkvalve.backup", "com.github.daparker.checkvalve.backup.FileChooserActivity");
+            settingsIntent.setClassName("com.github.daparker.checkvalve", "com.github.daparker.checkvalve.backup.FileChooserActivity");
             startActivityForResult(settingsIntent, Values.ACTIVITY_FILE_CHOOSER);
         }
         else {
