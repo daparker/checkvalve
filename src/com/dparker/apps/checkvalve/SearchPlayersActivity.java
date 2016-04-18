@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,6 +19,7 @@
 
 package com.dparker.apps.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class SearchPlayersActivity extends Activity {
     private TableRow[] tableRows;
     private TableRow[] messageRows;
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
@@ -66,8 +68,8 @@ public class SearchPlayersActivity extends Activity {
 
         setContentView(R.layout.searchresults);
 
-        search_results_table = (TableLayout)findViewById(R.id.search_results_table);
-        message_table = (TableLayout)findViewById(R.id.message_table);
+        search_results_table = (TableLayout)findViewById(R.id.searchresults_main_table);
+        message_table = (TableLayout)findViewById(R.id.searchresults_message_table);
 
         searchPlayers(search);
     }

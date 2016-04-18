@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import com.dparker.apps.checkvalve.R;
 import com.dparker.apps.checkvalve.exceptions.NullResponseException;
@@ -36,6 +37,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+@SuppressLint({ "NewApi", "DefaultLocale" })
 public class SearchPlayers extends Thread {
     private static final String TAG = SearchPlayers.class.getSimpleName();
 
@@ -73,6 +75,7 @@ public class SearchPlayers extends Thread {
         byte[] bufferIn;
 
         // String variables
+        String serverNickname = new String();
         String serverURL = new String();
         String resultString = new String();
         
@@ -90,13 +93,15 @@ public class SearchPlayers extends Thread {
 
         for( ServerRecord sr : serverList ) {
             try {
-                serverURL = sr.getServerName();
+                serverNickname = sr.getServerNickname();
+                serverURL = sr.getServerURL();
                 serverPort = sr.getServerPort();
                 serverTimeout = sr.getServerTimeout();
 
                 //String header = new String();
                 int header = 0;
                 String name = new String();
+                String host = new String();
 
                 short numplayers = 0;
                 short numpackets = 0;
@@ -235,9 +240,16 @@ public class SearchPlayers extends Thread {
                             // We have a match!
                             numResults++;
 
-                            resultString = "<b>" + name + "</b>";
-                            resultString += " " + (String)context.getText(R.string.playing_on);
-                            resultString += " " + serverURL + ":" + Integer.toString(serverPort);
+                            // Use the server nickname if there is one, otherwise server:port
+                            if( serverNickname.length() > 0 ) {
+                                resultString = String.format(context.getString(R.string.playing_on),
+                                        "<b>" + name + "</b>", serverNickname);
+                            }
+                            else {
+                                host = serverURL + ":" + Integer.toString(serverPort);
+                                resultString = String.format(context.getString(R.string.playing_on),
+                                        "<b>" + name + "</b>", host);
+                            }
 
                             TextView searchResult = new TextView(context);
                             searchResult.setId(0);
@@ -264,10 +276,8 @@ public class SearchPlayers extends Thread {
             catch( Exception e ) {
                 Log.w(TAG, "queryPlayers(): Caught an exception:", e);
 
-                String message = new String();
-
-                message += context.getText(R.string.msg_no_response);
-                message += " " + serverURL + ":" + serverPort;
+                String host = serverURL + ":" + Integer.toString(serverPort);
+                String message = String.format(context.getString(R.string.msg_no_response), host);
 
                 TextView errorMessage = new TextView(context);
 

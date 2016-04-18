@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -25,17 +25,14 @@ import android.util.Log;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class EngineQuery implements Runnable {
     private Handler handler;
     private String server;
     private int port;
     private int timeout;
-    private SourceServer ssrv;
-    private GoldSrcServer gsrv;
-    private Object obj;
+    private GameServer gs;
 
     private static final String TAG = EngineQuery.class.getSimpleName();
 
@@ -57,27 +54,21 @@ public class EngineQuery implements Runnable {
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
-        int result = 0;
         Message msg = new Message();
-
-        result = getServerEngine(server, port, timeout);
-
-        if( obj != null )
-            msg.obj = obj;
-
-        msg.what = result;
-
+        
+        gs = getServerEngine(server, port, timeout);
+        msg.obj = gs;
         handler.sendMessage(msg);
     }
 
-    public int getServerEngine( String s, int p, int t ) {
+    public GameServer getServerEngine( String s, int p, int t ) {
         int appId = 0;
         int byteNum = 0;
         int firstByte = 0;
         int secondByte = 0;
 
         try {
-            int result = 0;
+            int engine = 0;
 
             DatagramSocket socket = new DatagramSocket();
 
@@ -100,7 +91,7 @@ public class EngineQuery implements Runnable {
             // Show an error if the connection attempt failed
             if( !socket.isConnected() ) {
                 socket.close();
-                return -1;
+                return null;
             }
 
             // Send the query string to the server
@@ -141,7 +132,7 @@ public class EngineQuery implements Runnable {
             // If the app ID is less than 200 then the engine is assumed to be GoldSource,
             // but we'll check for the 64-bit game ID later and use that if possible since
             // it's more accurate
-            result = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
+            engine = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
 
             // Skip the next 9 bytes
             byteNum += 9;
@@ -188,27 +179,30 @@ public class EngineQuery implements Runnable {
                     appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn, byteNum, 3).put((byte)0x00).getInt(0);
 
                     // Use this app ID to determine the engine
-                    result = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
+                    engine = (appId < 200)?Values.ENGINE_GOLDSRC:Values.ENGINE_SOURCE;
                 }
             }
 
             socket.close();
-
-            if( result == Values.ENGINE_GOLDSRC ) {
-                gsrv = new GoldSrcServer(InetAddress.getByName(server), port);
-                obj = gsrv;
+            
+            if( engine == Values.ENGINE_GOLDSRC ) {
+                Log.i(TAG, "Server engine is GoldSrc");
+            }
+            else if( engine == Values.ENGINE_SOURCE ) {
+                Log.i(TAG, "Server engine is Source");
             }
             else {
-                ssrv = new SourceServer(InetAddress.getByName(server), port);
-                obj = ssrv;
+                Log.w(TAG, "Unrecognized server engine");
+                return null;
             }
-
+            
+            GameServer result = Server.getServer(engine, InetAddress.getByName(server), port);
             return result;
         }
         // Handle a socket timeout
         catch( Exception e ) {
             Log.w(TAG, "getServerEngine(): Caught an exception:", e);
-            return -1;
+            return null;
         }
     }
 }

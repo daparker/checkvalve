@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -21,13 +21,14 @@ along with the CheckValve source code.  If not, see
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
+    android:layout_height="match_parent"
+    android:layout_gravity="right|bottom"
     android:gravity="right"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:background="@android:color/transparent" >
 
     <Button
-        android:id="@+id/edit_button"
+        android:id="@+id/buttonbar_edit_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,7 +52,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/delete_button"
+        android:id="@+id/buttonbar_delete_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,7 +76,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/up_button"
+        android:id="@+id/buttonbar_up_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,7 +100,7 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <Button
-        android:id="@+id/down_button"
+        android:id="@+id/buttonbar_down_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -20,7 +20,7 @@ along with the CheckValve source code.  If not, see
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
+    android:id="@+id/shownote_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/steam_gray"
@@ -28,18 +28,18 @@ along with the CheckValve source code.  If not, see
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/note_text"
+        android:id="@+id/shownote_note_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:gravity="left|center_vertical"
+        android:padding="10dp"
         android:text=""
         android:textColor="#ffffff"
         android:textSize="16sp"
         android:textStyle="normal" />
 
     <LinearLayout
-        android:id="@+id/do_not_show_layout"
+        android:id="@+id/shownote_do_not_show_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -48,22 +48,22 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="5dp" >
 
         <CheckBox
-            android:id="@+id/checkbox_do_not_show"
+            android:id="@+id/shownote_checkbox_do_not_show"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="0dp"
+            android:checked="false"
             android:onClick="DoNotShowCheckboxHandler"
             android:text="@string/label_do_not_show"
-            android:textSize="12sp"
             android:textColor="#ffffff"
-            android:checked="false" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/button_layout"
+        android:id="@+id/shownote_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -76,7 +76,7 @@ along with the CheckValve source code.  If not, see
             android:gravity="center" />
 
         <Button
-            android:id="@+id/dismiss_button"
+            android:id="@+id/shownote_dismiss_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"

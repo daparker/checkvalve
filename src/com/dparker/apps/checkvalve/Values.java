@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,8 +19,12 @@
 
 package com.dparker.apps.checkvalve;
 
-/*
- * Define the Values class
+/**
+ * This class provides static values for standardizing things throughout
+ * the CheckValve source code.
+ * 
+ * @author David A. Parker
+ *
  */
 public final class Values {
     // Engine types
@@ -41,6 +45,10 @@ public final class Values {
     public static final int ACTIVITY_CONFIRM_UNSAFE_COMMAND = 12;
     public static final int ACTIVITY_SETTINGS = 13;
     public static final int ACTIVITY_SHOW_NOTE = 14;
+    public static final int ACTIVITY_DEBUG_CONSOLE = 15;
+    public static final int ACTIVITY_CREATE_BACKUP = 16;
+    public static final int ACTIVITY_RESTORE_BACKUP = 17;
+    public static final int ACTIVITY_FILE_CHOOSER = 18;
 
     // Intent extra names
     public static final String EXTRA_ROW_ID = "rowId";
@@ -54,6 +62,9 @@ public final class Values {
     public static final String EXTRA_MESSAGE_LIST = "messageList";
     public static final String EXTRA_FILE_NAME = "filename";
     public static final String EXTRA_NOTE_ID = "noteString";
+    public static final String EXTRA_DEBUG_TEXT = "debugText";
+    public static final String EXTRA_BACKUP_FILE = "backupFile";
+    public static final String EXTRA_NICKNAME = "nickname";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -69,11 +80,17 @@ public final class Values {
     public static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
     public static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
     public static final String SETTING_RCON_ENABLE_HISTORY = "rconEnableHistory";
+    public static final String SETTING_RCON_VOLUME_BUTTONS = "rconVolumeButtons";
+    public static final String SETTING_RCON_DEFAULT_FONT_SIZE = "rconDefaultFontSize";
+    public static final String SETTING_RCON_INCLUDE_SM = "rconIncludeSM";
+    public static final String SETTING_SHOW_SERVER_NAME = "showServerName";
     public static final String SETTING_SHOW_SERVER_IP = "showServerIP";
     public static final String SETTING_SHOW_SERVER_GAME_INFO = "showServerGameInfo";
     public static final String SETTING_SHOW_SERVER_MAP_NAME = "showServerMapName";
     public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
     public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
+    public static final String SETTING_SHOW_SERVER_PING = "showServerPing";
+    public static final String SETTING_USE_SERVER_NICKNAME = "useServerNickname";
     public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
     public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
     public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";
@@ -90,6 +107,8 @@ public final class Values {
     public static final String TAG_SERVER_MAP = "serverMap";
     public static final String TAG_SERVER_PLAYERS = "serverPlayers";
     public static final String TAG_SERVER_TAGS = "serverTags";
+    public static final String TAG_SERVER_PING = "serverPing";
+    public static final String TAG_SERVER_NICKNAME = "serverNickname";
     public static final String TAG_PLAYER_INFO = "playerInfo";
     public static final String TAG_MESSAGE_INFO = "messageInfo";
     
@@ -108,4 +127,8 @@ public final class Values {
     public static final byte BYTE_A2S_PLAYER = (byte)0x55;
     public static final byte BYTE_A2S_RULES = (byte)0x56;
     public static final String A2S_INFO_QUERY = "Source Engine Query";
+    
+    // Server query types
+    public static final int QUERY_ENGINE = 1;
+    public static final int QUERY_INFO = 2;
 }

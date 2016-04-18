@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -26,6 +26,7 @@ import android.os.Parcelable;
  * Define the ServerInfo class
  */
 public class ServerInfo implements Parcelable {
+    private String nickname;
     private String name;
     private String addr;
     private String game;
@@ -37,12 +38,14 @@ public class ServerInfo implements Parcelable {
     private int maxPlayers;
     private int listPos;
     private long rowId;
+    private long ping;
 
     public ServerInfo() {}
 
     /**
      * Create a new ServerInfo object using information from an A2S_INFO response
      * 
+     * @param nickname The server's nickname in CheckValve
      * @param name The server's name
      * @param addr The server's IP address
      * @param game The game which is running on the server
@@ -53,8 +56,9 @@ public class ServerInfo implements Parcelable {
      * @param numPlayers The number of players on the server
      * @param maxPlayers The max number of players the server will support
      */
-    public ServerInfo( String name, String addr, String game, String version, String map, String tags,
-            int port, int numPlayers, int maxPlayers, int listPos, long rowId ) {
+    public ServerInfo( String nickname, String name, String addr, String game, String version, String map,
+            String tags, int port, int numPlayers, int maxPlayers, int listPos, long rowId, long ping ) {
+        this.nickname = nickname;
         this.name = name;
         this.addr = addr;
         this.game = game;
@@ -66,8 +70,13 @@ public class ServerInfo implements Parcelable {
         this.maxPlayers = maxPlayers;
         this.listPos = listPos;
         this.rowId = rowId;
+        this.ping = ping;
     }
 
+    public void setNickname( String s ) {
+        this.nickname = s;
+    }
+    
     public void setName( String s ) {
         this.name = s;
     }
@@ -110,6 +119,14 @@ public class ServerInfo implements Parcelable {
     
     public void setMaxPlayers( int i ) {
         this.maxPlayers = i;
+    }
+    
+    public void setPing( long l ) {
+        this.ping = l;
+    }
+    
+    public String getNickame() {
+        return this.nickname;
     }
     
     public String getName() {
@@ -156,11 +173,16 @@ public class ServerInfo implements Parcelable {
         return this.rowId;
     }
     
+    public long getPing() {
+        return this.ping;
+    }
+    
     public int describeContents() {
         return 0;
     }
 
     public void writeToParcel( Parcel dest, int flags ) {
+        dest.writeString(this.nickname);
         dest.writeString(this.name);
         dest.writeString(this.addr);
         dest.writeString(this.game);
@@ -172,6 +194,7 @@ public class ServerInfo implements Parcelable {
         dest.writeInt(this.maxPlayers);
         dest.writeInt(this.listPos);
         dest.writeLong(this.rowId);
+        dest.writeLong(this.ping);
     }
 
     public static final Parcelable.Creator<ServerInfo> CREATOR = new Parcelable.Creator<ServerInfo>() {
@@ -185,6 +208,7 @@ public class ServerInfo implements Parcelable {
     };
 
     private ServerInfo( Parcel in ) {
+        nickname = in.readString();
         name = in.readString();
         addr = in.readString();
         game = in.readString();
@@ -196,5 +220,6 @@ public class ServerInfo implements Parcelable {
         maxPlayers = in.readInt();
         listPos = in.readInt();
         rowId = in.readLong();
+        ping = in.readLong();
     }
 }

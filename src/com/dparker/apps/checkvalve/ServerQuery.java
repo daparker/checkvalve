@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -31,6 +32,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import com.dparker.apps.checkvalve.R;
 
+@SuppressLint("DefaultLocale")
 public class ServerQuery implements Runnable {
     private DatagramSocket socket;
     private Handler handler;
@@ -38,6 +40,8 @@ public class ServerQuery implements Runnable {
     private ArrayList<String> messages;
     private ServerInfo[] serverInfo;
     private int status;
+    private boolean debug;
+    private QueryDebugLog debugLog;
 
     private static final String TAG = ServerQuery.class.getSimpleName();
 
@@ -47,10 +51,12 @@ public class ServerQuery implements Runnable {
      * @param c The context to use
      * @param h The Handler to use
      */
-    public ServerQuery( Context c, Handler h ) {
+    public ServerQuery( Context c, Handler h, boolean debugMode, QueryDebugLog debugLog ) {
         this.context = c;
         this.status = 0;
         this.handler = h;
+        this.debug = debugMode;
+        this.debugLog = debugLog;
     }
 
     public void run() {
@@ -79,10 +85,20 @@ public class ServerQuery implements Runnable {
     }
 
     public void queryServers() throws UnsupportedEncodingException {
+        long runStartTime = System.currentTimeMillis();
+        
+        if( debug == true ) {
+            debugLog.addMessage("Run started at " + runStartTime + "\n");
+        }
+        
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
         ServerRecord[] serverList = database.getAllServers();
         database.close();
+        
+        if( debug == true ) {
+            debugLog.addMessage(serverList.length + " servers will be queried.");
+        }
         
         // The outgoing data only needs to be set up once
         byte[] arrayOut = new byte[25];
@@ -98,17 +114,54 @@ public class ServerQuery implements Runnable {
         messages = new ArrayList<String>();
 
         for( int i = 0; i < serverList.length; i++ ) {
+            long startTime = 0L;
+            long endTime = 0L;
+            long requestTime = 0L;
+            long queryStart = 0L;
+            long queryEnd = 0L;
+            long queryTime = 0L;
+            long parseStart = 0L;
+            long parseEnd = 0L;
+            long parseTime = 0L;
+            
+            queryStart = System.currentTimeMillis();
+            
+            if( debug == true ) {
+                debugLog.addMessage("\nQUERY #" + (i+1));
+                debugLog.addMessage("> Start time: " + queryStart);
+            }
+            
             ServerRecord sr = serverList[i];
 
-            String serverURL = sr.getServerName();
+            String serverName = new String();
+            String serverURL = sr.getServerURL();
+            String serverNickname = sr.getServerNickname();
             long serverRowId = sr.getServerRowID();
             int serverPort = sr.getServerPort();
             int serverTimeout = sr.getServerTimeout();
             int serverListPos = sr.getServerListPosition();
             
+            int socketTimeout = 0;
+            
+            // Use the nickname in error rows if there is one, otherwise use
+            // the URL and port 
+            if( serverNickname.length() > 0 ) {
+                serverName = serverNickname;
+            }
+            else {
+                serverName = serverURL
+                        .concat(":")
+                        .concat(Integer.toString(serverPort));
+            }
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> Server: " + serverURL + ":" + Integer.toString(serverPort));
+            }
+            
             try {
                 socket = new DatagramSocket();
                 socket.setSoTimeout(serverTimeout * 1000);
+                socketTimeout = socket.getSoTimeout();
 
                 // Byte buffers for packet data
                 byte[] arrayIn = new byte[1400];
@@ -126,21 +179,62 @@ public class ServerQuery implements Runnable {
                 // Show an error if the connection attempt failed
                 if( !socket.isConnected() ) {
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Socket connect failed!");
+                    }
+                    
                     continue;
                 }
 
                 String serverIP = socket.getInetAddress().getHostAddress();
+                
+                if( debug == true ) {
+                    debugLog.addMessage("> Socket is connected");
+                    
+                    String localAddr = socket.getLocalAddress().getHostAddress();
+                    int localPort = socket.getLocalPort();
+                    int timeout = socket.getSoTimeout();
+                    
+                    debugLog.addMessage(">   Local addr: " + localAddr);
+                    debugLog.addMessage(">   Local port: " + localPort);
+                    debugLog.addMessage(">   Remote addr: " + serverIP);
+                    debugLog.addMessage(">   Remote port: " + Integer.toString(serverPort));
+                    debugLog.addMessage(">   Timeout: " + timeout);
+                }
 
+                // Get the start time of the request
+                startTime = System.currentTimeMillis();
+                
                 // Send the query string to the server
                 socket.send(packetOut);
+                
+                if( debug == true ) {
+                	debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
+                }
 
                 // Receive the response packet from the server
                 socket.receive(packetIn);
                 
+                if( debug == true ) {
+                    debugLog.addMessage("> Received response from " + serverIP + ":" + Integer.toString(serverPort));
+                }
+                
+                // Get the end time of the request
+                endTime = System.currentTimeMillis();
+                
+                // Calculate how long this request took (the ping time)
+                requestTime = endTime-startTime;
+
                 // Close the UDP socket
                 socket.close();
-
+                
+                if( debug == true ) {
+                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Request took " + requestTime + " ms");
+                }
+                
                 int packetHeader = bufferIn.getInt();
                 
                 // Make sure the packet includes the expected header bytes
@@ -148,7 +242,12 @@ public class ServerQuery implements Runnable {
                     String rcv = "0x" + String.format("%8s", Integer.toHexString(packetHeader)).replace(' ','0').toUpperCase();
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> ERROR: Invalid response header: " + rcv);
+                    }
+                    
                     continue;
                 }
 
@@ -156,44 +255,106 @@ public class ServerQuery implements Runnable {
                 
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
-                    Log.i(TAG, "Parsing Source Engine response");
+                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + Integer.toString(serverPort));
+                    
+                    if( debug == true ) {
+                        debugLog.addMessage("> Response type: Source");
+                    }
+                    
+                    parseStart = System.currentTimeMillis();
+                    
                     serverInfo[i] = parseResponseFromSRCDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
+                    serverInfo[i].setPing(requestTime);
+                    serverInfo[i].setNickname(serverNickname);
+                    
+                    parseEnd = System.currentTimeMillis();
+                    parseTime = (parseEnd - parseStart);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Parsed Source Engine response in " + parseTime + " ms");
+                    }
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
-                    Log.i(TAG, "Parsing GoldSrc Engine response");
+                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + Integer.toString(serverPort));
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Response type: GoldSrc");
+                    }
+                    
+                    parseStart = System.currentTimeMillis();
+                    
                     serverInfo[i] = parseResponseFromHLDS(arrayIn);
                     serverInfo[i].setAddress(serverIP);
                     serverInfo[i].setPort(serverPort);
                     serverInfo[i].setListPos(serverListPos);
                     serverInfo[i].setRowId(serverRowId);
+                    serverInfo[i].setPing(requestTime);
+                    serverInfo[i].setNickname(serverNickname);
+                    
+                    parseEnd = System.currentTimeMillis();
+                    parseTime = (parseEnd - parseStart);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> Parsed GoldSrc Engine response in " + parseTime + " ms");
+                    }
                 }
                 else {
                     // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ','0').toUpperCase();
-                    Log.w(TAG, "Packet type " + rcv + " does not match expected values 0x49 or 0x6d");
+                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + Integer.toString(serverPort) 
+                            + " does not match expected values 0x49 or 0x6d");
                     serverInfo[i] = null;
-                    addErrorRow(serverURL, serverPort, serverListPos);
+                    addErrorRow(serverName, serverListPos);
+                    
+                    if( debug == true ) {
+                    	debugLog.addMessage("> ERROR: Invalid response type: " + rcv);
+                    }
+                    
                     continue;
                 }
             }
-            catch( Exception e ) {
+            catch( SocketTimeoutException e ) {
+                if( debug == true ) {
+                    debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
+                }
                 serverInfo[i] = null;
-                addErrorRow(serverURL, serverPort, serverListPos);
+                addErrorRow(serverName, serverListPos);
+            }
+            catch( Exception e ) {
+                if( debug == true ) {
+                    debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
+                }
+                serverInfo[i] = null;
+                addErrorRow(serverName, serverListPos);
             }
 
+            queryEnd = System.currentTimeMillis();
+            queryTime = (queryEnd-queryStart);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> End time: " + queryEnd);
+                debugLog.addMessage("> Query time: " + queryTime + " ms");
+            }
+            
             status++;
+        }
+        
+        long runEndTime = System.currentTimeMillis();
+        
+        if( debug == true ) {
+            debugLog.addMessage("\nRun finished at " + runEndTime + "\n");
+            long totalRunTime = (runEndTime-runStartTime);
+            debugLog.addMessage("Total time: " + totalRunTime + " ms");
         }
     }
     
-    public void addErrorRow( String server, int port, int pos ) {
-        String message = new String();
-        message += context.getText(R.string.msg_no_response);
-        message += " " + server + ":" + port;
+    public void addErrorRow( String host, int pos ) {
+        String message = String.format(context.getString(R.string.msg_no_response), host);
         messages.add(message);
     }
     
@@ -258,6 +419,12 @@ public class ServerQuery implements Runnable {
         }
         catch( Exception e ) {
             Log.w(TAG, "parseResponseFromSRCDS(): Caught an exception:", e);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> ERROR: Exception while parsing:");
+            	debugLog.addMessage("> " + e.toString());
+            }
+            
             return null;
         }
     }
@@ -296,6 +463,12 @@ public class ServerQuery implements Runnable {
         }
         catch( Exception e ) {
             Log.w(TAG, "parseResponseFromHLDS(): Caught an exception:", e);
+            
+            if( debug == true ) {
+            	debugLog.addMessage("> ERROR: Exception while parsing:");
+            	debugLog.addMessage("> " + e.toString());
+            }
+            
             return null;
         }
     }

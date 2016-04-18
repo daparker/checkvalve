@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -82,20 +82,20 @@ public class RconPasswordActivity extends Activity {
 
         returned = new Intent();
 
-        submit_button = (Button)findViewById(R.id.submit_button);
+        submit_button = (Button)findViewById(R.id.rconpassword_submit_button);
         submit_button.setOnClickListener(submitButtonListener);
 
-        cancel_button = (Button)findViewById(R.id.cancel_button);
+        cancel_button = (Button)findViewById(R.id.rconpassword_cancel_button);
         cancel_button.setOnClickListener(cancelButtonListener);
 
-        field_password = (EditText)findViewById(R.id.field_password);
+        field_password = (EditText)findViewById(R.id.rconpassword_field_password);
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            ((CheckBox)findViewById(R.id.rconpassword_checkbox_show_password)).setChecked(true);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
         else {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            ((CheckBox)findViewById(R.id.rconpassword_checkbox_show_password)).setChecked(false);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }

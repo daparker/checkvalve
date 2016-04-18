@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,11 +19,13 @@
 
 package com.dparker.apps.checkvalve;
 
+
 /*
  * Define the ServerRecord class
  */
 public class ServerRecord {
     private String name;
+    private String url;
     private String rcon;
     private int port;
     private int timeout;
@@ -33,24 +35,30 @@ public class ServerRecord {
     /**
      * Construct a new instance of the ServerRecord class.
      * 
-     * @param s The IP address or URL of this server
-     * @param r The RCON password for this server
-     * @param p The listen port of this server
-     * @param t The query timeout for this server
-     * @param l The position of this server within the server list
-     * @param i The unique row ID of this server within the database
+     * @param name The nickname of this server in CheckValve
+     * @param url The IP address or URL of this server
+     * @param rcon The RCON password for this server
+     * @param port The listen port of this server
+     * @param timeout The query timeout for this server
+     * @param listpos The position of this server within the server list
+     * @param rowId The unique row ID of this server within the database
      */
-    public ServerRecord( String s, String r, int p, int t, int l, long i ) {
-        this.name = s;
-        this.rcon = r;
-        this.port = p;
-        this.timeout = t;
-        this.listpos = l;
-        this.rowId = i;
+    public ServerRecord( String name, String url, String rcon, int port, int timeout, int listpos, long rowId ) {
+        this.name = name;
+        this.url = url;
+        this.rcon = rcon;
+        this.port = port;
+        this.timeout = timeout;
+        this.listpos = listpos;
+        this.rowId = rowId;
     }
 
-    public String getServerName() {
+    public String getServerNickname() {
         return this.name;
+    }
+    
+    public String getServerURL() {
+        return this.url;
     }
 
     public String getServerRCONPassword() {
@@ -73,8 +81,12 @@ public class ServerRecord {
         return this.rowId;
     }
 
-    public void setServerName( String s ) {
+    public void setServerNickname( String s ) {
         this.name = s;
+    }
+    
+    public void setServerURL( String u ) {
+        this.name = u;
     }
 
     public void setServerRCONPassword( String r ) {

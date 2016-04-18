@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -48,10 +48,10 @@ public class AboutActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.about);
         
-        TextView app_support = (TextView)this.findViewById(R.id.app_support);
+        TextView app_support = (TextView)this.findViewById(R.id.about_app_support);
         app_support.setMovementMethod(LinkMovementMethod.getInstance());
         
-        this.findViewById(R.id.dismiss_button).setOnClickListener(dismissButtonListener);
+        this.findViewById(R.id.about_dismiss_button).setOnClickListener(dismissButtonListener);
     }
 
     @Override

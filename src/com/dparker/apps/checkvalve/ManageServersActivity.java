@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import com.dparker.apps.checkvalve.R;
 
+@SuppressLint("NewApi")
 public class ManageServersActivity extends Activity {
     private DatabaseProvider database;
     private TableLayout server_table;
@@ -173,9 +175,9 @@ public class ManageServersActivity extends Activity {
 
         setContentView(R.layout.manageservers);
 
-        x_button = (Button)findViewById(R.id.manage_servers_x_button);
+        x_button = (Button)findViewById(R.id.manageservers_x_button);
         x_button.setOnClickListener(xButtonListener);
-        server_table = (TableLayout)findViewById(R.id.serverTable);
+        server_table = (TableLayout)findViewById(R.id.manageservers_server_table);
 
         showServerList();
     }
@@ -186,6 +188,8 @@ public class ManageServersActivity extends Activity {
 
         if( database == null )
             database = new DatabaseProvider(ManageServersActivity.this);
+        
+        showServerList();
     }
 
     @Override
@@ -250,38 +254,45 @@ public class ManageServersActivity extends Activity {
          */
         for( int i = 0; i < serverList.length; i++ ) {
             ServerRecord sr = serverList[i];
-
-            String server = sr.getServerName();
+            
             int rowId = (int)sr.getServerRowID();
             int port = sr.getServerPort();
+            
+            // Use the nickname as the preferred server name in the list
+            String server = sr.getServerNickname();
+            
+            // If there's no nickname then use the URL as the server name 
+            if( server.length() == 0 ) {
+                server = sr.getServerURL() + ":" + Integer.toString(port);
+            }
 
-            View v = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
-            v.setId(i);
+            View buttonBar = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
+            buttonBar.setId(i);
 
             TextView serverName = (TextView)View.inflate(ManageServersActivity.this, R.layout.manageservers_servername, null);
-            serverName.setText(server + ":" + port);
+            serverName.setText(server);
             serverName.setId(i);
 
-            Button editButton = (Button)v.findViewById(R.id.edit_button);
+            Button editButton = (Button)buttonBar.findViewById(R.id.buttonbar_edit_button);
             editButton.setId(rowId);
             editButton.setOnClickListener(editButtonListener);
 
-            Button deleteButton = (Button)v.findViewById(R.id.delete_button);
+            Button deleteButton = (Button)buttonBar.findViewById(R.id.buttonbar_delete_button);
             deleteButton.setId(rowId);
             deleteButton.setOnClickListener(deleteButtonListener);
 
-            Button moveUpButton = (Button)v.findViewById(R.id.up_button);
+            Button moveUpButton = (Button)buttonBar.findViewById(R.id.buttonbar_up_button);
             moveUpButton.setId(rowId);
             moveUpButton.setOnClickListener(moveUpButtonListener);
 
-            Button moveDownButton = (Button)v.findViewById(R.id.down_button);
+            Button moveDownButton = (Button)buttonBar.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);
             serverRow.addView(serverName);
-            serverRow.addView(v);
+            serverRow.addView(buttonBar);
 
             TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                     TableLayout.LayoutParams.MATCH_PARENT,
@@ -289,6 +300,7 @@ public class ManageServersActivity extends Activity {
 
             params.setMargins(0, 50, 0, 0);
             serverRow.setLayoutParams(params);
+            serverRow.setGravity(Gravity.LEFT|Gravity.BOTTOM);
 
             server_table.addView(serverRow, params);
 

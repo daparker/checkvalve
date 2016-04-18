@@ -84,3 +84,19 @@ Notes
 **2.0.4**
 - Added UTF-8 support for server information, player names, and chat messages
 
+**2.0.5**
+- Added server nicknames
+- Added server ping
+- Added option for default RCON font size
+- Added backup/restore support (Settings > Backups)
+- Added READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE permissions for reading/writing backups
+- Added debug mode to see more information about server queries and response times
+- Fixed NumberFormatException caused by invalid integers in some input fields
+- Fixed NullPointerException caused by invalid engine type during RCON connection
+- Fixed UI bugs on the Manage Servers screen
+- Fixed button text wrapping on the Add Server and Edit Server screens
+- Various coding and efficiency improvements
+- RCON improvements:
+  - Volume keys increase/decrease font size while in a session
+  - Added SourceMod commands to the suggestions (must be enabled in Settings)
+  - Added the logaddress command to the suggestions (for GoldSrc servers)

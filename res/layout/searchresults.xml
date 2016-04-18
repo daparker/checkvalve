@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -20,21 +20,21 @@ along with the CheckValve source code.  If not, see
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+    android:id="@+id/searchresults_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#262626"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parent_layout"
+        android:id="@+id/searchresults_parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#262626"
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/searchresults_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -47,14 +47,14 @@ along with the CheckValve source code.  If not, see
             android:textSize="18sp" />
 
         <TableLayout
-            android:id="@+id/message_table"
+            android:id="@+id/searchresults_message_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:shrinkColumns="0" >
         </TableLayout>
 
         <TableLayout
-            android:id="@+id/search_results_table"
+            android:id="@+id/searchresults_main_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -20,14 +20,14 @@ along with the CheckValve source code.  If not, see
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_layout"
+    android:id="@+id/about_activity_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/info_layout"
+        android:id="@+id/about_info_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -38,7 +38,7 @@ along with the CheckValve source code.  If not, see
         android:paddingTop="10dp" >
 
         <TextView
-            android:id="@+id/app_name"
+            android:id="@+id/about_app_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -49,18 +49,18 @@ along with the CheckValve source code.  If not, see
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/header_about"
+            android:id="@+id/about_header_about"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             android:gravity="left|center_vertical"
             android:text="@string/about_header_about"
-            android:textStyle="bold"
-            android:textSize="14sp" />
-        
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/app_version"
+            android:id="@+id/about_app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
@@ -68,7 +68,7 @@ along with the CheckValve source code.  If not, see
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/app_credits"
+            android:id="@+id/about_app_credits"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
@@ -76,47 +76,47 @@ along with the CheckValve source code.  If not, see
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/header_license"
+            android:id="@+id/about_header_license"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             android:gravity="left|center_vertical"
             android:text="@string/about_header_license"
-            android:textStyle="bold"
-            android:textSize="14sp" />
-        
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/app_license"
+            android:id="@+id/about_app_license"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:text="@string/app_license"
             android:textSize="12sp" />
-  
+
         <TextView
-            android:id="@+id/header_support"
+            android:id="@+id/about_header_support"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             android:gravity="left|center_vertical"
             android:text="@string/about_header_support"
-            android:textStyle="bold"
-            android:textSize="14sp" />
-        
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/app_support"
+            android:id="@+id/about_app_support"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
             android:gravity="left|center_vertical"
+            android:paddingLeft="10dp"
             android:text="@string/app_support"
             android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/button_layout"
+        android:id="@+id/about_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -129,7 +129,7 @@ along with the CheckValve source code.  If not, see
             android:gravity="center" />
 
         <Button
-            android:id="@+id/dismiss_button"
+            android:id="@+id/about_dismiss_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"

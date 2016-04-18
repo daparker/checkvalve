@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -301,7 +301,7 @@ public class Chat implements Runnable {
             
             switch( responseType ) {
                 case PTYPE_CONNECTION_SUCCESS:
-                    Log.i(TAG, "Connected to " + chatRelayIP.getHostAddress() + ":" + chatRelayPort + ".");
+                    Log.i(TAG, "Connected to " + chatRelayIP.getHostAddress() + ":" + Integer.toString(chatRelayPort) + ".");
                     handler.sendEmptyMessage(4);
                     break;
 

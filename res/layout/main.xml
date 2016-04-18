@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -19,59 +19,95 @@ along with the CheckValve source code.  If not, see
 <http://www.gnu.org/licenses/>.
 -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_pane"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checkvalve_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#262626"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/parent_layout"
+        android:id="@+id/checkvalve_debug_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/steam_blue"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/checkvalve_debug_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/menu_debug"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/checkvalve_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/checkvalve_debug_button_layout"
+        android:layout_alignParentTop="true"
         android:background="#262626"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/title"
+        <LinearLayout
+            android:id="@+id/checkvalve_parent_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#262626"
-            android:gravity="center"
-            android:paddingBottom="5dp"
-            android:paddingTop="10dp"
-            android:text="@string/title_server_info"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/status_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#262626"
-            android:gravity="left"
-            android:paddingBottom="5dp"
-            android:paddingTop="0dp"
-            android:text=""
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/checkvalve_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#262626"
+                android:gravity="center"
+                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
+                android:text="@string/title_server_info"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
-        <TableLayout
-            android:id="@+id/message_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#262626"
-            android:shrinkColumns="1" >
-        </TableLayout>
+            <TextView
+                android:id="@+id/checkvalve_status_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#262626"
+                android:gravity="left"
+                android:paddingBottom="5dp"
+                android:paddingTop="0dp"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
 
-        <TableLayout
-            android:id="@+id/server_info_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#262626"
-            android:shrinkColumns="1" >
-        </TableLayout>
-    </LinearLayout>
+            <TableLayout
+                android:id="@+id/checkvalve_message_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#262626"
+                android:shrinkColumns="1" >
+            </TableLayout>
 
-</ScrollView>
+            <TableLayout
+                android:id="@+id/checkvalve_server_info_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#262626"
+                android:shrinkColumns="1" >
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

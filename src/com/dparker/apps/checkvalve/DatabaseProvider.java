@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,6 +19,7 @@
 
 package com.dparker.apps.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -27,13 +28,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 /*
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 10;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -47,16 +49,23 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SERVERS_TIMEOUT = "timeout";
     public static final String SERVERS_LISTPOS = "list_position";
     public static final String SERVERS_RCON = "rcon_password";
+    public static final String SERVERS_NICKNAME = "nickname";
     public static final String SETTINGS_ROWID = "row_id";
     public static final String SETTINGS_RCON_WARN_UNSAFE = "rcon_warn_unsafe";
     public static final String SETTINGS_RCON_SHOW_PASSWORDS = "rcon_show_passwords";
     public static final String SETTINGS_RCON_SHOW_SUGGESTIONS = "rcon_show_suggestions";
     public static final String SETTINGS_RCON_ENABLE_HISTORY = "rcon_enable_history";
+    public static final String SETTINGS_RCON_VOLUME_BUTTONS = "rcon_volume_buttons";
+    public static final String SETTINGS_RCON_DEFAULT_FONT_SIZE = "rcon_default_font_size";
+    public static final String SETTINGS_RCON_INCLUDE_SM = "rcon_include_sm";
+    public static final String SETTINGS_SHOW_SERVER_NAME = "show_name";
     public static final String SETTINGS_SHOW_SERVER_IP = "show_ip";
     public static final String SETTINGS_SHOW_SERVER_MAP = "show_map";
     public static final String SETTINGS_SHOW_SERVER_PLAYERS = "show_num_players";
     public static final String SETTINGS_SHOW_SERVER_GAME = "show_game_info";
     public static final String SETTINGS_SHOW_SERVER_TAGS = "show_tags";
+    public static final String SETTINGS_SHOW_SERVER_PING = "show_ping";
+    public static final String SETTINGS_USE_SERVER_NICKNAME = "show_nickname";
     public static final String SETTINGS_DEFAULT_QUERY_PORT = "default_query_port";
     public static final String SETTINGS_DEFAULT_QUERY_TIMEOUT = "default_query_timeout";
     public static final String SETTINGS_DEFAULT_RELAY_HOST = "default_relay_host";
@@ -73,7 +82,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SERVERS_PORT + " TEXT NOT NULL, "
             + SERVERS_TIMEOUT + " INTEGER NOT NULL, "
             + SERVERS_LISTPOS + " INTEGER NOT NULL DEFAULT 0, "
-            + SERVERS_RCON + " TEXT NOT NULL DEFAULT ''"
+            + SERVERS_RCON + " TEXT NOT NULL DEFAULT '', "
+            + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT ''"
             + ");";
 
     private static final String CREATE_TABLE_SETTINGS =
@@ -83,11 +93,17 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_RCON_SHOW_PASSWORDS + " INTEGER NOT NULL DEFAULT 0, "
             + SETTINGS_RCON_SHOW_SUGGESTIONS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9, "
+            + SETTINGS_RCON_INCLUDE_SM + " INTEGER NOT NULL DEFAULT 0, "
+            + SETTINGS_SHOW_SERVER_NAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_IP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_MAP + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PLAYERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_USE_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
@@ -121,6 +137,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             
             c.moveToFirst();
             
+            // Dump all table data to logcat for debugging
             for( int i = 0; i < c.getCount(); i++ )
             {
                 Log.d(TAG, "SQLite database table " + i + " is named " + c.getString(0) + " with schema:");
@@ -156,11 +173,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_RCON_SHOW_PASSWORDS, 1);
             values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, 1);
             values.put(SETTINGS_RCON_ENABLE_HISTORY, 1);
+            values.put(SETTINGS_SHOW_SERVER_NAME, 1);
             values.put(SETTINGS_SHOW_SERVER_IP, 1);
             values.put(SETTINGS_SHOW_SERVER_MAP, 1);
             values.put(SETTINGS_SHOW_SERVER_PLAYERS, 1);
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
+            values.put(SETTINGS_SHOW_SERVER_PING, 1);
+            values.put(SETTINGS_USE_SERVER_NICKNAME, 1);
             values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
@@ -189,20 +209,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 
         if( oldVersion < 2 ) {
-            /*
-             * Added the RCON password column to the servers table in DB version 2.
-             */
-            
             // Add the rcon_password column to the servers table
             db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_RCON + " TEXT NOT NULL DEFAULT '';");
         }
 
         if( oldVersion < 3 ) {
             try {
-                /*
-                 * Added the settings table in DB version 3.
-                 */
-                
                 // Create the settings table
                 Log.i(TAG, "Creating table " + TABLE_SETTINGS);
                 db.execSQL(CREATE_TABLE_SETTINGS);
@@ -240,9 +252,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
                 int count = c.getCount();
 
-                // Fix list position numbering in the servers table which
-                // may have been broken by deletions from the table in
-                // previous versions
+                // Fix list position numbering in the servers table which may have
+                // been broken by deletions from the table in previous versions
                 for( int i = 0; i < count; i++ ) {
                     c.moveToPosition(i);
 
@@ -269,10 +280,6 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         
         if( oldVersion < 4 ) {
             try {
-                /*
-                 * Added a setting to enable/disable RCON command history in DB version 4.
-                 */
-                
                 // Add the rcon_enable_history column to the settings table
                 Log.i(TAG, "Adding column " + SETTINGS_RCON_ENABLE_HISTORY + " to table " + TABLE_SETTINGS);
                 db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_ENABLE_HISTORY + " INTEGER NOT NULL DEFAULT 1;");
@@ -290,13 +297,109 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         }
         
         if( oldVersion < 5 ) {
-            /*
-             * Added the relay_hosts table in DB version 5.
-             */
-            
             // Add the relay_hosts table
             Log.i(TAG, "Creating table " + TABLE_RELAY_HOSTS);
             db.execSQL(CREATE_TABLE_RELAY_HOSTS);
+        }
+        
+        if( oldVersion < 6 ) {
+            try {
+                // Add the rcon_volume_buttons column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_VOLUME_BUTTONS + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_VOLUME_BUTTONS + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Add the rcon_default_font_size column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " INTEGER NOT NULL DEFAULT 9;");
+                
+                // Set the default values
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_RCON_VOLUME_BUTTONS, 1);
+                values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, 9);
+
+                Log.i(TAG, "Setting " + SETTINGS_RCON_VOLUME_BUTTONS + " default value to 1");
+                Log.i(TAG, "Setting " + SETTINGS_RCON_DEFAULT_FONT_SIZE + " default value to 9");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 7 ) {
+            try {
+                // Add the rcon_include_sm column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_RCON_INCLUDE_SM + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_RCON_INCLUDE_SM + " INTEGER NOT NULL DEFAULT 0;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_RCON_INCLUDE_SM, 0);
+
+                Log.i(TAG, "Setting " + SETTINGS_RCON_INCLUDE_SM + " default value to 0");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 8 ) {
+            try {
+                // Add the show_ping column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_PING + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_SHOW_SERVER_PING, 1);
+
+                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_PING + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 9 ) {
+            try {
+                // Add the nickname column to the servers table
+                Log.i(TAG, "Adding column " + SERVERS_NICKNAME + " to table " + TABLE_SERVERS);
+                db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT '';");
+                
+                // Add the show_nickname column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_USE_SERVER_NICKNAME + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_USE_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_USE_SERVER_NICKNAME, 1);
+    
+                Log.i(TAG, "Setting " + SETTINGS_USE_SERVER_NICKNAME + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
+        }
+        
+        if( oldVersion < 10 ) {
+            try {
+                // Add the show_name column to the settings table
+                Log.i(TAG, "Adding column " + SETTINGS_SHOW_SERVER_NAME + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_SHOW_SERVER_NAME + " INTEGER NOT NULL DEFAULT 1;");
+                
+                // Set the default value
+                ContentValues values = new ContentValues();
+                values.put(SETTINGS_SHOW_SERVER_NAME, 1);
+
+                Log.i(TAG, "Setting " + SETTINGS_SHOW_SERVER_NAME + " default value to 1");
+                db.update(TABLE_SETTINGS, values, null, null);
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "Caught an exception while upgrading database:", e);
+            }
         }
     }
 
@@ -314,18 +417,20 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     /**
      * Adds a new server to the database.
      * 
-     * @param server The URL or IP address of the server
+     * @param nickname The nickname of the server in CheckValve
+     * @param url The URL or IP address of the server
      * @param port The listen port of the server
      * @param timeout The query timeout for the server (in seconds)
      * @param password The RCON password for the server
      * @return The ID of the newly created database row.
      */
-    public long insertServer( String server, int port, int timeout, String password ) {
+    public long insertServer( String nickname, String url, int port, int timeout, String password ) {
         long result;
         int pos = getLastPosition() + 1;
 
         ContentValues values = new ContentValues();
-        values.put(SERVERS_SERVER, server);
+        values.put(SERVERS_NICKNAME, nickname);
+        values.put(SERVERS_SERVER, url);
         values.put(SERVERS_PORT, port);
         values.put(SERVERS_TIMEOUT, timeout);
         values.put(SERVERS_LISTPOS, pos);
@@ -378,6 +483,16 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         return result;
     }
 
+    /**
+     * Deletes all servers from the database.  Only used when restoring a backup file.
+     */
+    public void deleteAllServers() {
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete(TABLE_SERVERS, null, null);
+        }
+    }
+    
     public int getServerListPosition( long rowId ) {
         int result = -1;
         Cursor c;
@@ -423,12 +538,13 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
-                            SERVERS_ROWID,
+                            SERVERS_NICKNAME,
                             SERVERS_SERVER,
+                            SERVERS_RCON,
                             SERVERS_PORT,
                             SERVERS_TIMEOUT,
                             SERVERS_LISTPOS,
-                            SERVERS_RCON },
+                            SERVERS_ROWID},
                     null,
                     null,
                     null,
@@ -441,7 +557,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
             for( int i = 0; i < count; i++ ) {
                 c.moveToPosition(i);
-                result[i] = new ServerRecord(c.getString(1), c.getString(5), c.getInt(2), c.getInt(3), c.getInt(4), c.getLong(0));
+                result[i] = new ServerRecord(c.getString(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getLong(6));
             }
 
             c.close();
@@ -467,12 +583,13 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             c = db.query(
                     TABLE_SERVERS,
                     new String[] {
-                            SERVERS_ROWID,
+                            SERVERS_NICKNAME,
                             SERVERS_SERVER,
+                            SERVERS_RCON,
                             SERVERS_PORT,
                             SERVERS_TIMEOUT,
                             SERVERS_LISTPOS,
-                            SERVERS_RCON },
+                            SERVERS_ROWID },
                     SERVERS_ROWID + "=" + rowId,
                     null,
                     null,
@@ -482,7 +599,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             if( c != null ) {
                 if( c.getCount() > 0 ) {
                     c.moveToFirst();
-                    result = new ServerRecord(c.getString(1), c.getString(5), c.getInt(2), c.getInt(3), c.getInt(4), c.getLong(0));
+                    result = new ServerRecord(c.getString(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getLong(6));
                 }
 
                 c.close();
@@ -496,16 +613,18 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * Updates the specified server's information in the database.
      * 
      * @param rowId The database row which contains the server's data
+     * @param nickname The nickname for the server in CheckValve
      * @param server The URL or IP address of the server
      * @param port The listen port of the server
      * @param timeout The query timeout for the server (in seconds)
      * @param password The RCON password for the server
      * @return A boolean value indicating whether or not the operation was successful.
      */
-    public boolean updateServer( long rowId, String server, int port, int timeout, String password ) {
+    public boolean updateServer( long rowId, String nickname, String server, int port, int timeout, String password ) {
         boolean result;
 
         ContentValues values = new ContentValues();
+        values.put(SERVERS_NICKNAME, nickname);
         values.put(SERVERS_SERVER, server);
         values.put(SERVERS_PORT, port);
         values.put(SERVERS_TIMEOUT, timeout);
@@ -702,11 +821,17 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_RCON_SHOW_PASSWORDS,
                 SETTINGS_RCON_SHOW_SUGGESTIONS,
                 SETTINGS_RCON_ENABLE_HISTORY,
+                SETTINGS_RCON_VOLUME_BUTTONS,
+                SETTINGS_RCON_DEFAULT_FONT_SIZE,
+                SETTINGS_RCON_INCLUDE_SM,
+                SETTINGS_SHOW_SERVER_NAME,
                 SETTINGS_SHOW_SERVER_IP,
                 SETTINGS_SHOW_SERVER_MAP,
                 SETTINGS_SHOW_SERVER_PLAYERS,
                 SETTINGS_SHOW_SERVER_GAME,
                 SETTINGS_SHOW_SERVER_TAGS,
+                SETTINGS_SHOW_SERVER_PING,
+                SETTINGS_USE_SERVER_NICKNAME,
                 SETTINGS_VALIDATE_NEW_SERVERS,
                 SETTINGS_DEFAULT_QUERY_PORT,
                 SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -731,6 +856,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_RCON_ENABLE_HISTORY) )
                     result.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_RCON_VOLUME_BUTTONS) )
+                    result.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_RCON_DEFAULT_FONT_SIZE) )
+                    result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
+                else if( column.equals(SETTINGS_RCON_INCLUDE_SM) )
+                    result.putBoolean(Values.SETTING_RCON_INCLUDE_SM, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_SHOW_SERVER_NAME) )
+                    result.putBoolean(Values.SETTING_SHOW_SERVER_NAME, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
@@ -741,6 +874,10 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_TAGS) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
+                    result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_USE_SERVER_NICKNAME) )
+                    result.putBoolean(Values.SETTING_USE_SERVER_NICKNAME, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
                     result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
@@ -770,23 +907,29 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      */
     public boolean updateSettings( Bundle settings ) {
         int result;
-
+        
         // Get boolean values from the Bundle as integers (0 or 1)
         int warnUnsafe = (settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, true))?1:0;
         int showPwds = (settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, true))?1:0;
         int showSuggest = (settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, true))?1:0;
         int enableHistory = (settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY, true))?1:0;
+        int volumeButtons = (settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, true))?1:0;
+        int includeSM = (settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM, true))?1:0;
+        int showName = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NAME, true))?1:0;
         int showIP = (settings.getBoolean(Values.SETTING_SHOW_SERVER_IP, true))?1:0;
         int showGame = (settings.getBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, true))?1:0;
         int showMap = (settings.getBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, true))?1:0;
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
+        int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
+        int showNickname = (settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
 
         // Get int values from the Bundle
         int defaultQueryPort = settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT, 27015);
         int defaultQueryTimeout = settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, 1);
         int defaultRelayPort = settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT, 23456);
+        int defaultRconFontSize = settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, 9);
 
         // Get string values from the Bundle
         String defaultRelayHost = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
@@ -797,11 +940,17 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_SHOW_PASSWORDS, showPwds);
         values.put(SETTINGS_RCON_SHOW_SUGGESTIONS, showSuggest);
         values.put(SETTINGS_RCON_ENABLE_HISTORY, enableHistory);
+        values.put(SETTINGS_RCON_VOLUME_BUTTONS, volumeButtons);
+        values.put(SETTINGS_RCON_DEFAULT_FONT_SIZE, defaultRconFontSize);
+        values.put(SETTINGS_RCON_INCLUDE_SM, includeSM);
+        values.put(SETTINGS_SHOW_SERVER_NAME, showName);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
         values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
         values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
+        values.put(SETTINGS_SHOW_SERVER_PING, showPing);
+        values.put(SETTINGS_USE_SERVER_NICKNAME, showNickname);
         values.put(SETTINGS_VALIDATE_NEW_SERVERS, validate);
         values.put(SETTINGS_DEFAULT_QUERY_PORT, defaultQueryPort);
         values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
@@ -893,5 +1042,185 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete(TABLE_RELAY_HOSTS, null, null);
         }
+    }
+    
+    /**
+     * Puts all server and setting data into a String for saving to a backup file.
+     * 
+     * @param includeServers Boolean indicating whether server data should be included
+     * @param includeSettings Boolean indicating whether setting data should be included
+     * @return A <tt>StringBuilder</tt> containing all of the requested data in backup file format
+     */
+    @SuppressLint("NewApi")
+    public StringBuilder getBackupData(boolean includeServers, boolean includeSettings) {
+        StringBuilder sb = new StringBuilder();
+        Cursor c = null;
+        
+        try {
+            if( includeServers ) {
+                synchronized( lock ) {
+                    SQLiteDatabase db = this.getReadableDatabase();
+    
+                    // Get all servers
+                    c = db.query(
+                            TABLE_SERVERS,
+                            new String[] {
+                                    SERVERS_ROWID,
+                                    SERVERS_NICKNAME,
+                                    SERVERS_SERVER,
+                                    SERVERS_PORT,
+                                    SERVERS_TIMEOUT,
+                                    SERVERS_LISTPOS,
+                                    SERVERS_RCON },
+                            null,
+                            null,
+                            null,
+                            null,
+                            SERVERS_LISTPOS);
+    
+                    int rowCount = c.getCount();
+                    String rconRaw = new String();
+                    String rconB64 = new String();
+                    
+                    for( int i = 0; i < rowCount; i++ ) {
+                        c.moveToPosition(i);
+                        
+                        // Base64 encode the RCON password
+                        rconRaw = c.getString(6);
+                        rconB64 = (rconRaw.length() > 0)?Base64.encodeToString(rconRaw.getBytes("UTF-8"), Base64.NO_WRAP):"";
+                        
+                        // Add this server as a CheckValve backup file stanza
+                        sb.append("[server]").append("\r\n")
+                          .append("nickname=").append(c.getString(1)).append("\r\n")
+                          .append("url=").append(c.getString(2)).append("\r\n")
+                          .append("port=").append(c.getString(3)).append("\r\n")
+                          .append("timeout=").append(c.getInt(4)).append("\r\n")
+                          .append("rcon=").append(rconB64).append("\r\n")
+                          .append("listpos=").append(c.getInt(5)).append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
+                }                
+            }
+            
+            if( includeSettings ) {
+                // Columns which contain boolean values
+                String[] boolCols = new String[] {
+                        SETTINGS_RCON_WARN_UNSAFE,
+                        SETTINGS_RCON_SHOW_PASSWORDS,
+                        SETTINGS_RCON_SHOW_SUGGESTIONS,
+                        SETTINGS_RCON_ENABLE_HISTORY,
+                        SETTINGS_RCON_VOLUME_BUTTONS,
+                        SETTINGS_RCON_INCLUDE_SM,
+                        SETTINGS_SHOW_SERVER_NAME,
+                        SETTINGS_SHOW_SERVER_IP,
+                        SETTINGS_SHOW_SERVER_MAP,
+                        SETTINGS_SHOW_SERVER_PLAYERS,
+                        SETTINGS_SHOW_SERVER_GAME,
+                        SETTINGS_SHOW_SERVER_TAGS,
+                        SETTINGS_SHOW_SERVER_PING,
+                        SETTINGS_USE_SERVER_NICKNAME,
+                        SETTINGS_VALIDATE_NEW_SERVERS };
+                
+                // Columns which contain integer values
+                String[] intCols = new String[] {
+                        SETTINGS_RCON_DEFAULT_FONT_SIZE,
+                        SETTINGS_DEFAULT_QUERY_PORT,
+                        SETTINGS_DEFAULT_QUERY_TIMEOUT,
+                        SETTINGS_DEFAULT_RELAY_PORT };
+                
+                // Columns which contain string values
+                String[] stringCols = new String[] {
+                        SETTINGS_DEFAULT_RELAY_HOST,
+                        SETTINGS_DEFAULT_RELAY_PASSWORD };
+                
+                synchronized( lock ) {
+                    SQLiteDatabase db = this.getReadableDatabase();
+                    int columnCount = 0;
+    
+                    // Get settings with boolean values
+                    c = db.query(TABLE_SETTINGS, boolCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this string setting as a CheckValve backup file stanza
+                        sb.append("[setting]\r\n")
+                          .append("type=bool").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append((c.getInt(i)==0)?"false":"true").append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
+                    
+                    // Get settings with string values
+                    c = db.query(TABLE_SETTINGS, stringCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this string setting as a CheckValve backup file stanza
+                        sb.append("[setting]\r\n")
+                          .append("type=string").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append(c.getString(i)).append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
+                    
+                    // Get settings with integer values
+                    c = db.query(TABLE_SETTINGS, intCols, null, null, null, null, SETTINGS_ROWID);
+                    columnCount = c.getColumnCount();
+                    c.moveToFirst();
+                    
+                    for( int i = 0; i < columnCount; i++ ) {                        
+                        // Add this integer setting as a CheckValve backup file stanza
+                        sb.append("[setting]\r\n")
+                          .append("type=int").append("\r\n")
+                          .append("id=").append(c.getColumnName(i)).append("\r\n")
+                          .append("value=").append(c.getString(i)).append("\r\n")
+                          .append("\r\n");
+                    }
+                    
+                    c.close();
+                }
+            }
+            
+            return sb;
+        }
+        catch( Exception e ) {
+            Log.e(TAG, "createBackupFile(): Caught an exception:", e);
+            
+            if( c != null ) {
+                c.close();
+            }
+            
+            return null;
+        }
+    }
+    
+    public boolean serverNicknameExists(String s) {
+        boolean result = false;
+        String[] cols = new String[] { SERVERS_NICKNAME };
+        String where = String.format("%1$s = '%2$s'", SERVERS_NICKNAME, s);
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            
+            Cursor c = db.query(TABLE_SERVERS, cols, where, null, null, null, null);
+
+            if( c != null ) {
+                if( c.getCount() > 0 ) {
+                    result = true;
+                }
+            }
+
+            c.close();
+        }
+        
+        return result;
     }
 }

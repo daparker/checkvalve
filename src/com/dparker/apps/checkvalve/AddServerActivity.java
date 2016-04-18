@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2016 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,6 +19,7 @@
 
 package com.dparker.apps.checkvalve;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
@@ -38,6 +39,7 @@ import com.dparker.apps.checkvalve.R;
 /*
  * Define the AddNewServer class
  */
+@SuppressLint("HandlerLeak")
 public class AddServerActivity extends Activity {
     private static final String TAG = AddServerActivity.class.getSimpleName();
 
@@ -47,6 +49,7 @@ public class AddServerActivity extends Activity {
 
     private ProgressDialog p;
 
+    private EditText field_nickname;
     private EditText field_server;
     private EditText field_port;
     private EditText field_timeout;
@@ -62,16 +65,56 @@ public class AddServerActivity extends Activity {
             int port_len = field_port.getText().toString().length();
             int timeout_len = field_timeout.getText().toString().length();
             int password_len = field_rcon_password.length();
+            int nickname_len = field_nickname.length();
+            
+            final String server;
+            final String password;
+            final String nickname;
+            final int port;
+            final int timeout;
 
             if( (server_len == 0) || (port_len == 0) || (timeout_len == 0) ) {
                 UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_empty_fields);
             }
             else {
-                final String server = field_server.getText().toString().trim();
-                final int port = Integer.parseInt(field_port.getText().toString().trim());
-                final int timeout = Integer.parseInt(field_timeout.getText().toString().trim());
-                final String password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
-
+                server = field_server.getText().toString().trim();
+                password = (password_len > 0)?field_rcon_password.getText().toString().trim():"";
+                nickname = (nickname_len > 0)?field_nickname.getText().toString().trim():"";
+                
+                if( nickname.length() > 0 ) {
+                    if( database.serverNicknameExists(nickname) ) {
+                        Log.w(TAG, "addButtonListener: Server nickname '" + nickname + "' is a duplicate!");
+                        UserVisibleMessage.showMessage(AddServerActivity.this, "The server nickname is already in use.");
+                        return;
+                    }
+                }
+                
+                try {
+                    port = Integer.parseInt(field_port.getText().toString().trim());
+                    
+                    if( port < 1 || port > 65535 ) {
+                        UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_port_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_port_value);
+                    return;
+                }
+                
+                try {
+                    timeout = Integer.parseInt(field_timeout.getText().toString().trim());
+                    
+                    if( timeout < 0 ) {
+                        UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_timeout_value);
+                        return;
+                    }
+                }
+                catch( NumberFormatException e ) {
+                    UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_bad_timeout_value);
+                    return;
+                }
+                
                 Handler checkServerHandler = new Handler() {
                     String errorMsg = "";
 
@@ -80,7 +123,7 @@ public class AddServerActivity extends Activity {
 
                         switch( msg.what ) {
                             case 0:
-                                if( (database.insertServer(server, port, timeout, password)) > -1 ) {
+                                if( (database.insertServer(nickname, server, port, timeout, password)) > -1 ) {
                                     UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                                     setResult(1);
                                 }
@@ -95,13 +138,13 @@ public class AddServerActivity extends Activity {
                                 finish();
                                 break;
                             case 1:
-                                errorMsg = (String)AddServerActivity.this.getText(R.string.msg_unknown_host) + " " + server;
+                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unknown_host), server);
                                 UserVisibleMessage.showMessage(AddServerActivity.this, errorMsg);
                                 break;
                             case 2:
                             case 3:
                             case 4:
-                                errorMsg = (String)AddServerActivity.this.getText(R.string.msg_unable_to_connect_to) + " " + server;
+                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unable_to_connect), server);
                                 UserVisibleMessage.showMessage(AddServerActivity.this, errorMsg);
                                 break;
                             case 5:
@@ -122,7 +165,7 @@ public class AddServerActivity extends Activity {
                     new Thread(new ServerCheck(server, port, timeout, checkServerHandler)).start();
                 }
                 else {
-                    if( (database.insertServer(server, port, timeout, password)) > -1 ) {
+                    if( (database.insertServer(nickname, server, port, timeout, password)) > -1 ) {
                         UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_success);
                         setResult(1);
                     }
@@ -161,26 +204,27 @@ public class AddServerActivity extends Activity {
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
 
-        addButton = (Button)findViewById(R.id.addServerButton);
+        addButton = (Button)findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        field_server = (EditText)findViewById(R.id.field_server);
-        field_port = (EditText)findViewById(R.id.field_port);
-        field_timeout = (EditText)findViewById(R.id.field_timeout);
-        field_rcon_password = (EditText)findViewById(R.id.field_rcon_password);
-
+        field_server = (EditText)findViewById(R.id.addnewserver_field_server);
+        field_port = (EditText)findViewById(R.id.addnewserver_field_port);
+        field_timeout = (EditText)findViewById(R.id.addnewserver_field_timeout);
+        field_rcon_password = (EditText)findViewById(R.id.addnewserver_field_rcon_password);
+        field_nickname = (EditText)findViewById(R.id.addnewserver_field_nickname);
+        
         field_port.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_timeout.setText(Integer.toString(CheckValve.settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
 
         if( CheckValve.settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(true);
+            ((CheckBox)findViewById(R.id.addnewserver_checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
         else {
-            ((CheckBox)findViewById(R.id.checkbox_show_password)).setChecked(false);
+            ((CheckBox)findViewById(R.id.addnewserver_checkbox_show_password)).setChecked(false);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
     }
@@ -199,10 +243,10 @@ public class AddServerActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        addButton = (Button)findViewById(R.id.addServerButton);
+        addButton = (Button)findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button)findViewById(R.id.cancelButton);
+        cancelButton = (Button)findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
