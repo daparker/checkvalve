@@ -228,7 +228,7 @@ public final class R {
         public static final int settings_checkbox_servers_show_ping=0x7f0a00ba;
         public static final int settings_checkbox_servers_show_players=0x7f0a00b6;
         public static final int settings_checkbox_servers_show_tags=0x7f0a00b8;
-        public static final int settings_checkbox_servers_use_alias=0x7f0a00ae;
+        public static final int settings_checkbox_servers_use_nickname=0x7f0a00ae;
         public static final int settings_checkbox_validate_new_servers=0x7f0a00a8;
         public static final int settings_clear_saved_relays=0x7f0a00e1;
         public static final int settings_create_backup=0x7f0a00dc;
@@ -265,7 +265,7 @@ public final class R {
         public static final int settings_label_servers_show_ping=0x7f0a00b9;
         public static final int settings_label_servers_show_players=0x7f0a00b5;
         public static final int settings_label_servers_show_tags=0x7f0a00b7;
-        public static final int settings_label_servers_use_alias=0x7f0a00ad;
+        public static final int settings_label_servers_use_nickname=0x7f0a00ad;
         public static final int settings_label_validate_new_servers=0x7f0a00a7;
         public static final int settings_master_layout=0x7f0a009d;
         public static final int settings_miscellaneous_settings_table=0x7f0a00de;
@@ -505,7 +505,7 @@ public final class R {
         public static final int settings_show_server_name=0x7f0600a0;
         public static final int settings_show_server_ping=0x7f0600a1;
         public static final int settings_show_server_tags=0x7f0600a2;
-        public static final int settings_use_server_alias=0x7f0600a3;
+        public static final int settings_use_server_nickname=0x7f0600a3;
         public static final int settings_validate_new_servers=0x7f0600a4;
         public static final int status_connecting=0x7f0600a5;
         public static final int status_querying_server=0x7f0600a6;
