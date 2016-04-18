@@ -64,7 +64,7 @@ public final class Values {
     public static final String EXTRA_NOTE_ID = "noteString";
     public static final String EXTRA_DEBUG_TEXT = "debugText";
     public static final String EXTRA_BACKUP_FILE = "backupFile";
-    public static final String EXTRA_ALIAS = "alias";
+    public static final String EXTRA_NICKNAME = "nickname";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -90,7 +90,7 @@ public final class Values {
     public static final String SETTING_SHOW_SERVER_NUM_PLAYERS = "showServerNumPlayers";
     public static final String SETTING_SHOW_SERVER_TAGS = "showServerTags";
     public static final String SETTING_SHOW_SERVER_PING = "showServerPing";
-    public static final String SETTING_USE_SERVER_ALIAS = "useServerAlias";
+    public static final String SETTING_USE_SERVER_NICKNAME = "useServerNickname";
     public static final String SETTING_DEFAULT_QUERY_PORT = "defaultQueryPort";
     public static final String SETTING_DEFAULT_QUERY_TIMEOUT = "defaultQueryTimeout";
     public static final String SETTING_DEFAULT_RELAY_HOST = "defaultRelayHost";

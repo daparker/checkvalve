@@ -448,7 +448,7 @@ public class CheckValve extends Activity {
                     serverLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     serverValue.setId(i * 300);
                     
-                    if( settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS) ) {
+                    if( settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME) ) {
                         serverValue.setText((serverNickname.length() > 0)?serverNickname:serverName);
                     }
                     else {
@@ -903,7 +903,7 @@ public class CheckValve extends Activity {
         chatIntent.putExtra(Values.EXTRA_PASSWORD, r);
         
         if( n != null && n.length() > 0 ) {
-            chatIntent.putExtra(Values.EXTRA_ALIAS, n);
+            chatIntent.putExtra(Values.EXTRA_NICKNAME, n);
         }
         startActivityForResult(chatIntent, Values.ACTIVITY_CHAT);
     }

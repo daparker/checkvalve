@@ -65,7 +65,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_SHOW_SERVER_GAME = "show_game_info";
     public static final String SETTINGS_SHOW_SERVER_TAGS = "show_tags";
     public static final String SETTINGS_SHOW_SERVER_PING = "show_ping";
-    public static final String SETTINGS_USE_SERVER_ALIAS = "show_nickname";
+    public static final String SETTINGS_USE_SERVER_NICKNAME = "show_nickname";
     public static final String SETTINGS_DEFAULT_QUERY_PORT = "default_query_port";
     public static final String SETTINGS_DEFAULT_QUERY_TIMEOUT = "default_query_timeout";
     public static final String SETTINGS_DEFAULT_RELAY_HOST = "default_relay_host";
@@ -103,7 +103,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_SHOW_SERVER_GAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_TAGS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_SHOW_SERVER_PING + " INTEGER NOT NULL DEFAULT 1, "
-            + SETTINGS_USE_SERVER_ALIAS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_USE_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_VALIDATE_NEW_SERVERS + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_QUERY_PORT + " INTEGER NOT NULL DEFAULT 27015, "
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
@@ -180,7 +180,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_SHOW_SERVER_GAME, 1);
             values.put(SETTINGS_SHOW_SERVER_TAGS, 1);
             values.put(SETTINGS_SHOW_SERVER_PING, 1);
-            values.put(SETTINGS_USE_SERVER_ALIAS, 1);
+            values.put(SETTINGS_USE_SERVER_NICKNAME, 1);
             values.put(SETTINGS_VALIDATE_NEW_SERVERS, 1);
             values.put(SETTINGS_DEFAULT_QUERY_PORT, 27015);
             values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, 1);
@@ -369,14 +369,14 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE " + TABLE_SERVERS + " ADD COLUMN " + SERVERS_NICKNAME + " TEXT NOT NULL DEFAULT '';");
                 
                 // Add the show_nickname column to the settings table
-                Log.i(TAG, "Adding column " + SETTINGS_USE_SERVER_ALIAS + " to table " + TABLE_SETTINGS);
-                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_USE_SERVER_ALIAS + " INTEGER NOT NULL DEFAULT 1;");
+                Log.i(TAG, "Adding column " + SETTINGS_USE_SERVER_NICKNAME + " to table " + TABLE_SETTINGS);
+                db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_USE_SERVER_NICKNAME + " INTEGER NOT NULL DEFAULT 1;");
                 
                 // Set the default value
                 ContentValues values = new ContentValues();
-                values.put(SETTINGS_USE_SERVER_ALIAS, 1);
+                values.put(SETTINGS_USE_SERVER_NICKNAME, 1);
     
-                Log.i(TAG, "Setting " + SETTINGS_USE_SERVER_ALIAS + " default value to 1");
+                Log.i(TAG, "Setting " + SETTINGS_USE_SERVER_NICKNAME + " default value to 1");
                 db.update(TABLE_SETTINGS, values, null, null);
             }
             catch( Exception e ) {
@@ -831,7 +831,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 SETTINGS_SHOW_SERVER_GAME,
                 SETTINGS_SHOW_SERVER_TAGS,
                 SETTINGS_SHOW_SERVER_PING,
-                SETTINGS_USE_SERVER_ALIAS,
+                SETTINGS_USE_SERVER_NICKNAME,
                 SETTINGS_VALIDATE_NEW_SERVERS,
                 SETTINGS_DEFAULT_QUERY_PORT,
                 SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -876,8 +876,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
                     result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1)?true:false);
-                else if( column.equals(SETTINGS_USE_SERVER_ALIAS) )
-                    result.putBoolean(Values.SETTING_USE_SERVER_ALIAS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_USE_SERVER_NICKNAME) )
+                    result.putBoolean(Values.SETTING_USE_SERVER_NICKNAME, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
                     result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1)?true:false);
                 else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
@@ -922,7 +922,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int showPlayers = (settings.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, true))?1:0;
         int showTags = (settings.getBoolean(Values.SETTING_SHOW_SERVER_TAGS, true))?1:0;
         int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
-        int showNickname = (settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS, true))?1:0;
+        int showNickname = (settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
 
         // Get int values from the Bundle
@@ -950,7 +950,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
         values.put(SETTINGS_SHOW_SERVER_PING, showPing);
-        values.put(SETTINGS_USE_SERVER_ALIAS, showNickname);
+        values.put(SETTINGS_USE_SERVER_NICKNAME, showNickname);
         values.put(SETTINGS_VALIDATE_NEW_SERVERS, validate);
         values.put(SETTINGS_DEFAULT_QUERY_PORT, defaultQueryPort);
         values.put(SETTINGS_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);
@@ -1120,7 +1120,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                         SETTINGS_SHOW_SERVER_GAME,
                         SETTINGS_SHOW_SERVER_TAGS,
                         SETTINGS_SHOW_SERVER_PING,
-                        SETTINGS_USE_SERVER_ALIAS,
+                        SETTINGS_USE_SERVER_NICKNAME,
                         SETTINGS_VALIDATE_NEW_SERVERS };
                 
                 // Columns which contain integer values

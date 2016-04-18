@@ -54,7 +54,7 @@ public class SettingsActivity extends Activity {
     private boolean showServerNumPlayers;
     private boolean showServerTags;
     private boolean showServerPing;
-    private boolean useServerAlias;
+    private boolean useServerNickname;
     private boolean validateNewServers;
     private boolean refreshServers;
 
@@ -75,7 +75,7 @@ public class SettingsActivity extends Activity {
     private CheckBox checkbox_show_server_num_players;
     private CheckBox checkbox_show_server_tags;
     private CheckBox checkbox_show_server_ping;
-    private CheckBox checkbox_use_server_alias;
+    private CheckBox checkbox_use_server_nickname;
     private CheckBox checkbox_validate_new_servers;
     private EditText field_default_query_port;
     private EditText field_default_query_timeout;
@@ -160,7 +160,7 @@ public class SettingsActivity extends Activity {
              */
 
             // Refresh the server list if the "User server alias" option has been toggled
-            if( checkbox_use_server_alias.isChecked() != CheckValve.settings.getBoolean(Values.SETTING_USE_SERVER_ALIAS) )
+            if( checkbox_use_server_nickname.isChecked() != CheckValve.settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME) )
                 refreshServers = true;
             
             saveSettings();
@@ -228,7 +228,7 @@ public class SettingsActivity extends Activity {
         checkbox_show_server_num_players = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_players);
         checkbox_show_server_tags = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_tags);
         checkbox_show_server_ping = (CheckBox)findViewById(R.id.settings_checkbox_servers_show_ping);
-        checkbox_use_server_alias = (CheckBox)findViewById(R.id.settings_checkbox_servers_use_alias);
+        checkbox_use_server_nickname = (CheckBox)findViewById(R.id.settings_checkbox_servers_use_nickname);
         checkbox_validate_new_servers = (CheckBox)findViewById(R.id.settings_checkbox_validate_new_servers);
         field_default_query_port = (EditText)findViewById(R.id.settings_field_default_query_port);
         field_default_query_timeout = (EditText)findViewById(R.id.settings_field_default_query_timeout);
@@ -333,7 +333,7 @@ public class SettingsActivity extends Activity {
         showServerNumPlayers = b.getBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
         showServerTags = b.getBoolean(Values.SETTING_SHOW_SERVER_TAGS);
         showServerPing = b.getBoolean(Values.SETTING_SHOW_SERVER_PING);
-        useServerAlias = b.getBoolean(Values.SETTING_USE_SERVER_ALIAS);
+        useServerNickname = b.getBoolean(Values.SETTING_USE_SERVER_NICKNAME);
         validateNewServers = b.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS);
 
         checkbox_rcon_show_passwords.setChecked(rconShowPasswords);
@@ -349,7 +349,7 @@ public class SettingsActivity extends Activity {
         checkbox_show_server_num_players.setChecked(showServerNumPlayers);
         checkbox_show_server_tags.setChecked(showServerTags);
         checkbox_show_server_ping.setChecked(showServerPing);
-        checkbox_use_server_alias.setChecked(useServerAlias);
+        checkbox_use_server_nickname.setChecked(useServerNickname);
         checkbox_validate_new_servers.setChecked(validateNewServers);
 
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
@@ -387,7 +387,7 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.settings_checkbox_servers_show_name:
                 showServerName = checked;
-                checkbox_use_server_alias.setEnabled(showServerName);
+                checkbox_use_server_nickname.setEnabled(showServerName);
                 break;
             case R.id.settings_checkbox_servers_show_ip:
                 showServerIP = checked;
@@ -407,8 +407,8 @@ public class SettingsActivity extends Activity {
             case R.id.settings_checkbox_servers_show_ping:
                 showServerPing = checked;
                 break;
-            case R.id.settings_checkbox_servers_use_alias:
-                useServerAlias = checked;
+            case R.id.settings_checkbox_servers_use_nickname:
+                useServerNickname = checked;
                 break;
             case R.id.settings_checkbox_validate_new_servers:
                 validateNewServers = checked;
@@ -470,7 +470,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, showServerNumPlayers);
             b.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, showServerTags);
             b.putBoolean(Values.SETTING_SHOW_SERVER_PING, showServerPing);
-            b.putBoolean(Values.SETTING_USE_SERVER_ALIAS, useServerAlias);
+            b.putBoolean(Values.SETTING_USE_SERVER_NICKNAME, useServerNickname);
             b.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, validateNewServers);
             b.putInt(Values.SETTING_DEFAULT_QUERY_PORT, defaultQueryPort);
             b.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, defaultQueryTimeout);

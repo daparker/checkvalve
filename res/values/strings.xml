@@ -73,8 +73,8 @@ along with the CheckValve source code.  If not, see
     <string name="label_include_settings">Include settings</string>
     <string name="label_ip">IP/Port:</string>
     <string name="label_map">Map:</string>
-    <string name="label_nickname">Alias:</string>
-    <string name="label_nickname_field">Alias (optional):</string>
+    <string name="label_nickname">Nickname:</string>
+    <string name="label_nickname_field">Nickname (optional):</string>
     <string name="label_ping">Ping:</string>
     <string name="label_players">Players:</string>
     <string name="label_playersearch">Look For:</string>
@@ -189,7 +189,7 @@ along with the CheckValve source code.  If not, see
     <string name="settings_show_server_name">Show server name</string>
     <string name="settings_show_server_ping">Show server ping</string>
     <string name="settings_show_server_tags">Show server tags</string>
-    <string name="settings_use_server_alias">Use server alias if available</string>
+    <string name="settings_use_server_nickname">Use server nickname if available</string>
     <string name="settings_validate_new_servers">Validate new servers</string>
     <string name="status_connecting">Connecting&#8230;</string>
     <string name="status_querying_server">Querying server&#8230;</string>

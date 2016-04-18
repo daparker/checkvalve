@@ -205,7 +205,7 @@ along with the CheckValve source code.  If not, see
                     android:layout_height="wrap_content" >
 
                     <TextView
-                        android:id="@+id/settings_label_servers_use_alias"
+                        android:id="@+id/settings_label_servers_use_nickname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
@@ -213,11 +213,11 @@ along with the CheckValve source code.  If not, see
                         android:gravity="start|center_vertical"
                         android:padding="10dp"
                         android:singleLine="false"
-                        android:text="@string/settings_use_server_alias"
+                        android:text="@string/settings_use_server_nickname"
                         android:textSize="14sp" />
 
                     <CheckBox
-                        android:id="@+id/settings_checkbox_servers_use_alias"
+                        android:id="@+id/settings_checkbox_servers_use_nickname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="true"

@@ -586,8 +586,8 @@ public class ChatViewerActivity extends Activity {
 
         subtitle = (TextView)findViewById(R.id.chatui_subtitle);
         
-        if( thisIntent.getStringExtra(Values.EXTRA_ALIAS) != null ) {
-            subtitle.setText(thisIntent.getStringExtra(Values.EXTRA_ALIAS));
+        if( thisIntent.getStringExtra(Values.EXTRA_NICKNAME) != null ) {
+            subtitle.setText(thisIntent.getStringExtra(Values.EXTRA_NICKNAME));
         }
         else {
             subtitle.setText(gameServerIP + ":" + gameServerPort);
