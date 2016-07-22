@@ -65,6 +65,8 @@ public final class Values {
     public static final String EXTRA_DEBUG_TEXT = "debugText";
     public static final String EXTRA_BACKUP_FILE = "backupFile";
     public static final String EXTRA_NICKNAME = "nickname";
+    public static final String EXTRA_REFRESH_SERVERS = "refreshServers";
+    public static final String EXTRA_RESTART_SERVICE = "restartService";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -76,6 +78,11 @@ public final class Values {
     public static final String SERVER_NUM_PLAYERS = "numPlayers";
     public static final String SERVER_MAX_PLAYERS = "maxPlayers";
     public static final String SERVER_TAGS = "serverTags";
+    public static final String SETTING_ENABLE_NOTIFICATION_LED = "enableNotificationLED";
+    public static final String SETTING_ENABLE_NOTIFICATION_SOUND = "enableNotificationSounds";
+    public static final String SETTING_ENABLE_NOTIFICATION_VIBRATE = "enableNotificationVibrate";
+    public static final String SETTING_ENABLE_NOTIFICATIONS = "enableNotifications";
+    public static final String SETTING_BACKGROUND_QUERY_FREQUENCY = "backgroundQueryFrequency";
     public static final String SETTING_RCON_SHOW_PASSWORDS = "rconShowPasswords";
     public static final String SETTING_RCON_WARN_UNSAFE_COMMAND = "rconWarnUnsafeCommand";
     public static final String SETTING_RCON_SHOW_SUGGESTIONS = "rconShowSuggestions";
@@ -115,6 +122,7 @@ public final class Values {
     // File names
     public static final String FILE_HIDE_CHAT_RELAY_NOTE = ".hide_chat_relay_note";
     public static final String FILE_HIDE_CONSOLE_RELAY_NOTE = ".hide_console_relay_note";
+    public static final String FILE_HIDE_ANDROID_VERSION_NOTE = ".hide_android_version_note";
     
     // Server query values
     public static final int INT_PACKET_HEADER = 0xFFFFFFFF;
