@@ -37,10 +37,15 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import com.github.daparker.checkvalve.R;
+import com.github.daparker.checkvalve.exceptions.InvalidDataTypeException;
 
 public class SettingsActivity extends Activity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
+    private boolean enableNotificationLED;
+    private boolean enableNotificationSound;
+    private boolean enableNotificationVibrate;
+    private boolean enableNotifications;
     private boolean rconShowPasswords;
     private boolean rconWarnUnsafeCommand;
     private boolean rconShowSuggestions;
@@ -62,6 +67,10 @@ public class SettingsActivity extends Activity {
     private Button cancelButton;
     private Button plusButton;
     private Button minusButton;
+    private CheckBox checkbox_enable_notification_led;
+    private CheckBox checkbox_enable_notification_sound;
+    private CheckBox checkbox_enable_notification_vibrate;
+    private CheckBox checkbox_enable_notifications;
     private CheckBox checkbox_rcon_show_passwords;
     private CheckBox checkbox_rcon_warn_unsafe_command;
     private CheckBox checkbox_rcon_show_suggestions;
@@ -82,6 +91,7 @@ public class SettingsActivity extends Activity {
     private EditText field_default_relay_host;
     private EditText field_default_relay_port;
     private EditText field_default_relay_password;
+    private EditText field_background_query_frequency;
     private TextView field_default_rcon_font_size;
     private TextView reset_do_not_show;
     private TextView clear_saved_relays;
@@ -111,9 +121,11 @@ public class SettingsActivity extends Activity {
                 File filesDir = SettingsActivity.this.getFilesDir();
                 File f1 = new File(filesDir, Values.FILE_HIDE_CHAT_RELAY_NOTE);
                 File f2 = new File(filesDir, Values.FILE_HIDE_CONSOLE_RELAY_NOTE);
+                File f3 = new File(filesDir, Values.FILE_HIDE_ANDROID_VERSION_NOTE);
                 		    	
                 f1.delete();
                 f2.delete();
+                f3.delete();
                 		    	
                 UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_options_reset);
             }
@@ -159,12 +171,65 @@ public class SettingsActivity extends Activity {
              * "Save" button was clicked
              */
 
-            // Refresh the server list if the "User server alias" option has been toggled
-            if( checkbox_use_server_nickname.isChecked() != CheckValve.settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME) )
-                refreshServers = true;
+            Intent resultIntent = new Intent();
             
-            saveSettings();
-            setResult((refreshServers)?1:0);
+            try {
+                int defaultQueryPort = Integer.parseInt(field_default_query_port.getText().toString().trim());
+                
+                if( defaultQueryPort < 1 || defaultQueryPort > 65535 ) {
+                    UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_default_query_port_value);
+                    return;
+                }
+            }
+            catch( NumberFormatException e ) {
+                UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_default_query_port_value);
+                return;
+            }
+            
+            try {
+                int defaultRelayPort = Integer.parseInt(field_default_relay_port.getText().toString().trim());
+                
+                if( defaultRelayPort < 1 || defaultRelayPort > 65535 ) {
+                    UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_default_relay_port_value);
+                    return;
+                }
+            }
+            catch( NumberFormatException e ) {
+                UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_default_relay_port_value);
+                return;
+            }
+            
+            // Background service is only supported on Honeycomb and above
+            if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+                try {
+                    int currentFreq = database.getIntSetting(DatabaseProvider.SETTINGS_BACKGROUND_QUERY_FREQUENCY);
+                    int newFreq = Integer.parseInt(field_background_query_frequency.getText().toString().trim());
+                    
+                    if( (currentFreq != newFreq) && checkbox_enable_notifications.isChecked() ) {
+                        resultIntent.putExtra(Values.EXTRA_RESTART_SERVICE, true);
+                    }
+                }
+                catch( InvalidDataTypeException idte ) {
+                    Log.e(TAG, "saveButtonListener(): Caught an exception:", idte);
+                }
+                catch( NumberFormatException nfe ) {
+                    UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_freq_value);
+                    return;
+                }
+            }
+
+            if( refreshServers ) {
+                resultIntent.putExtra(Values.EXTRA_REFRESH_SERVERS, true);
+            }
+            
+            // Result codes:
+            // -1 = Database error
+            //  0 = Canceled
+            //  1 = Success
+            //  2 = Some other error
+            int result = saveSettings();
+            
+            setResult(result, resultIntent);
             finish();
         }
     };
@@ -175,7 +240,8 @@ public class SettingsActivity extends Activity {
              * "Cancel" button was clicked
              */
             
-            setResult((refreshServers)?1:0);
+            // Return 0
+            setResult(0);
             finish();
         }
     };
@@ -235,8 +301,17 @@ public class SettingsActivity extends Activity {
         field_default_relay_host = (EditText)findViewById(R.id.settings_field_default_relay_host);
         field_default_relay_port = (EditText)findViewById(R.id.settings_field_default_relay_port);
         field_default_relay_password = (EditText)findViewById(R.id.settings_field_default_relay_password);
-        field_default_rcon_font_size = (TextView)findViewById(R.id.settings_field_default_rcon_font_size);
-
+        
+        // Background service is only supported on Honeycomb and above
+        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+            checkbox_enable_notification_led = (CheckBox)findViewById(R.id.settings_checkbox_notification_led);
+            checkbox_enable_notification_sound = (CheckBox)findViewById(R.id.settings_checkbox_notification_sound);
+            checkbox_enable_notification_vibrate = (CheckBox)findViewById(R.id.settings_checkbox_notification_vibrate);
+            checkbox_enable_notifications = (CheckBox)findViewById(R.id.settings_checkbox_notifications);
+            field_background_query_frequency = (EditText)findViewById(R.id.settings_field_background_query_frequency);
+            field_default_rcon_font_size = (TextView)findViewById(R.id.settings_field_default_rcon_font_size);
+        }
+        
         reset_do_not_show = (TextView)findViewById(R.id.settings_reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
         
@@ -342,6 +417,7 @@ public class SettingsActivity extends Activity {
         checkbox_rcon_enable_history.setChecked(rconEnableHistory);
         checkbox_rcon_volume_buttons.setChecked(rconVolumeButtons);
         checkbox_rcon_include_sm.setChecked(rconIncludeSM);
+        checkbox_rcon_include_sm.setEnabled(rconShowSuggestions);
         checkbox_show_server_name.setChecked(showServerName);
         checkbox_show_server_ip.setChecked(showServerIP);
         checkbox_show_server_game_info.setChecked(showServerGameInfo);
@@ -350,6 +426,7 @@ public class SettingsActivity extends Activity {
         checkbox_show_server_tags.setChecked(showServerTags);
         checkbox_show_server_ping.setChecked(showServerPing);
         checkbox_use_server_nickname.setChecked(useServerNickname);
+        checkbox_use_server_nickname.setEnabled(showServerName);
         checkbox_validate_new_servers.setChecked(validateNewServers);
 
         field_default_query_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
@@ -358,13 +435,53 @@ public class SettingsActivity extends Activity {
         field_default_relay_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_RELAY_PORT)));
         field_default_relay_password.setText(b.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD));
         field_default_rcon_font_size.setText(Integer.toString(b.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE)));
+        
+        // Background service is only supported on Honeycomb and above
+        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+            enableNotificationLED = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED);
+            enableNotificationSound = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND);
+            enableNotificationVibrate = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE);
+            enableNotifications = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS);
+            
+            checkbox_enable_notification_led.setChecked(enableNotificationLED);
+            checkbox_enable_notification_led.setEnabled(enableNotifications);
+            checkbox_enable_notification_sound.setChecked(enableNotificationSound);
+            checkbox_enable_notification_sound.setEnabled(enableNotifications);
+            checkbox_enable_notification_vibrate.setChecked(enableNotificationVibrate);
+            checkbox_enable_notification_vibrate.setEnabled(enableNotifications);
+            checkbox_enable_notifications.setChecked(enableNotifications);
+            
+            field_background_query_frequency.setText(Integer.toString(b.getInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY)));
+            field_background_query_frequency.setEnabled(enableNotifications);
+        }
     }
 
     public void settingCheckboxHandler( View view ) {
         boolean checked = ((CheckBox)view).isChecked();
 
-        Log.i(TAG, "settingCheckboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked=" + checked);
-
+        // Background service is only supported on Honeycomb and above
+        // --- THIS DOUBLE SWITCH() IS CRAZY AND I NEED TO FIND A BETTER WAY ---
+        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+            switch( view.getId() ) {
+                case R.id.settings_checkbox_notification_led:
+                    enableNotificationLED = checked;
+                    break;
+                case R.id.settings_checkbox_notification_sound:
+                    enableNotificationSound = checked;
+                    break;
+                case R.id.settings_checkbox_notification_vibrate:
+                    enableNotificationVibrate = checked;
+                    break;
+                case R.id.settings_checkbox_notifications:
+                    enableNotifications = checked;
+                    checkbox_enable_notification_led.setEnabled(checked);
+                    checkbox_enable_notification_sound.setEnabled(checked);
+                    checkbox_enable_notification_vibrate.setEnabled(checked);
+                    field_background_query_frequency.setEnabled(checked);
+                    break;
+            }
+        }
+        
         switch( view.getId() ) {
             case R.id.settings_checkbox_rcon_show_passwords:
                 rconShowPasswords = checked;
@@ -387,44 +504,55 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.settings_checkbox_servers_show_name:
                 showServerName = checked;
-                checkbox_use_server_nickname.setEnabled(showServerName);
+                checkbox_use_server_nickname.setEnabled(checked);
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_ip:
                 showServerIP = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_game:
                 showServerGameInfo = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_map:
                 showServerMapName = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_players:
                 showServerNumPlayers = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_tags:
                 showServerTags = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_show_ping:
                 showServerPing = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_servers_use_nickname:
                 useServerNickname = checked;
+                refreshServers = true;
                 break;
             case R.id.settings_checkbox_validate_new_servers:
                 validateNewServers = checked;
         }
     }
 
-    public void saveSettings() {
+    private int saveSettings() {
         Bundle b = new Bundle();
 
         int defaultQueryPort;
         int defaultQueryTimeout;
         int defaultRelayPort;
         int defaultRconFontSize;
+        int backgroundQueryFrequency;
         String defaultRelayHost;
         String defaultRelayPassword;
 
+        int result = 0;
+        
         try {
             try {
                 defaultQueryPort = Integer.parseInt(field_default_query_port.getText().toString());
@@ -479,21 +607,39 @@ public class SettingsActivity extends Activity {
             b.putString(Values.SETTING_DEFAULT_RELAY_HOST, defaultRelayHost);
             b.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, defaultRelayPassword);
 
+            // Background service is only supported on Honeycomb and above
+            if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+                try {
+                    backgroundQueryFrequency = Integer.parseInt(field_background_query_frequency.getText().toString());
+                }
+                catch( NumberFormatException nfe ) {
+                    backgroundQueryFrequency = 5;
+                }
+                
+                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, enableNotificationLED);
+                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, enableNotificationSound);
+                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, enableNotificationVibrate);
+                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, enableNotifications);
+                b.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, backgroundQueryFrequency);
+            }
+            
             Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b.toString());
 
             if( database.updateSettings(b) ) {
                 Log.i(TAG, "Success!");
-                setResult(0);
+                result = 1;
             }
             else {
                 Log.e(TAG, "saveSettings(): Failed to update settings in database.");
-                setResult(1);
+                result = -1;
             }
         }
         catch( Exception e ) {
             Log.e(TAG, "Caught an exception while saving settings:", e);
-            setResult(1);
+            result = 2;
         }
+        
+        return result;
     }
     
     public void createBackup() {
