@@ -630,7 +630,13 @@ public class ChatViewerActivity extends Activity {
         chatRelayPort = Integer.valueOf(settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT)).toString();
         chatRelayPassword = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
 
-        showNote();
+        //showNote();
+        getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
+        
+        UserVisibleMessage.showNote(
+                ChatViewerActivity.this,
+                Values.FILE_HIDE_CHAT_RELAY_NOTE,
+                R.string.note_chat_relay_required);
     }
 
     @Override
