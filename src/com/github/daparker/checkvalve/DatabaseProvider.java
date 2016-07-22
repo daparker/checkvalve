@@ -19,6 +19,7 @@
 
 package com.github.daparker.checkvalve;
 
+import com.github.daparker.checkvalve.exceptions.InvalidDataTypeException;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,7 +36,7 @@ import android.util.Log;
  * Define the DatabaseProvider class
  */
 public class DatabaseProvider extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     private static final String TAG = DatabaseProvider.class.getSimpleName();
 
@@ -72,6 +73,11 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public static final String SETTINGS_DEFAULT_RELAY_PORT = "default_relay_port";
     public static final String SETTINGS_DEFAULT_RELAY_PASSWORD = "default_relay_password";
     public static final String SETTINGS_VALIDATE_NEW_SERVERS = "validate_new_servers";
+    public static final String SETTINGS_BACKGROUND_QUERY_FREQUENCY = "background_query_frequency";
+    public static final String SETTINGS_ENABLE_NOTIFICATION_LED = "enable_notification_led";
+    public static final String SETTINGS_ENABLE_NOTIFICATION_SOUND = "enable_notification_sound";
+    public static final String SETTINGS_ENABLE_NOTIFICATION_VIBRATE = "enable_notification_vibrate";
+    public static final String SETTINGS_ENABLE_NOTIFICATIONS = "enable_notifications";
     public static final String RELAY_HOSTS_ROWID = "row_id";
     public static final String RELAY_HOSTS_HOST = "host";
 
@@ -109,7 +115,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + SETTINGS_DEFAULT_QUERY_TIMEOUT + " INTEGER NOT NULL DEFAULT 1, "
             + SETTINGS_DEFAULT_RELAY_HOST + " TEXT NOT NULL DEFAULT '', "
             + SETTINGS_DEFAULT_RELAY_PORT + " INTEGER NOT NULL DEFAULT 23456, "
-            + SETTINGS_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT ''"
+            + SETTINGS_DEFAULT_RELAY_PASSWORD + " TEXT NOT NULL DEFAULT '', "
+            + SETTINGS_ENABLE_NOTIFICATION_LED + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_ENABLE_NOTIFICATION_SOUND + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_ENABLE_NOTIFICATION_VIBRATE + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_ENABLE_NOTIFICATIONS + " INTEGER NOT NULL DEFAULT 1, "
+            + SETTINGS_BACKGROUND_QUERY_FREQUENCY + " INTEGER NOT NULL DEFAULT 10 "
             + ");";
 
     private static final String CREATE_TABLE_RELAY_HOSTS =
@@ -117,6 +128,41 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             + RELAY_HOSTS_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + RELAY_HOSTS_HOST + " TEXT NOT NULL DEFAULT ''"
             + ");";
+    
+    // Settings columns which contain boolean values
+    private static String[] boolCols = new String[] {
+            SETTINGS_ENABLE_NOTIFICATION_LED,
+            SETTINGS_ENABLE_NOTIFICATION_SOUND,
+            SETTINGS_ENABLE_NOTIFICATION_VIBRATE,
+            SETTINGS_ENABLE_NOTIFICATIONS,
+            SETTINGS_RCON_WARN_UNSAFE,
+            SETTINGS_RCON_SHOW_PASSWORDS,
+            SETTINGS_RCON_SHOW_SUGGESTIONS,
+            SETTINGS_RCON_ENABLE_HISTORY,
+            SETTINGS_RCON_VOLUME_BUTTONS,
+            SETTINGS_RCON_INCLUDE_SM,
+            SETTINGS_SHOW_SERVER_NAME,
+            SETTINGS_SHOW_SERVER_IP,
+            SETTINGS_SHOW_SERVER_MAP,
+            SETTINGS_SHOW_SERVER_PLAYERS,
+            SETTINGS_SHOW_SERVER_GAME,
+            SETTINGS_SHOW_SERVER_TAGS,
+            SETTINGS_SHOW_SERVER_PING,
+            SETTINGS_USE_SERVER_NICKNAME,
+            SETTINGS_VALIDATE_NEW_SERVERS };
+    
+    // Settings columns which contain integer values
+    private static String[] intCols = new String[] {
+            SETTINGS_RCON_DEFAULT_FONT_SIZE,
+            SETTINGS_DEFAULT_QUERY_PORT,
+            SETTINGS_DEFAULT_QUERY_TIMEOUT,
+            SETTINGS_DEFAULT_RELAY_PORT,
+            SETTINGS_BACKGROUND_QUERY_FREQUENCY };
+    
+    // Settings columns which contain string values
+    private static String[] stringCols = new String[] {
+            SETTINGS_DEFAULT_RELAY_HOST,
+            SETTINGS_DEFAULT_RELAY_PASSWORD };
     
     private static final Object[] lock = new Object[0];
 
@@ -187,6 +233,11 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             values.put(SETTINGS_DEFAULT_RELAY_HOST, "");
             values.put(SETTINGS_DEFAULT_RELAY_PORT, 23456);
             values.put(SETTINGS_DEFAULT_RELAY_PASSWORD, "");
+            values.put(SETTINGS_BACKGROUND_QUERY_FREQUENCY, 10);
+            values.put(SETTINGS_ENABLE_NOTIFICATION_LED, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATION_SOUND, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATION_VIBRATE, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATIONS, 1);
 
             Log.i(TAG, "Inserting default values");
             db.insert(TABLE_SETTINGS, null, values);
@@ -400,6 +451,43 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             catch( Exception e ) {
                 Log.w(TAG, "Caught an exception while upgrading database:", e);
             }
+        }
+        
+        if( oldVersion < 11 ) {
+            // Add the enable_notification_led column to the settings table
+            Log.i(TAG, "Adding column " + SETTINGS_ENABLE_NOTIFICATION_LED + " to table " + TABLE_SETTINGS);
+            db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_ENABLE_NOTIFICATION_LED + " INTEGER NOT NULL DEFAULT 1;");
+            
+            // Add the enable_notification_sound column to the settings table
+            Log.i(TAG, "Adding column " + SETTINGS_ENABLE_NOTIFICATION_SOUND + " to table " + TABLE_SETTINGS);
+            db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_ENABLE_NOTIFICATION_SOUND + " INTEGER NOT NULL DEFAULT 1;");
+            
+            // Add the enable_notification_vibrate column to the settings table
+            Log.i(TAG, "Adding column " + SETTINGS_ENABLE_NOTIFICATION_VIBRATE + " to table " + TABLE_SETTINGS);
+            db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_ENABLE_NOTIFICATION_VIBRATE + " INTEGER NOT NULL DEFAULT 1;");
+            
+            // Add the enable_notifications column to the settings table
+            Log.i(TAG, "Adding column " + SETTINGS_ENABLE_NOTIFICATIONS + " to table " + TABLE_SETTINGS);
+            db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_ENABLE_NOTIFICATIONS + " INTEGER NOT NULL DEFAULT 1;");
+            
+            // Add the background_query_frequency column to the settings table
+            Log.i(TAG, "Adding column " + SETTINGS_BACKGROUND_QUERY_FREQUENCY + " to table " + TABLE_SETTINGS);
+            db.execSQL("ALTER TABLE " + TABLE_SETTINGS + " ADD COLUMN " + SETTINGS_BACKGROUND_QUERY_FREQUENCY + " INTEGER NOT NULL DEFAULT 10;");
+            
+            // Set the default values
+            ContentValues values = new ContentValues();
+            values.put(SETTINGS_ENABLE_NOTIFICATION_LED, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATION_SOUND, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATION_VIBRATE, 1);
+            values.put(SETTINGS_ENABLE_NOTIFICATIONS, 1);
+            values.put(SETTINGS_BACKGROUND_QUERY_FREQUENCY, 10);
+
+            Log.i(TAG, "Setting " + SETTINGS_ENABLE_NOTIFICATION_LED + " default value to 1");
+            Log.i(TAG, "Setting " + SETTINGS_ENABLE_NOTIFICATION_SOUND + " default value to 1");
+            Log.i(TAG, "Setting " + SETTINGS_ENABLE_NOTIFICATION_VIBRATE + " default value to 1");
+            Log.i(TAG, "Setting " + SETTINGS_ENABLE_NOTIFICATIONS + " default value to 1");
+            Log.i(TAG, "Setting " + SETTINGS_BACKGROUND_QUERY_FREQUENCY + " default value to 10");
+            db.update(TABLE_SETTINGS, values, null, null);
         }
     }
 
@@ -816,32 +904,9 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         String column = new String();
         Bundle result = new Bundle();
 
-        String[] cols = new String[] {
-                SETTINGS_RCON_WARN_UNSAFE,
-                SETTINGS_RCON_SHOW_PASSWORDS,
-                SETTINGS_RCON_SHOW_SUGGESTIONS,
-                SETTINGS_RCON_ENABLE_HISTORY,
-                SETTINGS_RCON_VOLUME_BUTTONS,
-                SETTINGS_RCON_DEFAULT_FONT_SIZE,
-                SETTINGS_RCON_INCLUDE_SM,
-                SETTINGS_SHOW_SERVER_NAME,
-                SETTINGS_SHOW_SERVER_IP,
-                SETTINGS_SHOW_SERVER_MAP,
-                SETTINGS_SHOW_SERVER_PLAYERS,
-                SETTINGS_SHOW_SERVER_GAME,
-                SETTINGS_SHOW_SERVER_TAGS,
-                SETTINGS_SHOW_SERVER_PING,
-                SETTINGS_USE_SERVER_NICKNAME,
-                SETTINGS_VALIDATE_NEW_SERVERS,
-                SETTINGS_DEFAULT_QUERY_PORT,
-                SETTINGS_DEFAULT_QUERY_TIMEOUT,
-                SETTINGS_DEFAULT_RELAY_HOST,
-                SETTINGS_DEFAULT_RELAY_PORT,
-                SETTINGS_DEFAULT_RELAY_PASSWORD };
-
         synchronized( lock ) {
             SQLiteDatabase db = this.getReadableDatabase();
-            c = db.query(TABLE_SETTINGS, cols, null, null, null, null, SETTINGS_ROWID);
+            c = db.query(TABLE_SETTINGS, null, null, null, null, null, SETTINGS_ROWID);
 
             c.moveToFirst();
 
@@ -890,6 +955,16 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     result.putInt(Values.SETTING_DEFAULT_RELAY_PORT, c.getInt(i));
                 else if( column.equals(SETTINGS_DEFAULT_RELAY_PASSWORD) )
                     result.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, c.getString(i));
+                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_LED) )
+                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_SOUND) )
+                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_VIBRATE) )
+                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_ENABLE_NOTIFICATIONS) )
+                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, (c.getInt(i) == 1)?true:false);
+                else if( column.equals(SETTINGS_BACKGROUND_QUERY_FREQUENCY) )
+                    result.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, c.getInt(i));
             }
 
             c.close();
@@ -924,12 +999,17 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         int showPing = (settings.getBoolean(Values.SETTING_SHOW_SERVER_PING, true))?1:0;
         int showNickname = (settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME, true))?1:0;
         int validate = (settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, true))?1:0;
+        int notificationLED = (settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, true))?1:0;
+        int notificationSound = (settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, true))?1:0;
+        int notificationVibrate = (settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, true))?1:0;
+        int notifications = (settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, true))?1:0;
 
         // Get int values from the Bundle
         int defaultQueryPort = settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT, 27015);
         int defaultQueryTimeout = settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, 1);
         int defaultRelayPort = settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT, 23456);
         int defaultRconFontSize = settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, 9);
+        int queryFrequency = settings.getInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, 5);
 
         // Get string values from the Bundle
         String defaultRelayHost = settings.getString(Values.SETTING_DEFAULT_RELAY_HOST);
@@ -957,6 +1037,11 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_DEFAULT_RELAY_HOST, defaultRelayHost);
         values.put(SETTINGS_DEFAULT_RELAY_PORT, defaultRelayPort);
         values.put(SETTINGS_DEFAULT_RELAY_PASSWORD, defaultRelayPswd);
+        values.put(SETTINGS_ENABLE_NOTIFICATION_LED, notificationLED);
+        values.put(SETTINGS_ENABLE_NOTIFICATION_SOUND, notificationSound);
+        values.put(SETTINGS_ENABLE_NOTIFICATION_VIBRATE, notificationVibrate);
+        values.put(SETTINGS_ENABLE_NOTIFICATIONS, notifications);
+        values.put(SETTINGS_BACKGROUND_QUERY_FREQUENCY, queryFrequency);
 
         synchronized( lock ) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -1104,37 +1189,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                 }                
             }
             
-            if( includeSettings ) {
-                // Columns which contain boolean values
-                String[] boolCols = new String[] {
-                        SETTINGS_RCON_WARN_UNSAFE,
-                        SETTINGS_RCON_SHOW_PASSWORDS,
-                        SETTINGS_RCON_SHOW_SUGGESTIONS,
-                        SETTINGS_RCON_ENABLE_HISTORY,
-                        SETTINGS_RCON_VOLUME_BUTTONS,
-                        SETTINGS_RCON_INCLUDE_SM,
-                        SETTINGS_SHOW_SERVER_NAME,
-                        SETTINGS_SHOW_SERVER_IP,
-                        SETTINGS_SHOW_SERVER_MAP,
-                        SETTINGS_SHOW_SERVER_PLAYERS,
-                        SETTINGS_SHOW_SERVER_GAME,
-                        SETTINGS_SHOW_SERVER_TAGS,
-                        SETTINGS_SHOW_SERVER_PING,
-                        SETTINGS_USE_SERVER_NICKNAME,
-                        SETTINGS_VALIDATE_NEW_SERVERS };
-                
-                // Columns which contain integer values
-                String[] intCols = new String[] {
-                        SETTINGS_RCON_DEFAULT_FONT_SIZE,
-                        SETTINGS_DEFAULT_QUERY_PORT,
-                        SETTINGS_DEFAULT_QUERY_TIMEOUT,
-                        SETTINGS_DEFAULT_RELAY_PORT };
-                
-                // Columns which contain string values
-                String[] stringCols = new String[] {
-                        SETTINGS_DEFAULT_RELAY_HOST,
-                        SETTINGS_DEFAULT_RELAY_PASSWORD };
-                
+            if( includeSettings ) {                
                 synchronized( lock ) {
                     SQLiteDatabase db = this.getReadableDatabase();
                     int columnCount = 0;
@@ -1202,6 +1257,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         }
     }
     
+    /**
+     * Determine whether a server nickname already exists in the database.
+     * 
+     * @param s The server nickname to check
+     * @return true if the nickname exists, false otherwise
+     */
     public boolean serverNicknameExists(String s) {
         boolean result = false;
         String[] cols = new String[] { SERVERS_NICKNAME };
@@ -1219,6 +1280,141 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             }
 
             c.close();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Get the value of a boolean setting from the database.
+     *  
+     * @param s The name of the column for which the value should be returned
+     * @return The value of the column
+     * @throws InvalidDataTypeException if the specified column does not hold a boolean setting
+     */
+    public boolean getBooleanSetting(String s) throws InvalidDataTypeException {
+        if( ! isBooleanColumn(s) )
+            throw new InvalidDataTypeException();
+        
+        boolean result = false;
+        String[] col = new String[] { s };
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            
+            Cursor c = db.query(TABLE_SETTINGS, col, null, null, null, null, null);
+
+            if( c != null ) {
+                if( c.getCount() > 0 ) {
+                    c.moveToFirst();
+                    result = (c.getInt(0)==1)?true:false;                        
+                }
+            }
+
+            c.close();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Get the value of an integer setting from the database.
+     * 
+     * @param s The name of the column for which the value should be returned
+     * @return The value of the column
+     * @throws InvalidDataTypeException if the specified column does not hold an integer setting
+     */
+    public int getIntSetting(String s) throws InvalidDataTypeException {
+        if( ! isIntColumn(s) )
+            throw new InvalidDataTypeException();
+        
+        int result = 0;
+        String[] col = new String[] { s };
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            
+            Cursor c = db.query(TABLE_SETTINGS, col, null, null, null, null, null);
+
+            if( c != null ) {
+                if( c.getCount() > 0 ) {
+                    c.moveToFirst();
+                    result = c.getInt(0);                        
+                }
+            }
+
+            c.close();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Get the value of a String setting from the database.
+     * 
+     * @param s The name of the column for which the value should be returned
+     * @return The value of the column
+     * @throws InvalidDataTypeException if the specified column does not hold a String setting
+     */
+    public String getStringSetting(String s) throws InvalidDataTypeException {
+        if( ! isStringColumn(s) )
+            throw new InvalidDataTypeException();
+        
+        String result = new String();
+        String[] col = new String[] { s };
+        
+        synchronized( lock ) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            
+            Cursor c = db.query(TABLE_SETTINGS, col, null, null, null, null, null);
+
+            if( c != null ) {
+                if( c.getCount() > 0 ) {
+                    c.moveToFirst();
+                    result = c.getString(0);                        
+                }
+            }
+
+            c.close();
+        }
+        
+        return result;
+    }
+    
+    private boolean isBooleanColumn(String s) {
+        boolean result = false;
+        
+        for( String x : boolCols ) {
+            if( x.equals(s) ) {
+                result = true;
+                break;
+            }
+        }
+        
+        return result;
+    }
+    
+    private boolean isIntColumn(String s) {
+        boolean result = false;
+        
+        for( String x : intCols ) {
+            if( x.equals(s) ) {
+                result = true;
+                break;
+            }
+        }
+        
+        return result;
+    }
+    
+    private boolean isStringColumn(String s) {
+        boolean result = false;
+        
+        for( String x : stringCols ) {
+            if( x.equals(s) ) {
+                result = true;
+                break;
+            }
         }
         
         return result;
