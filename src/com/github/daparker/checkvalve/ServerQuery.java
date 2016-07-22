@@ -81,7 +81,11 @@ public class ServerQuery implements Runnable {
         msg.what = status;
         msg.obj = b;
         
+        Log.d(TAG, "msg=" + msg.toString());
+        Log.d(TAG, "handler=" + handler.toString());
+        Log.d(TAG, "Returning msg to handler");
         this.handler.sendMessage(msg);
+        Log.d(TAG, "Done.");
     }
 
     public void queryServers() throws UnsupportedEncodingException {
@@ -211,7 +215,7 @@ public class ServerQuery implements Runnable {
                 socket.send(packetOut);
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
                 }
 
                 // Receive the response packet from the server
