@@ -51,6 +51,9 @@ along with the CheckValve source code.  If not, see
     <string name="button_search">Search</string>
     <string name="button_send">Send</string>
     <string name="button_submit">Submit</string>
+    <string name="button_toggle_disabled">Disabled</string>
+    <string name="button_toggle_enabled">Enabled</string>
+    <string name="button_toggle_visible">Enable/Disable</string>
     <string name="button_x">&#10005;</string>
     <string name="default_chat_relay_port">23456</string>
     <string name="default_query_port">27015</string>
