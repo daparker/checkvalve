@@ -35,13 +35,14 @@ import android.view.ViewConfiguration;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import com.github.daparker.checkvalve.R;
 
 @SuppressLint("NewApi")
-public class ManageServersActivity extends Activity {
+public class ManageServersActivity extends Activity {    
     private DatabaseProvider database;
     private TableLayout server_table;
     private Intent thisIntent;
@@ -154,6 +155,30 @@ public class ManageServersActivity extends Activity {
             }
         }
     };
+    
+    public void buttonbarCheckboxHandler( View v ) {
+        boolean checked = ((CheckBox)v).isChecked();
+        long rowId = (long)v.getId();
+
+        if( checked ) {
+            if( database.enableServer(rowId) ) {
+                setResult(1, thisIntent);
+                showServerList();
+            }
+            else {
+                UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+            }
+        }
+        else {
+            if( database.disableServer(rowId) ) {
+                setResult(1, thisIntent);
+                showServerList();
+            }
+            else {
+                UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+            }
+        }
+    }
 
     @Override
     public void onCreate( Bundle savedInstanceState ) {
@@ -288,6 +313,10 @@ public class ManageServersActivity extends Activity {
             Button moveDownButton = (Button)buttonBar.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
+            
+            CheckBox checkbox = (CheckBox)buttonBar.findViewById(R.id.buttonbar_checkbox);
+            checkbox.setId(rowId);
+            checkbox.setChecked(sr.isEnabled());
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);
