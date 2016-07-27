@@ -97,8 +97,7 @@ public class ServerQuery implements Runnable {
         
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
-        //ServerRecord[] serverList = database.getAllServers();
-        ServerRecord[] serverList = database.getAllEnabledServers();
+        ServerRecord[] serverList = database.getEnabledServers();
         database.close();
         
         if( debug == true ) {

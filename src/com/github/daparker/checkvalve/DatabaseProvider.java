@@ -682,7 +682,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * 
      * @return A <tt>ServerRecord[]</tt> array containing the results of the query.
      */
-    public ServerRecord[] getAllEnabledServers() {
+    public ServerRecord[] getEnabledServers() {
         Cursor c;
 
         ServerRecord[] result = null;
@@ -753,7 +753,8 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                             SERVERS_PORT,
                             SERVERS_TIMEOUT,
                             SERVERS_LISTPOS,
-                            SERVERS_ROWID },
+                            SERVERS_ROWID,
+                            SERVERS_ENABLED },
                     SERVERS_ROWID + "=" + rowId,
                     null,
                     null,

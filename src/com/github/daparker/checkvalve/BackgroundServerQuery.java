@@ -81,7 +81,7 @@ public class BackgroundServerQuery implements Runnable {
     public void queryServers() throws UnsupportedEncodingException {        
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
-        ServerRecord[] serverList = database.getAllEnabledServers();
+        ServerRecord[] serverList = database.getEnabledServers();
         database.close();
         
         // The outgoing data only needs to be set up once
