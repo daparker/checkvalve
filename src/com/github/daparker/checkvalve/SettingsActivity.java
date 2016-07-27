@@ -62,6 +62,7 @@ public class SettingsActivity extends Activity {
     private boolean useServerNickname;
     private boolean validateNewServers;
     private boolean refreshServers;
+    private boolean queryServers;
 
     private Button saveButton;
     private Button cancelButton;
@@ -218,8 +219,13 @@ public class SettingsActivity extends Activity {
                 }
             }
 
-            if( refreshServers ) {
-                resultIntent.putExtra(Values.EXTRA_REFRESH_SERVERS, true);
+            if( queryServers ) {
+                resultIntent.putExtra(Values.EXTRA_QUERY_SERVERS, true);
+            }
+            else {
+                if( refreshServers ) {
+                    resultIntent.putExtra(Values.EXTRA_REFRESH_SERVERS, true);
+                }
             }
             
             // Result codes:
@@ -264,6 +270,9 @@ public class SettingsActivity extends Activity {
         
         // Flag to main Activity to refresh the server list if necessary
         refreshServers = false;
+        
+        // Flag to main Activity to re-query all servers
+        queryServers = false;
         
         if( database == null )
             database = new DatabaseProvider(SettingsActivity.this);
@@ -380,7 +389,7 @@ public class SettingsActivity extends Activity {
                 break;
             case Values.ACTIVITY_RESTORE_BACKUP:
                 showCurrentValues();
-                refreshServers = true;
+                queryServers = true;
                 break;
             default:
                 break;
