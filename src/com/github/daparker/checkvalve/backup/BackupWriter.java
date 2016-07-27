@@ -63,8 +63,11 @@ public class BackupWriter implements Runnable {
         String version = context.getString(R.string.app_version);
         File backupFile = new File(filename);
         File filesDir = context.getFilesDir();
-        File f1 = new File(filesDir, Values.FILE_HIDE_CHAT_RELAY_NOTE);
-        File f2 = new File(filesDir, Values.FILE_HIDE_CONSOLE_RELAY_NOTE);
+        
+        File[] markerFiles = new File[] {
+                new File(filesDir, Values.FILE_HIDE_CHAT_RELAY_NOTE),
+                new File(filesDir, Values.FILE_HIDE_CONSOLE_RELAY_NOTE),
+                new File(filesDir, Values.FILE_HIDE_ANDROID_VERSION_NOTE) };
         
         try {
             if( database == null )
@@ -93,18 +96,12 @@ public class BackupWriter implements Runnable {
                 // Data backup
                 bw.write(sb.toString());
                 
-                // Flag for hiding the chat relay note
-                if( f1.exists() ) {
-                    bw.write("[flag]\r\n");
-                    bw.write("name=" + f1.getName() + "\r\n");
-                    bw.write("\r\n");
-                }
-                
-                // Flag for hiding the console relay note
-                if( f2.exists() ) {
-                    bw.write("[flag]\r\n");
-                    bw.write("name=" + f2.getName() + "\r\n");
-                    bw.write("\r\n");
+                for( File f : markerFiles ) {
+                    if( f.exists() ) {
+                        bw.write("[flag]\r\n");
+                        bw.write("name=" + f.getName() + "\r\n");
+                        bw.write("\r\n");
+                    }
                 }
                 
                 // Close the output buffer
