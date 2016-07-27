@@ -97,7 +97,8 @@ public class ServerQuery implements Runnable {
         
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
-        ServerRecord[] serverList = database.getAllServers();
+        //ServerRecord[] serverList = database.getAllServers();
+        ServerRecord[] serverList = database.getAllEnabledServers();
         database.close();
         
         if( debug == true ) {
@@ -118,6 +119,8 @@ public class ServerQuery implements Runnable {
         messages = new ArrayList<String>();
 
         for( int i = 0; i < serverList.length; i++ ) {
+            ServerRecord sr = serverList[i];
+            
             long startTime = 0L;
             long endTime = 0L;
             long requestTime = 0L;
@@ -134,8 +137,6 @@ public class ServerQuery implements Runnable {
                 debugLog.addMessage("\nQUERY #" + (i+1));
                 debugLog.addMessage("> Start time: " + queryStart);
             }
-            
-            ServerRecord sr = serverList[i];
 
             String serverName = new String();
             String serverURL = sr.getServerURL();
