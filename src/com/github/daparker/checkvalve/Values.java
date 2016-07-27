@@ -67,6 +67,7 @@ public final class Values {
     public static final String EXTRA_NICKNAME = "nickname";
     public static final String EXTRA_REFRESH_SERVERS = "refreshServers";
     public static final String EXTRA_RESTART_SERVICE = "restartService";
+    public static final String EXTRA_QUERY_SERVERS = "queryServers";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -118,6 +119,8 @@ public final class Values {
     public static final String TAG_SERVER_NICKNAME = "serverNickname";
     public static final String TAG_PLAYER_INFO = "playerInfo";
     public static final String TAG_MESSAGE_INFO = "messageInfo";
+    public static final String TAG_ENABLED = "enabled";
+    public static final String TAG_DISABLED = "disabled";
     
     // File names
     public static final String FILE_HIDE_CHAT_RELAY_NOTE = ".hide_chat_relay_note";
