@@ -215,6 +215,9 @@ public class BackupParser implements Runnable {
                         else if( fields[0].equals("nickname") ) {
                             servers[x].setName(fields[1]);
                         }
+                        else if( fields[0].equals("enabled") ) {
+                            servers[x].setEnabled(Integer.parseInt(fields[1]));
+                        }
                         else {
                             Log.e(TAG, "getBackupData(): Unrecognized server key '" + fields[0] + "' on line " + lineNumber);
                             reader.close();
@@ -399,8 +402,15 @@ public class BackupParser implements Runnable {
         
         Log.i(TAG, "restoreBackupData(): Inserting server records from backup into the database");
         
+        long id = 0L;
+        
         for( ServerBackupRecord s : servers ) {
-            database.insertServer(s.getName(), s.getURL(), s.getPort(), s.getTimeout(), s.getRCONPassword());
+            id = database.insertServer(s.getName(), s.getURL(), s.getPort(), s.getTimeout(), s.getRCONPassword());
+            
+            if( s.getEnabled() == 0 ) {
+                Log.i(TAG, "restoreBackupData(): Server " + s.getURL() + ":" + s.getPort() + " is disabled.");
+                database.disableServer(id);
+            }
         }
         
         if( newSettings.size() > 0 ) {
