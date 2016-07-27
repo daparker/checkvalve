@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -316,7 +317,15 @@ public class ManageServersActivity extends Activity {
             
             CheckBox checkbox = (CheckBox)buttonBar.findViewById(R.id.buttonbar_checkbox);
             checkbox.setId(rowId);
-            checkbox.setChecked(sr.isEnabled());
+            
+            if( sr.isEnabled() ) {
+                checkbox.setChecked(true);
+                serverName.setTextColor(Color.WHITE);
+            }
+            else {
+                checkbox.setChecked(false);
+                serverName.setTextColor(Color.GRAY);
+            }
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);
