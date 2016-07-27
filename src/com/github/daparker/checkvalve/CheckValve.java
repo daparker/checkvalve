@@ -286,8 +286,15 @@ public class CheckValve extends Activity {
                     // Success
                     getSettings();
 
-                    if( data.getBooleanExtra(Values.EXTRA_REFRESH_SERVERS, false) ) {
-                        refreshView();
+                    if( data.getBooleanExtra(Values.EXTRA_QUERY_SERVERS, false) ) {
+                        // Re-query all servers
+                        queryServers();
+                    }
+                    else {
+                        if( data.getBooleanExtra(Values.EXTRA_REFRESH_SERVERS, false) ) {
+                            // Refresh the existing view
+                            refreshView();
+                        }
                     }
                     
                     // Background service is only supported on Honeycomb and above
