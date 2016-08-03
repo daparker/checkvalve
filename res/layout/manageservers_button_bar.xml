@@ -124,13 +124,12 @@ along with the CheckValve source code.  If not, see
         android:gravity="bottom|left" />
 
     <CheckBox
-        android:id="@+id/buttonbar_checkbox"
+        android:id="@+id/buttonbar_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
         android:paddingRight="0dp"
-        android:paddingTop="5dp"
-        android:onClick="buttonbarCheckboxHandler" />
+        android:paddingTop="5dp" />
 </LinearLayout>
