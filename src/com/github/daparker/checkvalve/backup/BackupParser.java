@@ -322,6 +322,7 @@ public class BackupParser implements Runnable {
             }
         }
         catch( InvalidBackupFileException ibfe ) {
+            Log.e(TAG, "getBackupData(): Caught an exception:", ibfe);
             throw ibfe;
         }
         catch( Exception e ) {
@@ -339,26 +340,30 @@ public class BackupParser implements Runnable {
 
         HashMap<String,String> map = new HashMap<String,String>();
 
-        map.put("rcon_default_font_size", Values.SETTING_RCON_DEFAULT_FONT_SIZE);
-        map.put("default_query_port", Values.SETTING_DEFAULT_QUERY_PORT);
-        map.put("default_query_timeout", Values.SETTING_DEFAULT_QUERY_TIMEOUT);
-        map.put("default_relay_port", Values.SETTING_DEFAULT_RELAY_PORT);
-        map.put("rcon_warn_unsafe", Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
-        map.put("rcon_show_passwords", Values.SETTING_RCON_SHOW_PASSWORDS);
-        map.put("rcon_show_suggestions", Values.SETTING_RCON_SHOW_SUGGESTIONS);
-        map.put("rcon_enable_history", Values.SETTING_RCON_ENABLE_HISTORY);
-        map.put("rcon_volume_buttons", Values.SETTING_RCON_VOLUME_BUTTONS);
-        map.put("rcon_include_sm", Values.SETTING_RCON_INCLUDE_SM);
-        map.put("show_ip", Values.SETTING_SHOW_SERVER_IP);
-        map.put("show_map", Values.SETTING_SHOW_SERVER_MAP_NAME);
-        map.put("show_num_players", Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
-        map.put("show_game_info", Values.SETTING_SHOW_SERVER_GAME_INFO);
-        map.put("show_tags", Values.SETTING_SHOW_SERVER_TAGS);
-        map.put("show_ping", Values.SETTING_SHOW_SERVER_PING);
-        map.put("show_nickname", Values.SETTING_USE_SERVER_NICKNAME);
-        map.put("validate_new_servers", Values.SETTING_VALIDATE_NEW_SERVERS);
-        map.put("default_relay_host", Values.SETTING_DEFAULT_RELAY_HOST);
-        map.put("default_relay_password", Values.SETTING_DEFAULT_RELAY_PASSWORD);
+        map.put(DatabaseProvider.SETTINGS_RCON_DEFAULT_FONT_SIZE, Values.SETTING_RCON_DEFAULT_FONT_SIZE);
+        map.put(DatabaseProvider.SETTINGS_DEFAULT_QUERY_PORT, Values.SETTING_DEFAULT_QUERY_PORT);
+        map.put(DatabaseProvider.SETTINGS_DEFAULT_QUERY_TIMEOUT, Values.SETTING_DEFAULT_QUERY_TIMEOUT);
+        map.put(DatabaseProvider.SETTINGS_DEFAULT_RELAY_PORT, Values.SETTING_DEFAULT_RELAY_PORT);
+        map.put(DatabaseProvider.SETTINGS_RCON_WARN_UNSAFE, Values.SETTING_RCON_WARN_UNSAFE_COMMAND);
+        map.put(DatabaseProvider.SETTINGS_RCON_SHOW_PASSWORDS, Values.SETTING_RCON_SHOW_PASSWORDS);
+        map.put(DatabaseProvider.SETTINGS_RCON_SHOW_SUGGESTIONS, Values.SETTING_RCON_SHOW_SUGGESTIONS);
+        map.put(DatabaseProvider.SETTINGS_RCON_ENABLE_HISTORY, Values.SETTING_RCON_ENABLE_HISTORY);
+        map.put(DatabaseProvider.SETTINGS_RCON_VOLUME_BUTTONS, Values.SETTING_RCON_VOLUME_BUTTONS);
+        map.put(DatabaseProvider.SETTINGS_RCON_INCLUDE_SM, Values.SETTING_RCON_INCLUDE_SM);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_IP, Values.SETTING_SHOW_SERVER_IP);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_MAP, Values.SETTING_SHOW_SERVER_MAP_NAME);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_PLAYERS, Values.SETTING_SHOW_SERVER_NUM_PLAYERS);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_GAME, Values.SETTING_SHOW_SERVER_GAME_INFO);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_TAGS, Values.SETTING_SHOW_SERVER_TAGS);
+        map.put(DatabaseProvider.SETTINGS_SHOW_SERVER_PING, Values.SETTING_SHOW_SERVER_PING);
+        map.put(DatabaseProvider.SETTINGS_USE_SERVER_NICKNAME, Values.SETTING_USE_SERVER_NICKNAME);
+        map.put(DatabaseProvider.SETTINGS_VALIDATE_NEW_SERVERS, Values.SETTING_VALIDATE_NEW_SERVERS);
+        map.put(DatabaseProvider.SETTINGS_DEFAULT_RELAY_HOST, Values.SETTING_DEFAULT_RELAY_HOST);
+        map.put(DatabaseProvider.SETTINGS_DEFAULT_RELAY_PASSWORD, Values.SETTING_DEFAULT_RELAY_PASSWORD);
+        map.put(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATION_LED, Values.SETTING_ENABLE_NOTIFICATION_LED);
+        map.put(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATION_SOUND, Values.SETTING_ENABLE_NOTIFICATION_SOUND);
+        map.put(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATION_VIBRATE, Values.SETTING_ENABLE_NOTIFICATION_VIBRATE);
+        map.put(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATIONS, Values.SETTING_ENABLE_NOTIFICATIONS);
         
         for( SettingBackupRecord s : settings ) {
             type = s.getType();
