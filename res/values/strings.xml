@@ -178,8 +178,7 @@ along with the CheckValve source code.  If not, see
     <string name="settings_default_chat_relay_port">Chat Relay Port</string>
     <string name="settings_default_query_port">Default query port</string>
     <string name="settings_default_query_timeout">Default query timeout</string>
-    <string name="settings_enable_background_queries">Enable background server queries</string>
-    <string name="settings_enable_notifications">Notify on server status change</string>
+    <string name="settings_enable_notifications">Enable notifications</string>
     <string name="settings_header_backups">Backups</string>
     <string name="settings_header_chat_relay_options">Default Chat Relay</string>
     <string name="settings_header_general_options">General</string>
