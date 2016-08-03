@@ -37,6 +37,9 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+//import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -157,29 +160,30 @@ public class ManageServersActivity extends Activity {
         }
     };
     
-    public void buttonbarCheckboxHandler( View v ) {
-        boolean checked = ((CheckBox)v).isChecked();
-        long rowId = (long)v.getId();
-
-        if( checked ) {
-            if( database.enableServer(rowId) ) {
-                setResult(1, thisIntent);
-                showServerList();
+    private OnCheckedChangeListener toggleListener = new OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+            long rowId = (long)buttonView.getId();
+            
+            if( checked ) {
+                if( database.enableServer(rowId) ) {
+                    setResult(1, thisIntent);
+                    showServerList();
+                }
+                else {
+                    UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+                }
             }
             else {
-                UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+                if( database.disableServer(rowId) ) {
+                    setResult(1, thisIntent);
+                    showServerList();
+                }
+                else {
+                    UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+                }
             }
         }
-        else {
-            if( database.disableServer(rowId) ) {
-                setResult(1, thisIntent);
-                showServerList();
-            }
-            else {
-                UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
-            }
-        }
-    }
+    };
 
     @Override
     public void onCreate( Bundle savedInstanceState ) {
@@ -315,17 +319,38 @@ public class ManageServersActivity extends Activity {
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
             
-            CheckBox checkbox = (CheckBox)buttonBar.findViewById(R.id.buttonbar_checkbox);
-            checkbox.setId(rowId);
-            
-            if( sr.isEnabled() ) {
-                checkbox.setChecked(true);
-                serverName.setTextColor(Color.WHITE);
+            /*
+            if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+                Switch toggle = (Switch)buttonBar.findViewById(R.id.buttonbar_toggle);
+                toggle.setId(rowId);
+                
+                if( sr.isEnabled() ) {
+                    toggle.setChecked(true);
+                    serverName.setTextColor(Color.WHITE);
+                }
+                else {
+                    toggle.setChecked(false);
+                    serverName.setTextColor(Color.GRAY);
+                }
+                
+                toggle.setOnCheckedChangeListener(toggleListener);
             }
             else {
-                checkbox.setChecked(false);
-                serverName.setTextColor(Color.GRAY);
-            }
+            */
+                CheckBox toggle = (CheckBox)buttonBar.findViewById(R.id.buttonbar_toggle);
+                toggle.setId(rowId);
+                
+                if( sr.isEnabled() ) {
+                    toggle.setChecked(true);
+                    serverName.setTextColor(Color.WHITE);
+                }
+                else {
+                    toggle.setChecked(false);
+                    serverName.setTextColor(Color.GRAY);
+                }
+                
+                toggle.setOnCheckedChangeListener(toggleListener);
+            //}
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);
