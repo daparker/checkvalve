@@ -56,7 +56,10 @@ import com.github.daparker.checkvalve.R;
 public class CheckValve extends Activity {
     private static final String TAG = CheckValve.class.getSimpleName();
 
-    private static boolean debugMode = false;
+    private static boolean debugMode;
+    private static boolean queryIsRunning;
+    private static Intent currentIntent;
+    
     public static Bundle settings;
 
     private ProgressDialog p;
@@ -91,6 +94,9 @@ public class CheckValve extends Activity {
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
 
+        debugMode = false;
+        queryIsRunning = false;
+        
         selectedServerRowId = 0;
         server_info_table = (TableLayout)findViewById(R.id.checkvalve_server_info_table);
         message_table = (TableLayout)findViewById(R.id.checkvalve_message_table);
@@ -101,7 +107,19 @@ public class CheckValve extends Activity {
         TextView titleBar = (TextView)findViewById(R.id.checkvalve_title);
         titleBar.setOnLongClickListener(titleBarClickListener);
         
+        Log.d(TAG, "onCreate(): Getting settings");
         getSettings();
+
+        Log.d(TAG, "onCreate(): Getting current Intent");
+        currentIntent = this.getIntent();
+        
+        if( currentIntent != null ) {            
+            if( currentIntent.hasExtra(Values.EXTRA_QUERY_SERVERS) ) {
+                currentIntent.removeExtra(Values.EXTRA_QUERY_SERVERS);
+            }
+        }
+        
+        Log.d(TAG, "onCreate(): Calling queryServers()");
         queryServers();
     }
 
@@ -114,7 +132,20 @@ public class CheckValve extends Activity {
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
         
+        Log.d(TAG, "onResume(): Getting settings");
         getSettings();
+        
+        Log.d(TAG, "onResume(): Getting current Intent");
+        currentIntent = this.getIntent();
+        
+        if( currentIntent != null ) {            
+            if( currentIntent.hasExtra(Values.EXTRA_QUERY_SERVERS) ) {
+                currentIntent.removeExtra(Values.EXTRA_QUERY_SERVERS);
+                
+                Log.d(TAG, "onResume(): Calling queryServers()");
+                queryServers();
+            }
+        }
     }
 
     @Override
@@ -131,6 +162,11 @@ public class CheckValve extends Activity {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+    
+    @Override
     public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
@@ -146,7 +182,6 @@ public class CheckValve extends Activity {
             menuResId = R.menu.main_menu;
         
         MenuInflater inflater = getMenuInflater();
-        //inflater.inflate(R.menu.main_menu, menu);
         inflater.inflate(menuResId, menu);
         return true;
     }
@@ -368,8 +403,15 @@ public class CheckValve extends Activity {
     
     //@SuppressWarnings("deprecation")
     public void queryServers() {
-    	if( debugMode )
+        if( queryIsRunning ) {
+            return;
+        }
+        
+        queryIsRunning = true;
+        
+    	if( debugMode ) {
     	    debugLog = new QueryDebugLog();
+    	}
     	
         // Clear the server info table
         server_info_table.setVisibility(View.INVISIBLE);
@@ -395,7 +437,9 @@ public class CheckValve extends Activity {
 
     // Handler for the server query thread
     Handler progressHandler = new Handler() {
-        public void handleMessage( Message msg ) {            
+        public void handleMessage( Message msg ) {
+            queryIsRunning = false;
+            
             message_table.setVisibility(View.GONE);
             server_info_table.setVisibility(View.GONE);
             
@@ -748,19 +792,19 @@ public class CheckValve extends Activity {
     public void checkServiceState() {
         serviceIntent = new Intent(this, BackgroundQueryService.class);
         
-        Log.d(TAG, "Checking state of background query service.");
+        Log.d(TAG, "Checking state of background query service");
         
         // Start the service if it's not running but should be
         if( ! BackgroundQueryService.isRunning() ) {
             if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
-                Log.i(TAG, "Starting background query service.");
+                Log.i(TAG, "Starting background query service");
                 startService(serviceIntent);
             }
         }
         // Stop the service if it is running but shouldn't be
         else {
             if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == false ) {
-                Log.i(TAG, "Stopping background query service.");
+                Log.i(TAG, "Stopping background query service");
                 stopService(serviceIntent);
             }
         }
@@ -770,20 +814,21 @@ public class CheckValve extends Activity {
         serviceIntent = new Intent(this, BackgroundQueryService.class);
         
         if( BackgroundQueryService.isRunning() ) {
-            Log.i(TAG, "Stopping background query service.");
+            Log.i(TAG, "Stopping background query service");
             stopService(serviceIntent);
         }
         
         if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
-            Log.i(TAG, "Starting background query service.");
+            Log.i(TAG, "Starting background query service");
             startService(serviceIntent);
         }
         else {
-            Log.i(TAG, "Background service is disabled in settings, not restarting.");
+            Log.i(TAG, "Background service is disabled in settings: not restarting");
         }
     }
     
     public void quit() {
+        Log.d(TAG, "quit(): Shutting down CheckValve");
         finish();
     }
 
