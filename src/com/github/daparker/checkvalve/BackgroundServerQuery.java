@@ -71,9 +71,6 @@ public class BackgroundServerQuery implements Runnable {
         msg.what = status;
         msg.obj = messages;
         
-        Log.d(TAG, "msg=" + msg.toString());
-        Log.d(TAG, "handler=" + handler.toString());
-        Log.d(TAG, "Returning msg to handler");
         this.handler.sendMessage(msg);
         Log.d(TAG, "Done.");
     }
