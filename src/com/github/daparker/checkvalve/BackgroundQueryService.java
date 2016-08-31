@@ -87,10 +87,16 @@ public class BackgroundQueryService extends Service {
                 if( ! messages.isEmpty() ) {
                     // If this was the first try then try again
                     if( retry == false ) {
-                        retry = true;
-                        querying = true;
-                        new Thread(new BackgroundServerQuery(context, resultHandler)).start();
-                        return;
+                    	if( networkIsConnected() ) {
+                            retry = true;
+                            querying = true;
+                            new Thread(new BackgroundServerQuery(context, resultHandler)).start();
+                    	}
+                    	else {
+                    		Log.w(TAG, "Cannot query servers: no network connection.");
+                    	}
+                    	
+                    	return;
                     }
                     else {
                         retry = false;
