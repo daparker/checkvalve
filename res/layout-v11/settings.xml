@@ -753,7 +753,7 @@ along with the CheckValve source code.  If not, see
                     android:text="@string/settings_header_notifications"
                     android:textSize="14sp"
                     android:textStyle="bold" />
-                                
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -776,32 +776,6 @@ along with the CheckValve source code.  If not, see
                         android:focusable="true"
                         android:onClick="settingCheckboxHandler"
                         android:padding="10dp" />
-                </TableRow>
-                
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <TextView
-                        android:id="@+id/settings_label_background_query_frequency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="start|center_vertical"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:text="@string/settings_background_query_frequency"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/settings_field_background_query_frequency"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="right"
-                        android:focusable="true"
-                        android:inputType="number"
-                        android:maxLength="3"
-                        android:textSize="14sp" />
                 </TableRow>
 
                 <TableRow
@@ -851,7 +825,7 @@ along with the CheckValve source code.  If not, see
                         android:onClick="settingCheckboxHandler"
                         android:padding="10dp" />
                 </TableRow>
-                
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -874,6 +848,32 @@ along with the CheckValve source code.  If not, see
                         android:focusable="true"
                         android:onClick="settingCheckboxHandler"
                         android:padding="10dp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/settings_label_background_query_frequency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:gravity="start|center_vertical"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:text="@string/settings_background_query_frequency"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/settings_field_background_query_frequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:gravity="start"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:textSize="14sp" />
                 </TableRow>
             </TableLayout>
 
@@ -947,24 +947,6 @@ along with the CheckValve source code.  If not, see
                         android:text="@string/settings_restore_backup"
                         android:textSize="14sp" />
                 </TableRow>
-                <!--
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_span="1"
-                        android:background="@color/steam_gray"
-                        android:gravity="center"
-                        android:paddingBottom="5dp"
-                        android:paddingLeft="0dp"
-                        android:paddingRight="0dp"
-                        android:paddingTop="5dp" />
-                </TableRow>
-                -->
             </TableLayout>
 
             <TableLayout
@@ -1037,24 +1019,6 @@ along with the CheckValve source code.  If not, see
                         android:text="@string/settings_clear_saved_relays"
                         android:textSize="14sp" />
                 </TableRow>
-                <!--
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_span="1"
-                        android:background="@color/steam_gray"
-                        android:gravity="center"
-                        android:paddingBottom="5dp"
-                        android:paddingLeft="0dp"
-                        android:paddingRight="0dp"
-                        android:paddingTop="5dp" />
-                </TableRow>
-                -->
             </TableLayout>
         </LinearLayout>
     </ScrollView>
