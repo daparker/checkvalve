@@ -218,9 +218,9 @@ public final class R {
         public static final int settings_button_bar=0x7f0a009f;
         public static final int settings_cancel_button=0x7f0a00a0;
         public static final int settings_chat_relay_settings_table=0x7f0a00d3;
-        public static final int settings_checkbox_notification_led=0x7f0a00ec;
-        public static final int settings_checkbox_notification_sound=0x7f0a00ea;
-        public static final int settings_checkbox_notification_vibrate=0x7f0a00ee;
+        public static final int settings_checkbox_notification_led=0x7f0a00ea;
+        public static final int settings_checkbox_notification_sound=0x7f0a00e8;
+        public static final int settings_checkbox_notification_vibrate=0x7f0a00ec;
         public static final int settings_checkbox_notifications=0x7f0a00e6;
         public static final int settings_checkbox_rcon_enable_history=0x7f0a00c5;
         public static final int settings_checkbox_rcon_include_sm=0x7f0a00c3;
@@ -239,7 +239,7 @@ public final class R {
         public static final int settings_checkbox_validate_new_servers=0x7f0a00a9;
         public static final int settings_clear_saved_relays=0x7f0a00e2;
         public static final int settings_create_backup=0x7f0a00dd;
-        public static final int settings_field_background_query_frequency=0x7f0a00e8;
+        public static final int settings_field_background_query_frequency=0x7f0a00ee;
         public static final int settings_field_default_query_port=0x7f0a00d0;
         public static final int settings_field_default_query_timeout=0x7f0a00d2;
         public static final int settings_field_default_rcon_font_size=0x7f0a00cb;
@@ -247,7 +247,7 @@ public final class R {
         public static final int settings_field_default_relay_password=0x7f0a00da;
         public static final int settings_field_default_relay_port=0x7f0a00d8;
         public static final int settings_general_settings_table=0x7f0a00a4;
-        public static final int settings_label_background_query_frequency=0x7f0a00e7;
+        public static final int settings_label_background_query_frequency=0x7f0a00ed;
         public static final int settings_label_backup_settings_header=0x7f0a00dc;
         public static final int settings_label_chat_relay_settings_header=0x7f0a00d4;
         public static final int settings_label_default_query_port=0x7f0a00cf;
@@ -255,9 +255,9 @@ public final class R {
         public static final int settings_label_default_relay_host=0x7f0a00d5;
         public static final int settings_label_default_relay_password=0x7f0a00d9;
         public static final int settings_label_default_relay_port=0x7f0a00d7;
-        public static final int settings_label_enable_notification_led=0x7f0a00eb;
-        public static final int settings_label_enable_notification_sound=0x7f0a00e9;
-        public static final int settings_label_enable_notification_vibrate=0x7f0a00ed;
+        public static final int settings_label_enable_notification_led=0x7f0a00e9;
+        public static final int settings_label_enable_notification_sound=0x7f0a00e7;
+        public static final int settings_label_enable_notification_vibrate=0x7f0a00eb;
         public static final int settings_label_enable_notifications=0x7f0a00e5;
         public static final int settings_label_general_settings_header=0x7f0a00a5;
         public static final int settings_label_miscellaneous_settings_header=0x7f0a00e0;
