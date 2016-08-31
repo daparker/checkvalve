@@ -206,6 +206,10 @@ public class SettingsActivity extends Activity {
                     int currentFreq = database.getIntSetting(DatabaseProvider.SETTINGS_BACKGROUND_QUERY_FREQUENCY);
                     int newFreq = Integer.parseInt(field_background_query_frequency.getText().toString().trim());
                     
+                    if( newFreq <= 0 ) {
+                    	throw new NumberFormatException();
+                    }
+                    
                     if( (currentFreq != newFreq) && checkbox_enable_notifications.isChecked() ) {
                         resultIntent.putExtra(Values.EXTRA_RESTART_SERVICE, true);
                     }
