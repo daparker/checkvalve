@@ -293,6 +293,13 @@ public class CheckValve extends Activity {
     public void onActivityResult( int request, int result, Intent data ) {
         if( database == null ) database = new DatabaseProvider(CheckValve.this);
 
+        if( data != null ) {
+            Log.d(TAG, "onActivityResult(): request=" + request + "; result=" + result + "; data=" + data.toString());
+        }
+        else {
+            Log.d(TAG, "onActivityResult(): request=" + request + "; result=" + result);
+        }
+        
         switch( request ) {
             case Values.ACTIVITY_RCON:
             case Values.ACTIVITY_CHAT:
@@ -323,10 +330,15 @@ public class CheckValve extends Activity {
 
                     if( data.getBooleanExtra(Values.EXTRA_QUERY_SERVERS, false) ) {
                         // Re-query all servers
+                    	Log.d(TAG, "onActivityResult(): EXTRA_QUERY_SERVERS is set in result intent");
+                    	Log.d(TAG, "onActivityResult(): Calling queryServers()");
                         queryServers();
                     }
                     else {
+                    	Log.d(TAG, "onActivityResult(): EXTRA_QUERY_SERVERS is not set in result intent");
                         if( data.getBooleanExtra(Values.EXTRA_REFRESH_SERVERS, false) ) {
+                        	Log.d(TAG, "onActivityResult(): EXTRA_REFRESH_SERVERS is set in result intent");
+                        	Log.d(TAG, "onActivityResult(): Calling refreshView()");
                             // Refresh the existing view
                             refreshView();
                         }
@@ -404,10 +416,9 @@ public class CheckValve extends Activity {
     //@SuppressWarnings("deprecation")
     public void queryServers() {
         if( queryIsRunning ) {
+        	Log.d(TAG, "queryServers(): A query is already running.");
             return;
         }
-        
-        queryIsRunning = true;
         
     	if( debugMode ) {
     	    debugLog = new QueryDebugLog();
@@ -427,6 +438,8 @@ public class CheckValve extends Activity {
             addNewServer();
         }
         else {
+            queryIsRunning = true;
+            
             // Show the progress dialog
             p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
