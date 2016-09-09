@@ -373,6 +373,8 @@ public class CheckValve extends Activity {
                 for( int i = 0; i < count; i++ )
                     if( server_info_table.getChildAt(i).getId() == id )
                         server_info_table.getChildAt(i).setBackgroundResource(R.color.steam_gray);
+                
+                v.performClick();
             }
             // Set the background color of each row to blue if the touch action is "DOWN"
             else {
