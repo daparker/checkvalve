@@ -20,7 +20,9 @@
 package com.github.daparker.checkvalve;
 
 import java.util.ArrayList;
+
 import com.github.daparker.checkvalve.exceptions.InvalidDataTypeException;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -175,7 +177,8 @@ public class BackgroundQueryService extends Service {
         Log.d(TAG, "Stopped CheckValve background query service.");
     }
     
-    private static void handleNotification(int numServersDown) {
+    @SuppressWarnings("deprecation")
+	private static void handleNotification(int numServersDown) {
         String tag = "CheckValve";
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         
