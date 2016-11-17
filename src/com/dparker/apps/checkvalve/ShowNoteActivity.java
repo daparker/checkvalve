@@ -60,10 +60,17 @@ public class ShowNoteActivity extends Activity {
         filename = thisIntent.getStringExtra(Values.EXTRA_FILE_NAME);
         int noteId = thisIntent.getIntExtra(Values.EXTRA_NOTE_ID, 0);
         
-        if( noteId == 0 )
-            finish();
+        if( filename != null ) {
+            if( noteId == 0 ) {
+                Log.w(TAG, "onCreate(): Note ID extra is missing or 0; aborting.");
+                finish();
+            }
         
-        ((TextView)findViewById(R.id.shownote_note_text)).setText(noteId);
+            ((TextView)findViewById(R.id.shownote_note_text)).setText(noteId);
+        }
+        else {
+            Log.w(TAG, "onCreate(): Filename extra is missing or null; aborting.");
+        }
     }
 
     @Override
@@ -77,22 +84,22 @@ public class ShowNoteActivity extends Activity {
     }
     
     public void DoNotShowCheckboxHandler( View view ) {
-        boolean checked = ((CheckBox)view).isChecked();
+        final boolean checked = ((CheckBox)view).isChecked();
         
         try {
             File f = new File(ShowNoteActivity.this.getFilesDir(), filename);
 
             if( checked ) {
                 if( f.createNewFile() )
-                    Log.i(TAG, "Created file " + f.getCanonicalPath());
+                    Log.i(TAG, "DoNotShowCheckboxHandler(): Created file " + f.getCanonicalPath());
                 else
-                    Log.e(TAG, "Failed to create file " + f.getCanonicalPath());
+                    Log.e(TAG, "DoNotShowCheckboxHandler(): Failed to create file " + f.getCanonicalPath());
             }
             else {
                 if( f.delete() )
-                    Log.i(TAG, "Deleted file " + f.getCanonicalPath());
+                    Log.i(TAG, "DoNotShowCheckboxHandler(): Deleted file " + f.getCanonicalPath());
                 else
-                    Log.e(TAG, "Failed to delete file " + f.getCanonicalPath());
+                    Log.e(TAG, "DoNotShowCheckboxHandler(): Failed to delete file " + f.getCanonicalPath());
             }
         }
         catch( Exception e ) {

@@ -163,7 +163,7 @@ public class ChatViewerActivity extends Activity {
 
     // Handler for the Chat Relay client thread
     private Handler chatClientHandler = new Handler() {
-        public void handleMessage( Message msg ) {
+        public void handleMessage( Message msg ) {            
             /*
              * Message object "what" codes:
              * -2   = An exception during shutdown (maybe normal)
@@ -353,7 +353,7 @@ public class ChatViewerActivity extends Activity {
     // Handler for the network event receiver thread
     private Handler networkEventHandler = new Handler() {
         @Override
-        public void handleMessage( Message msg ) {
+        public void handleMessage( Message msg ) {            
             /*
              * Message object "what" codes:
              * -2  =  Fatal exception in the NetworkEventReceiver thread
@@ -630,7 +630,13 @@ public class ChatViewerActivity extends Activity {
         chatRelayPort = Integer.valueOf(settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT)).toString();
         chatRelayPassword = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
 
-        showNote();
+        //showNote();
+        getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
+        
+        UserVisibleMessage.showNote(
+                ChatViewerActivity.this,
+                Values.FILE_HIDE_CHAT_RELAY_NOTE,
+                R.string.note_chat_relay_required);
     }
 
     @Override

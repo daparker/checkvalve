@@ -29,20 +29,23 @@ public class ServerBackupRecord {
     private int port;
     private int timeout;
     private int listpos;
+    private int enabled;
 
     public ServerBackupRecord() {
         this.port = -1;
         this.timeout = -1;
         this.listpos = -1;
+        this.enabled = -1;
     }
 
-    public ServerBackupRecord(String name, String url, int port, int timeout, int listpos, String rcon) {
+    public ServerBackupRecord(String name, String url, int port, int timeout, int listpos, String rcon, int enabled) {
         this.name = name;
         this.url = url;
         this.port = port;
         this.timeout = timeout;
         this.listpos = listpos;
         this.rcon = rcon;
+        this.enabled = enabled;
     }
 
     public String getName() {
@@ -67,6 +70,10 @@ public class ServerBackupRecord {
 
     public String getRCONPassword() {
         return rcon;
+    }
+    
+    public int getEnabled() {
+        return enabled;
     }
 
     public void setName(String s) throws InvalidBackupFileException {
@@ -124,7 +131,19 @@ public class ServerBackupRecord {
             e.printStackTrace();
         }
     }
-
+    
+    public void setEnabled(int i) throws InvalidBackupFileException {
+        if( enabled >= 0 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        if( i != 0 && i != 1 ) {
+            throw new InvalidBackupFileException();
+        }
+        
+        enabled = i;
+    }
+    
     public boolean isValid() {
         return (url != null && port >= 0 && timeout >= 0 && listpos >= 0);
     }

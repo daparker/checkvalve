@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -35,13 +36,17 @@ import android.view.ViewConfiguration;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+//import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import com.dparker.apps.checkvalve.R;
 
 @SuppressLint("NewApi")
-public class ManageServersActivity extends Activity {
+public class ManageServersActivity extends Activity {    
     private DatabaseProvider database;
     private TableLayout server_table;
     private Intent thisIntent;
@@ -151,6 +156,31 @@ public class ManageServersActivity extends Activity {
             }
             else {
                 UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+            }
+        }
+    };
+    
+    private OnCheckedChangeListener toggleListener = new OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+            long rowId = (long)buttonView.getId();
+            
+            if( checked ) {
+                if( database.enableServer(rowId) ) {
+                    setResult(1, thisIntent);
+                    showServerList();
+                }
+                else {
+                    UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+                }
+            }
+            else {
+                if( database.disableServer(rowId) ) {
+                    setResult(1, thisIntent);
+                    showServerList();
+                }
+                else {
+                    UserVisibleMessage.showMessage(ManageServersActivity.this, R.string.msg_db_failure);
+                }
             }
         }
     };
@@ -288,6 +318,39 @@ public class ManageServersActivity extends Activity {
             Button moveDownButton = (Button)buttonBar.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
+            
+            /*
+            if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+                Switch toggle = (Switch)buttonBar.findViewById(R.id.buttonbar_toggle);
+                toggle.setId(rowId);
+                
+                if( sr.isEnabled() ) {
+                    toggle.setChecked(true);
+                    serverName.setTextColor(Color.WHITE);
+                }
+                else {
+                    toggle.setChecked(false);
+                    serverName.setTextColor(Color.GRAY);
+                }
+                
+                toggle.setOnCheckedChangeListener(toggleListener);
+            }
+            else {
+            */
+                CheckBox toggle = (CheckBox)buttonBar.findViewById(R.id.buttonbar_toggle);
+                toggle.setId(rowId);
+                
+                if( sr.isEnabled() ) {
+                    toggle.setChecked(true);
+                    serverName.setTextColor(Color.WHITE);
+                }
+                else {
+                    toggle.setChecked(false);
+                    serverName.setTextColor(Color.GRAY);
+                }
+                
+                toggle.setOnCheckedChangeListener(toggleListener);
+            //}
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);

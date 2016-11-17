@@ -23,13 +23,13 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 
 /*
- * Define the ServerRecord class
+ * Define the QueryDebugLog class
  */
 public class QueryDebugLog {
     private StringBuilder sb;
 
     /**
-     * Construct a new instance of the ServerRecord class.
+     * Construct a new instance of the QueryDebugLog class.
      */
     public QueryDebugLog() {
     	sb = new StringBuilder();

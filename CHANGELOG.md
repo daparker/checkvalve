@@ -100,3 +100,9 @@ Notes
   - Volume keys increase/decrease font size while in a session
   - Added SourceMod commands to the suggestions (must be enabled in Settings)
   - Added the logaddress command to the suggestions (for GoldSrc servers)
+
+**2.0.6**
+- Added notifications (Settings > Notifications)
+- Added RECEIVE_BOOT_COMPLETED permission
+- Added a checkbox on the Manage Servers screen to enable/disable each server
+- Fixed a few bugs

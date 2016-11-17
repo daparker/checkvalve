@@ -31,6 +31,7 @@ public class ServerRecord {
     private int timeout;
     private int listpos;
     private long rowId;
+    private boolean enabled;
 
     /**
      * Construct a new instance of the ServerRecord class.
@@ -43,7 +44,7 @@ public class ServerRecord {
      * @param listpos The position of this server within the server list
      * @param rowId The unique row ID of this server within the database
      */
-    public ServerRecord( String name, String url, String rcon, int port, int timeout, int listpos, long rowId ) {
+    public ServerRecord( String name, String url, String rcon, int port, int timeout, int listpos, long rowId, boolean enabled ) {
         this.name = name;
         this.url = url;
         this.rcon = rcon;
@@ -51,6 +52,7 @@ public class ServerRecord {
         this.timeout = timeout;
         this.listpos = listpos;
         this.rowId = rowId;
+        this.enabled = enabled;
     }
 
     public String getServerNickname() {
@@ -80,6 +82,10 @@ public class ServerRecord {
     public long getServerRowID() {
         return this.rowId;
     }
+    
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 
     public void setServerNickname( String s ) {
         this.name = s;
@@ -107,5 +113,9 @@ public class ServerRecord {
 
     public void setServerRowID( long i ) {
         this.rowId = i;
+    }
+    
+    public void setServerEnabled( boolean b ) {
+        this.enabled = b;
     }
 }

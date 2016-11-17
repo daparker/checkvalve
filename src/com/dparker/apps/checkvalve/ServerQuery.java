@@ -81,7 +81,11 @@ public class ServerQuery implements Runnable {
         msg.what = status;
         msg.obj = b;
         
+        Log.d(TAG, "msg=" + msg.toString());
+        Log.d(TAG, "handler=" + handler.toString());
+        Log.d(TAG, "Returning msg to handler");
         this.handler.sendMessage(msg);
+        Log.d(TAG, "Done.");
     }
 
     public void queryServers() throws UnsupportedEncodingException {
@@ -93,7 +97,7 @@ public class ServerQuery implements Runnable {
         
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
-        ServerRecord[] serverList = database.getAllServers();
+        ServerRecord[] serverList = database.getEnabledServers();
         database.close();
         
         if( debug == true ) {
@@ -114,6 +118,8 @@ public class ServerQuery implements Runnable {
         messages = new ArrayList<String>();
 
         for( int i = 0; i < serverList.length; i++ ) {
+            ServerRecord sr = serverList[i];
+            
             long startTime = 0L;
             long endTime = 0L;
             long requestTime = 0L;
@@ -130,8 +136,6 @@ public class ServerQuery implements Runnable {
                 debugLog.addMessage("\nQUERY #" + (i+1));
                 debugLog.addMessage("> Start time: " + queryStart);
             }
-            
-            ServerRecord sr = serverList[i];
 
             String serverName = new String();
             String serverURL = sr.getServerURL();
@@ -211,7 +215,7 @@ public class ServerQuery implements Runnable {
                 socket.send(packetOut);
                 
                 if( debug == true ) {
-                	debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
                 }
 
                 // Receive the response packet from the server

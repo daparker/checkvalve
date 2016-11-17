@@ -56,25 +56,33 @@ import com.dparker.apps.checkvalve.R;
 public class CheckValve extends Activity {
     private static final String TAG = CheckValve.class.getSimpleName();
 
+    private static boolean debugMode;
+    private static boolean queryIsRunning;
+    private static Intent currentIntent;
+    
+    public static Bundle settings;
+
     private ProgressDialog p;
     private DatabaseProvider database;
     private TableLayout server_info_table;
     private TableLayout message_table;
-    private boolean debugMode = false;
     private QueryDebugLog debugLog;
-
-    public static Bundle settings;
-
+    private Intent serviceIntent;
     private long selectedServerRowId;
 
     @SuppressLint({ "InlinedApi", "NewApi" })
     @Override
     public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate(savedInstanceState);
         Log.i(TAG, "Starting CheckValve.");
 
+        super.onCreate(savedInstanceState);
+        
         if( android.os.Build.VERSION.SDK_INT < 11 ) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
+            UserVisibleMessage.showNote(
+                    CheckValve.this,
+                    Values.FILE_HIDE_ANDROID_VERSION_NOTE,
+                    R.string.note_android_version_support);
         }
         else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
@@ -84,8 +92,11 @@ public class CheckValve extends Activity {
         setContentView(R.layout.main);
 
         if( database == null )
-        	database = new DatabaseProvider(CheckValve.this);
+            database = new DatabaseProvider(CheckValve.this);
 
+        debugMode = false;
+        queryIsRunning = false;
+        
         selectedServerRowId = 0;
         server_info_table = (TableLayout)findViewById(R.id.checkvalve_server_info_table);
         message_table = (TableLayout)findViewById(R.id.checkvalve_message_table);
@@ -96,7 +107,19 @@ public class CheckValve extends Activity {
         TextView titleBar = (TextView)findViewById(R.id.checkvalve_title);
         titleBar.setOnLongClickListener(titleBarClickListener);
         
+        Log.d(TAG, "onCreate(): Getting settings");
         getSettings();
+
+        Log.d(TAG, "onCreate(): Getting current Intent");
+        currentIntent = this.getIntent();
+        
+        if( currentIntent != null ) {            
+            if( currentIntent.hasExtra(Values.EXTRA_QUERY_SERVERS) ) {
+                currentIntent.removeExtra(Values.EXTRA_QUERY_SERVERS);
+            }
+        }
+        
+        Log.d(TAG, "onCreate(): Calling queryServers()");
         queryServers();
     }
 
@@ -109,7 +132,20 @@ public class CheckValve extends Activity {
         if( database == null )
             database = new DatabaseProvider(CheckValve.this);
         
+        Log.d(TAG, "onResume(): Getting settings");
         getSettings();
+        
+        Log.d(TAG, "onResume(): Getting current Intent");
+        currentIntent = this.getIntent();
+        
+        if( currentIntent != null ) {            
+            if( currentIntent.hasExtra(Values.EXTRA_QUERY_SERVERS) ) {
+                currentIntent.removeExtra(Values.EXTRA_QUERY_SERVERS);
+                
+                Log.d(TAG, "onResume(): Calling queryServers()");
+                queryServers();
+            }
+        }
     }
 
     @Override
@@ -126,6 +162,11 @@ public class CheckValve extends Activity {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+    
+    @Override
     public void onConfigurationChanged( Configuration newConfig ) {
         super.onConfigurationChanged(newConfig);
         return;
@@ -141,7 +182,6 @@ public class CheckValve extends Activity {
             menuResId = R.menu.main_menu;
         
         MenuInflater inflater = getMenuInflater();
-        //inflater.inflate(R.menu.main_menu, menu);
         inflater.inflate(menuResId, menu);
         return true;
     }
@@ -259,6 +299,7 @@ public class CheckValve extends Activity {
             case Values.ACTIVITY_ABOUT:
             case Values.ACTIVITY_SHOW_PLAYERS:
             case Values.ACTIVITY_DEBUG_CONSOLE:
+            case Values.ACTIVITY_SHOW_NOTE:
                 break;
 
             case Values.ACTIVITY_ADD_NEW_SERVER:
@@ -270,17 +311,36 @@ public class CheckValve extends Activity {
 
             case Values.ACTIVITY_SETTINGS:
                 if( result == -1 ) {
+                    // Database error
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_db_failure);
                 }
                 else if( result == 0 ) {
-                    getSettings();
-                    refreshView();
+                    // "Cancel" was clicked
                 }
                 else if( result == 1 ) {
+                    // Success
                     getSettings();
-                    queryServers();
+
+                    if( data.getBooleanExtra(Values.EXTRA_QUERY_SERVERS, false) ) {
+                        // Re-query all servers
+                        queryServers();
+                    }
+                    else {
+                        if( data.getBooleanExtra(Values.EXTRA_REFRESH_SERVERS, false) ) {
+                            // Refresh the existing view
+                            refreshView();
+                        }
+                    }
+                    
+                    // Background service is only supported on Honeycomb and above
+                    if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+                        if( data.getBooleanExtra(Values.EXTRA_RESTART_SERVICE, false) ) {
+                            restartService();
+                        }
+                    }
                 }
                 else {
+                    // Some other error
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                 }
                 break;
@@ -343,8 +403,15 @@ public class CheckValve extends Activity {
     
     //@SuppressWarnings("deprecation")
     public void queryServers() {
-    	if( debugMode )
+        if( queryIsRunning ) {
+            return;
+        }
+        
+        queryIsRunning = true;
+        
+    	if( debugMode ) {
     	    debugLog = new QueryDebugLog();
+    	}
     	
         // Clear the server info table
         server_info_table.setVisibility(View.INVISIBLE);
@@ -370,7 +437,9 @@ public class CheckValve extends Activity {
 
     // Handler for the server query thread
     Handler progressHandler = new Handler() {
-        public void handleMessage( Message msg ) {            
+        public void handleMessage( Message msg ) {
+            queryIsRunning = false;
+            
             message_table.setVisibility(View.GONE);
             server_info_table.setVisibility(View.GONE);
             
@@ -417,25 +486,7 @@ public class CheckValve extends Activity {
              * Build and display the query results table
              */
             for( int i = 0; i < serverInfo.length; i++ ) {
-                if( serverInfo[i] != null ) {                    
-                    // Create TextViews for table rows
-                    /*
-                    String serverNickname = serverInfo[i].getNickame();
-                    TextView nicknameLabel = new TextView(CheckValve.this);
-                    TextView nicknameValue = new TextView(CheckValve.this);
-                    nicknameLabel.setId(i * 200);
-                    nicknameLabel.setText(CheckValve.this.getText(R.string.label_nickname));
-                    nicknameLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                    nicknameLabel.setPadding(3, 0, 3, 0);
-                    nicknameLabel.setTypeface(null, Typeface.BOLD);
-                    nicknameLabel.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                    nicknameValue.setId(i * 300);
-                    nicknameValue.setText(serverNickname);
-                    nicknameValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                    nicknameValue.setPadding(3, 0, 3, 0);
-                    nicknameValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                    */
-                    
+                if( serverInfo[i] != null ) {
                     String serverNickname = serverInfo[i].getNickame();
                     String serverName = serverInfo[i].getName();
                     TextView serverLabel = new TextView(CheckValve.this);
@@ -731,9 +782,53 @@ public class CheckValve extends Activity {
 
     public void getSettings() {
         settings = database.getSettingsAsBundle();
+        
+        // Background service is only supported on Honeycomb and above
+        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
+            checkServiceState();
+        }
     }
 
+    public void checkServiceState() {
+        serviceIntent = new Intent(this, BackgroundQueryService.class);
+        
+        Log.d(TAG, "Checking state of background query service");
+        
+        // Start the service if it's not running but should be
+        if( ! BackgroundQueryService.isRunning() ) {
+            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
+                Log.i(TAG, "Starting background query service");
+                startService(serviceIntent);
+            }
+        }
+        // Stop the service if it is running but shouldn't be
+        else {
+            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == false ) {
+                Log.i(TAG, "Stopping background query service");
+                stopService(serviceIntent);
+            }
+        }
+    }
+    
+    public void restartService() {
+        serviceIntent = new Intent(this, BackgroundQueryService.class);
+        
+        if( BackgroundQueryService.isRunning() ) {
+            Log.i(TAG, "Stopping background query service");
+            stopService(serviceIntent);
+        }
+        
+        if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
+            Log.i(TAG, "Starting background query service");
+            startService(serviceIntent);
+        }
+        else {
+            Log.i(TAG, "Background service is disabled in settings: not restarting");
+        }
+    }
+    
     public void quit() {
+        Log.d(TAG, "quit(): Shutting down CheckValve");
         finish();
     }
 
@@ -933,9 +1028,10 @@ public class CheckValve extends Activity {
     }
     
     @SuppressLint("NewApi")
-	private void toggleDebugMode() {
+    private void toggleDebugMode() {
         if( debugMode == false ) {
             debugMode = true;
+            
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);
             
             if( android.os.Build.VERSION.SDK_INT >= 11 )
@@ -945,6 +1041,7 @@ public class CheckValve extends Activity {
         }
         else {
             debugMode = false;
+            
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_disabled);
             
             if( android.os.Build.VERSION.SDK_INT >= 11 )
