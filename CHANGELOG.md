@@ -106,3 +106,6 @@ Notes
 - Added RECEIVE_BOOT_COMPLETED permission
 - Added a checkbox on the Manage Servers screen to enable/disable each server
 - Fixed a few bugs
+
+**2.0.7**
+- Fixed duplicate nickname error when saving changes on the Edit Server screen (issue #10)
