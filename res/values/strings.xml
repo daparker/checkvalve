@@ -24,7 +24,7 @@ along with the CheckValve source code.  If not, see
     <string name="about_header_about">About</string>
     <string name="about_header_license">License</string>
     <string name="about_header_support">Support</string>
-    <string name="app_credits">Copyright 2010&#8211;2016 by David A. Parker</string>
+    <string name="app_credits">Copyright 2010&#8211;2017 by David A. Parker</string>
     <string name="app_license">CheckValve is free software under the terms of the GNU General Public License version 3.</string>
     <string name="app_name">CheckValve</string>
     <string name="app_support">        
@@ -33,7 +33,7 @@ along with the CheckValve source code.  If not, see
         &#8226; <a href="https://github.com/daparker/checkvalve/issues">Report an issue on GitHub</a>\n\n
         &#8226; <a href="https://sites.google.com/site/checkvalveapp/documentation/app/change-log">View the change log</a>\n\n
         &#8226; <a href="mailto:checkvalvedev@gmail.com">E-mail the developer</a></string>
-    <string name="app_version">CheckValve version 2.0.6</string>
+    <string name="app_version">CheckValve version 2.0.7</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_connect">Connect</string>
