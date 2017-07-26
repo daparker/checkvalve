@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -19,14 +19,10 @@
 
 package com.github.daparker.checkvalve;
 
+import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
+import android.os.Message;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.widget.TextView;
-import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import com.github.daparker.checkvalve.R;
@@ -35,6 +31,7 @@ import com.github.daparker.checkvalve.exceptions.SocketNotConnectedException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @SuppressLint({ "NewApi", "DefaultLocale" })
@@ -43,24 +40,49 @@ public class SearchPlayers extends Thread {
 
     private Handler handler;
     private Context context;
-    private TableRow[] tableRows;
-    private TableRow[] messageRows;
     private String search;
     private byte[] challengeResponse;
+    
+    // New - 2.0.8-dev
+    private ArrayList<String> messages;
+    private ArrayList<String> players;
 
-    public SearchPlayers( Context c, TableRow[] t, TableRow[] m, Handler h, String s ) {
+    public SearchPlayers( Context c, Handler h, String s ) {
         this.context = c;
-        this.tableRows = t;
-        this.messageRows = m;
         this.handler = h;
         this.search = s.toLowerCase();
     }
 
     public void run() {
-        searchPlayers(search);
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
-        if( handler != null )
-            this.handler.sendEmptyMessage(0);
+        int status = 0;
+        Bundle b = new Bundle();
+        
+        players = new ArrayList<String>();
+        messages = new ArrayList<String>();
+
+        Log.d(TAG, "Calling queryServers()");
+        
+        try {
+            searchPlayers(search);
+            b.putStringArrayList(Values.PLAYER_INFO, players);
+            b.putStringArrayList(Values.MESSAGES, messages);
+        }
+        catch( Exception e ) {
+            Log.w(TAG, "run(): Caught an exception:", e);            
+            status = -1;
+        }
+        
+        Message msg = new Message();
+        msg.what = status;
+        msg.obj = b;
+        
+        Log.d(TAG, "msg=" + msg.toString());
+        Log.d(TAG, "handler=" + handler.toString());
+        Log.d(TAG, "Returning msg to handler");
+        this.handler.sendMessage(msg);
+        Log.d(TAG, "Done.");
     }
 
     public void searchPlayers( String search ) {
@@ -84,11 +106,8 @@ public class SearchPlayers extends Thread {
         // Integer variables
         int serverPort = 0;
         int serverTimeout = 0;
-        int numResults = 0;
-        int t = 0;
-        int m = 0;
 
-        ServerRecord[] serverList = database.getAllServers();
+        ServerRecord[] serverList = database.getEnabledServers();
         database.close();
 
         for( ServerRecord sr : serverList ) {
@@ -238,9 +257,7 @@ public class SearchPlayers extends Thread {
                         // Check for a match
                         if( name.toLowerCase().indexOf(search) > -1 ) {
                             // We have a match!
-                            numResults++;
 
-                            // Use the server nickname if there is one, otherwise server:port
                             if( serverNickname.length() > 0 ) {
                                 resultString = String.format(context.getString(R.string.playing_on),
                                         "<b>" + name + "</b>", serverNickname);
@@ -250,22 +267,8 @@ public class SearchPlayers extends Thread {
                                 resultString = String.format(context.getString(R.string.playing_on),
                                         "<b>" + name + "</b>", host);
                             }
-
-                            TextView searchResult = new TextView(context);
-                            searchResult.setId(0);
-                            searchResult.setText(Html.fromHtml(resultString));
-                            searchResult.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                            searchResult.setPadding(5, 0, 5, 0);
-                            searchResult.setGravity(Gravity.LEFT);
-                            searchResult.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                            TableRow row = new TableRow(context);
-                            row.setId(0);
-                            row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-                            row.addView(searchResult);
-
-                            tableRows[t++] = row;
+                            
+                            players.add(resultString);
                         }
 
                         // Skip the next 8 bytes (number of kills and connection time)
@@ -276,47 +279,19 @@ public class SearchPlayers extends Thread {
             catch( Exception e ) {
                 Log.w(TAG, "queryPlayers(): Caught an exception:", e);
 
-                String host = serverURL + ":" + Integer.toString(serverPort);
+                String host = new String();
+                
+                if( serverNickname.length() > 0 ) {
+                    host = serverNickname;
+                }
+                else {
+                    host = serverURL + ":" + Integer.toString(serverPort);
+                }
+                
                 String message = String.format(context.getString(R.string.msg_no_response), host);
 
-                TextView errorMessage = new TextView(context);
-
-                errorMessage.setId(1);
-                errorMessage.setText(message);
-                errorMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-                errorMessage.setPadding(5, 0, 5, 0);
-                errorMessage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-                // Create a TableRow and give it an ID
-                TableRow messageRow = new TableRow(context);
-                messageRow.setId(2);
-                messageRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-                messageRow.addView(errorMessage);
-
-                // Add the TableRow to the TableLayout
-                messageRows[m++] = messageRow;
+                messages.add(message);
             }
-        }
-
-        if( numResults == 0 ) {
-            resultString = (String)context.getText(R.string.msg_no_search_results);
-
-            TextView searchResult = new TextView(context);
-            searchResult.setId(0);
-            searchResult.setText(resultString);
-            searchResult.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-            searchResult.setPadding(5, 0, 5, 0);
-            searchResult.setGravity(Gravity.LEFT);
-            searchResult.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-            TableRow row = new TableRow(context);
-            row.setId(0);
-            row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-            row.addView(searchResult);
-
-            tableRows[0] = row;
         }
     }
 }
