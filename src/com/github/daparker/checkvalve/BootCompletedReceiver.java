@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -30,29 +30,24 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent arg1) {
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            DatabaseProvider db = new DatabaseProvider(context);
+        DatabaseProvider db = new DatabaseProvider(context);
             
-            try {
-                boolean enabled = db.getBooleanSetting(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATIONS);
-                
-                if( enabled ) {
-                    Log.d(TAG, "[CHECKVALVE] Starting background query service.");
-                    context.startService(new Intent(context, BackgroundQueryService.class));
-                }
-                else {
-                    Log.d(TAG, "[CHECKVALVE] Background service is disbaled in settings.");
-                }
+        try {
+            boolean enabled = db.getBooleanSetting(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATIONS);
+            
+            if( enabled ) {
+                Log.d(TAG, "[CHECKVALVE] Starting background query service.");
+                context.startService(new Intent(context, BackgroundQueryService.class));
             }
-            catch( Exception e ) {
-                Log.w(TAG, "[CHECKVALVE] Caught an exception:", e);
-            }
-            finally {
-                db.close();
+            else {
+                Log.d(TAG, "[CHECKVALVE] Background service is disbaled in settings.");
             }
         }
-        else {
-            Log.e(TAG, "[CHECKVALVE] Background service requires Android 3.0 or higher.");
+        catch( Exception e ) {
+            Log.w(TAG, "[CHECKVALVE] Caught an exception:", e);
+        }
+        finally {
+            db.close();
         }
     }
 }

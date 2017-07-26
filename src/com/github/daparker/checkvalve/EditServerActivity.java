@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -37,6 +37,7 @@ public class EditServerActivity extends Activity {
     private static final String TAG = EditServerActivity.class.getSimpleName();
 
     private DatabaseProvider database;
+    private ServerRecord sr;
     private EditText field_server;
     private EditText field_port;
     private EditText field_timeout;
@@ -77,10 +78,14 @@ public class EditServerActivity extends Activity {
                     nickname = "";
                 }
                 else {
-                    if( database.serverNicknameExists(nickname) ) {
-                        Log.w(TAG, "saveButtonListener: Server nickname '" + nickname + "' is a duplicate!");
-                        UserVisibleMessage.showMessage(EditServerActivity.this, "The server nickname is already in use.");
-                        return;
+                    // Fix for GitHub issue #10:
+                    // Only check the nickname if the value of that field has changed
+                    if( ! nickname.equals(sr.getServerNickname()) ) {
+                        if( database.serverNicknameExists(nickname) ) {
+                            Log.w(TAG, "saveButtonListener: Server nickname '" + nickname + "' is a duplicate!");
+                            UserVisibleMessage.showMessage(EditServerActivity.this, "The server nickname is already in use.");
+                            return;
+                        }
                     }
                 }
                 
@@ -155,7 +160,7 @@ public class EditServerActivity extends Activity {
             finish();
         }
 
-        ServerRecord sr = database.getServer(rowId);
+        sr = database.getServer(rowId);
 
         saveButton = (Button)findViewById(R.id.editserver_save_button);
         saveButton.setOnClickListener(saveButtonListener);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -163,7 +163,7 @@ public class ChatViewerActivity extends Activity {
 
     // Handler for the Chat Relay client thread
     private Handler chatClientHandler = new Handler() {
-        public void handleMessage( Message msg ) {
+        public void handleMessage( Message msg ) {            
             /*
              * Message object "what" codes:
              * -2   = An exception during shutdown (maybe normal)
@@ -353,7 +353,7 @@ public class ChatViewerActivity extends Activity {
     // Handler for the network event receiver thread
     private Handler networkEventHandler = new Handler() {
         @Override
-        public void handleMessage( Message msg ) {
+        public void handleMessage( Message msg ) {            
             /*
              * Message object "what" codes:
              * -2  =  Fatal exception in the NetworkEventReceiver thread
@@ -511,11 +511,8 @@ public class ChatViewerActivity extends Activity {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        // Required for InetAddress.getByName() to work on the UI thread in newer APIs
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         if( android.os.Build.VERSION.SDK_INT < 11 ) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);

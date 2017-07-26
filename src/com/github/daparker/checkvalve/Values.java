@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -71,6 +71,7 @@ public final class Values {
 
     // Bundle keys
     public static final String MESSAGES = "messages";
+    public static final String PLAYER_INFO = "playerInfo";
     public static final String SERVER_INFO = "serverInfo";
     public static final String SERVER_NAME = "serverName";
     public static final String SERVER_MAP = "serverMap";
@@ -142,4 +143,11 @@ public final class Values {
     // Server query types
     public static final int QUERY_ENGINE = 1;
     public static final int QUERY_INFO = 2;
+    
+    // Default values
+    public static final int DEFAULT_QUERY_PORT = 27015;
+    public static final int DEFAULT_QUERY_TIMEOUT = 1;
+    public static final int DEFAULT_RELAY_PORT = 23456;
+    public static final int DEFAULT_RCON_FONT_SIZE = 9;
+    public static final int DEFAULT_QUERY_FREQ = 5;
 }

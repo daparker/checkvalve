@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -200,23 +200,20 @@ public class SettingsActivity extends Activity {
                 return;
             }
             
-            // Background service is only supported on Honeycomb and above
-            if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-                try {
-                    int currentFreq = database.getIntSetting(DatabaseProvider.SETTINGS_BACKGROUND_QUERY_FREQUENCY);
-                    int newFreq = Integer.parseInt(field_background_query_frequency.getText().toString().trim());
-                    
-                    if( (currentFreq != newFreq) && checkbox_enable_notifications.isChecked() ) {
-                        resultIntent.putExtra(Values.EXTRA_RESTART_SERVICE, true);
-                    }
+            try {
+                int currentFreq = database.getIntSetting(DatabaseProvider.SETTINGS_BACKGROUND_QUERY_FREQUENCY);
+                int newFreq = Integer.parseInt(field_background_query_frequency.getText().toString().trim());
+                
+                if( (currentFreq != newFreq) && checkbox_enable_notifications.isChecked() ) {
+                    resultIntent.putExtra(Values.EXTRA_RESTART_SERVICE, true);
                 }
-                catch( InvalidDataTypeException idte ) {
-                    Log.e(TAG, "saveButtonListener(): Caught an exception:", idte);
-                }
-                catch( NumberFormatException nfe ) {
-                    UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_freq_value);
-                    return;
-                }
+            }
+            catch( InvalidDataTypeException idte ) {
+                Log.e(TAG, "saveButtonListener(): Caught an exception:", idte);
+            }
+            catch( NumberFormatException nfe ) {
+                UserVisibleMessage.showMessage(SettingsActivity.this, R.string.msg_bad_freq_value);
+                return;
             }
 
             if( queryServers ) {
@@ -311,15 +308,12 @@ public class SettingsActivity extends Activity {
         field_default_relay_port = (EditText)findViewById(R.id.settings_field_default_relay_port);
         field_default_relay_password = (EditText)findViewById(R.id.settings_field_default_relay_password);
         
-        // Background service is only supported on Honeycomb and above
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            checkbox_enable_notification_led = (CheckBox)findViewById(R.id.settings_checkbox_notification_led);
-            checkbox_enable_notification_sound = (CheckBox)findViewById(R.id.settings_checkbox_notification_sound);
-            checkbox_enable_notification_vibrate = (CheckBox)findViewById(R.id.settings_checkbox_notification_vibrate);
-            checkbox_enable_notifications = (CheckBox)findViewById(R.id.settings_checkbox_notifications);
-            field_background_query_frequency = (EditText)findViewById(R.id.settings_field_background_query_frequency);
-            field_default_rcon_font_size = (TextView)findViewById(R.id.settings_field_default_rcon_font_size);
-        }
+        checkbox_enable_notification_led = (CheckBox)findViewById(R.id.settings_checkbox_notification_led);
+        checkbox_enable_notification_sound = (CheckBox)findViewById(R.id.settings_checkbox_notification_sound);
+        checkbox_enable_notification_vibrate = (CheckBox)findViewById(R.id.settings_checkbox_notification_vibrate);
+        checkbox_enable_notifications = (CheckBox)findViewById(R.id.settings_checkbox_notifications);
+        field_background_query_frequency = (EditText)findViewById(R.id.settings_field_background_query_frequency);
+        field_default_rcon_font_size = (TextView)findViewById(R.id.settings_field_default_rcon_font_size);
         
         reset_do_not_show = (TextView)findViewById(R.id.settings_reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
@@ -444,52 +438,26 @@ public class SettingsActivity extends Activity {
         field_default_relay_port.setText(Integer.toString(b.getInt(Values.SETTING_DEFAULT_RELAY_PORT)));
         field_default_relay_password.setText(b.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD));
         field_default_rcon_font_size.setText(Integer.toString(b.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE)));
+
+        enableNotificationLED = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED);
+        enableNotificationSound = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND);
+        enableNotificationVibrate = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE);
+        enableNotifications = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS);
         
-        // Background service is only supported on Honeycomb and above
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            enableNotificationLED = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED);
-            enableNotificationSound = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND);
-            enableNotificationVibrate = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE);
-            enableNotifications = b.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS);
-            
-            checkbox_enable_notification_led.setChecked(enableNotificationLED);
-            checkbox_enable_notification_led.setEnabled(enableNotifications);
-            checkbox_enable_notification_sound.setChecked(enableNotificationSound);
-            checkbox_enable_notification_sound.setEnabled(enableNotifications);
-            checkbox_enable_notification_vibrate.setChecked(enableNotificationVibrate);
-            checkbox_enable_notification_vibrate.setEnabled(enableNotifications);
-            checkbox_enable_notifications.setChecked(enableNotifications);
-            
-            field_background_query_frequency.setText(Integer.toString(b.getInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY)));
-            field_background_query_frequency.setEnabled(enableNotifications);
-        }
+        checkbox_enable_notification_led.setChecked(enableNotificationLED);
+        checkbox_enable_notification_led.setEnabled(enableNotifications);
+        checkbox_enable_notification_sound.setChecked(enableNotificationSound);
+        checkbox_enable_notification_sound.setEnabled(enableNotifications);
+        checkbox_enable_notification_vibrate.setChecked(enableNotificationVibrate);
+        checkbox_enable_notification_vibrate.setEnabled(enableNotifications);
+        checkbox_enable_notifications.setChecked(enableNotifications);
+        
+        field_background_query_frequency.setText(Integer.toString(b.getInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY)));
+        field_background_query_frequency.setEnabled(enableNotifications);
     }
 
     public void settingCheckboxHandler( View view ) {
         boolean checked = ((CheckBox)view).isChecked();
-
-        // Background service is only supported on Honeycomb and above
-        // --- THIS DOUBLE SWITCH() IS CRAZY AND I NEED TO FIND A BETTER WAY ---
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            switch( view.getId() ) {
-                case R.id.settings_checkbox_notification_led:
-                    enableNotificationLED = checked;
-                    break;
-                case R.id.settings_checkbox_notification_sound:
-                    enableNotificationSound = checked;
-                    break;
-                case R.id.settings_checkbox_notification_vibrate:
-                    enableNotificationVibrate = checked;
-                    break;
-                case R.id.settings_checkbox_notifications:
-                    enableNotifications = checked;
-                    checkbox_enable_notification_led.setEnabled(checked);
-                    checkbox_enable_notification_sound.setEnabled(checked);
-                    checkbox_enable_notification_vibrate.setEnabled(checked);
-                    field_background_query_frequency.setEnabled(checked);
-                    break;
-            }
-        }
         
         switch( view.getId() ) {
             case R.id.settings_checkbox_rcon_show_passwords:
@@ -546,6 +514,23 @@ public class SettingsActivity extends Activity {
                 break;
             case R.id.settings_checkbox_validate_new_servers:
                 validateNewServers = checked;
+                break;
+            case R.id.settings_checkbox_notification_led:
+                enableNotificationLED = checked;
+                break;
+            case R.id.settings_checkbox_notification_sound:
+                enableNotificationSound = checked;
+                break;
+            case R.id.settings_checkbox_notification_vibrate:
+                enableNotificationVibrate = checked;
+                break;
+            case R.id.settings_checkbox_notifications:
+                enableNotifications = checked;
+                checkbox_enable_notification_led.setEnabled(checked);
+                checkbox_enable_notification_sound.setEnabled(checked);
+                checkbox_enable_notification_vibrate.setEnabled(checked);
+                field_background_query_frequency.setEnabled(checked);
+                break;
         }
     }
 
@@ -567,28 +552,35 @@ public class SettingsActivity extends Activity {
                 defaultQueryPort = Integer.parseInt(field_default_query_port.getText().toString());
             }
             catch( NumberFormatException nfe ) {
-                defaultQueryPort = 27015;
+                defaultQueryPort = Values.DEFAULT_QUERY_PORT;
             }
 
             try {
                 defaultQueryTimeout = Integer.parseInt(field_default_query_timeout.getText().toString());
             }
             catch( NumberFormatException nfe ) {
-                defaultQueryTimeout = 1;
+                defaultQueryTimeout = Values.DEFAULT_QUERY_TIMEOUT;
             }
 
             try {
                 defaultRelayPort = Integer.parseInt(field_default_relay_port.getText().toString());
             }
             catch( NumberFormatException nfe ) {
-                defaultRelayPort = 1;
+                defaultRelayPort = Values.DEFAULT_RELAY_PORT;
             }
             
             try {
                 defaultRconFontSize = Integer.parseInt(field_default_rcon_font_size.getText().toString());
             }
             catch( NumberFormatException nfe ) {
-                defaultRconFontSize = 9;
+                defaultRconFontSize = Values.DEFAULT_RCON_FONT_SIZE;
+            }
+            
+            try {
+                backgroundQueryFrequency = Integer.parseInt(field_background_query_frequency.getText().toString());
+            }
+            catch( NumberFormatException nfe ) {
+                backgroundQueryFrequency = Values.DEFAULT_QUERY_FREQ;
             }
 
             defaultRelayHost = field_default_relay_host.getText().toString();
@@ -616,21 +608,12 @@ public class SettingsActivity extends Activity {
             b.putString(Values.SETTING_DEFAULT_RELAY_HOST, defaultRelayHost);
             b.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, defaultRelayPassword);
 
-            // Background service is only supported on Honeycomb and above
-            if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-                try {
-                    backgroundQueryFrequency = Integer.parseInt(field_background_query_frequency.getText().toString());
-                }
-                catch( NumberFormatException nfe ) {
-                    backgroundQueryFrequency = 5;
-                }
-                
-                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, enableNotificationLED);
-                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, enableNotificationSound);
-                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, enableNotificationVibrate);
-                b.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, enableNotifications);
-                b.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, backgroundQueryFrequency);
-            }
+            // Notification settings
+            b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, enableNotificationLED);
+            b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, enableNotificationSound);
+            b.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, enableNotificationVibrate);
+            b.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, enableNotifications);
+            b.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, backgroundQueryFrequency);
             
             Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b.toString());
 

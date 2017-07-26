@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -38,7 +38,7 @@ public class UserVisibleMessage {
      * @param text The text to be displayed in the message
      */
     public static Toast showMessage( Context context, CharSequence text ) {
-        Log.d(TAG, "Showing message [context=" + context.toString() + "][text=" + text + "]");
+        Log.d(TAG, "showMessage(): Showing message [context=" + context.toString() + "][text=" + text + "]");
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, text, Toast.LENGTH_SHORT);
@@ -53,7 +53,7 @@ public class UserVisibleMessage {
      * @param resId The ID of the string resource to be displayed in the message
      */
     public static Toast showMessage( Context context, int resId ) {
-        Log.d(TAG, "Showing message [context=" + context.toString() + "][resId=" + resId + "]");
+        Log.d(TAG, "showMessage(): Showing message [context=" + context.toString() + "][resId=" + resId + "]");
 
         // Create a new Toast message
         Toast t = Toast.makeText(context, resId, Toast.LENGTH_SHORT);
@@ -72,11 +72,11 @@ public class UserVisibleMessage {
         File f = new File(context.getFilesDir(), file);
         
         if( f.exists() ) {
-            Log.d(TAG, "Marker file " + file + " exists; note will not be displayed.");
+            Log.d(TAG, "showNote(): Marker file " + file + " exists; note will not be displayed.");
             return;
         }
         
-        Log.d(TAG, "Marker file " + file + " does not exist; showing note.");
+        Log.d(TAG, "showNote(): Marker file " + file + " does not exist; showing note.");
         
         
         Intent showNoteIntent = new Intent();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -581,11 +581,7 @@ public class RconActivity extends Activity {
     public void confirmUnsafeCommand() {
         AlertDialog.Builder alertDialogBuilder;
 
-        if( android.os.Build.VERSION.SDK_INT >= 11 )
-            alertDialogBuilder = new AlertDialog.Builder(RconActivity.this, AlertDialog.THEME_HOLO_DARK);
-        else
-            alertDialogBuilder = new AlertDialog.Builder(RconActivity.this);
-
+        alertDialogBuilder = new AlertDialog.Builder(RconActivity.this, AlertDialog.THEME_HOLO_DARK);
         alertDialogBuilder.setTitle(R.string.title_confirm_unsafe_command);
         alertDialogBuilder.setMessage(R.string.msg_send_unsafe_command);
         alertDialogBuilder.setCancelable(false);

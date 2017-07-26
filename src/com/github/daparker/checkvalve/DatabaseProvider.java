@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
  * 
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  * 
@@ -497,7 +497,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             
             // Set the default values for the 'enabled' column
             ContentValues serversValues = new ContentValues();
-            settingsValues.put(SERVERS_ENABLED, 1);
+            serversValues.put(SERVERS_ENABLED, 1);
             
             Log.i(TAG, "Setting " + SERVERS_ENABLED + " default value to 1");
             db.update(TABLE_SERVERS,  serversValues, null, null);

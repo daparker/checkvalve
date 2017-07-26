@@ -36,10 +36,10 @@ import android.os.Message;
 import android.util.Log;
 
 @SuppressLint("NewApi")
-public class BackgroundQueryService extends Service {    
-    private static final String TAG = BackgroundQueryService.class.getSimpleName();
-    private static final staticHandler resultHandler = new staticHandler();
-    
+public class BackgroundQueryService_old extends Service {    
+    private static final String TAG = BackgroundQueryService_old.class.getSimpleName();
+    private static final Handler resultHandler = new staticHandler();
+
     private static boolean retry;
     private static boolean running;
     private static boolean querying;
@@ -50,65 +50,98 @@ public class BackgroundQueryService extends Service {
     private static Context context;
     private static Thread t;
     
-    private static Runnable r = new Runnable() {
-        public void run() {
-            Thread q = new Thread();
-            
-            if( ! querying ) {
-                if( networkIsConnected() ) {
-                    querying = true;
-        
-                    // Run the server queries in a separate thread
-                    Log.d(TAG, "Running background query.");
-                    q = new Thread(new BackgroundServerQuery(context, resultHandler));
-                    q.start();
-                }
-                else {
-                    Log.w(TAG, "Cannot query servers: no network connection.");
-                }
-            }
-            else {
-                Log.w(TAG, "Background query is still running on thread " + q.toString());
-            }
-        }
-    };
-    
     private static class staticHandler extends Handler {
-        @SuppressWarnings({ "unchecked" })
+        @SuppressWarnings({ "unchecked", "deprecation" })
         public void handleMessage( Message msg ) {            
             querying = false;
             
             Log.d(TAG, "Background query thread returned " + msg.what);
             
             // A negative "what" code indicates the server query thread failed
-            if( msg.what >= 0 ) {
-                ArrayList<String> messages = (ArrayList<String>)msg.obj;
+            if( msg.what < 0 ) {
+                return;
+            }
+
+            getSettings();
+
+            ArrayList<String> messages = (ArrayList<String>)msg.obj;
+            String messageText = new String();
+            Notification n = null;
+            
+            int id = 0;
+            int defaults = 0;
+            
+            if( ! messages.isEmpty() ) {
+                // If this was the first try then try again
+                if( retry == false ) {
+                    retry = true;
+                    querying = true;
+                    new Thread(new BackgroundServerQuery(context, resultHandler)).start();
+                    return;
+                }
+                // If this was a retry then notify the user
+                else {
+                    retry = false;
+                    id = 1;
                 
-                if( ! messages.isEmpty() ) {
-                    // If this was the first try then try again
-                    if( retry == false ) {
-                        retry = true;
-                        querying = true;
-                        new Thread(new BackgroundServerQuery(context, resultHandler)).start();
-                        return;
+                    if( messages.size() == 1 ) {
+                        messageText = context.getString(R.string.notification_single_server_down);
+                    }
+                    else {                        
+                        messageText = String.format(
+                                context.getString(R.string.notification_multiple_servers_down),
+                                Integer.valueOf(messages.size()).toString());
+                    }
+                    
+                    Intent intent = new Intent(context, com.github.daparker.checkvalve.CheckValve.class);
+                    PendingIntent pending = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent, 0);
+                 
+                    // Show a notification of how many servers did not respond
+                    Notification.Builder nb = new Notification.Builder(context)
+                            .setSmallIcon(R.drawable.checkvalve_statusbar)
+                            .setContentIntent(pending)
+                            .setContentText(messageText)
+                            .setContentTitle(context.getString(R.string.notification_title))
+                            .setTicker(context.getString(R.string.notification_ticker_text))
+                            .setOnlyAlertOnce(true)
+                            .setAutoCancel(true);
+                    
+                    if( useLED ) {
+                        defaults |= Notification.DEFAULT_LIGHTS;
+                    }
+                    
+                    if( useSound ) {
+                        defaults |= Notification.DEFAULT_SOUND;
+                    }
+                    
+                    if( useVibrate ) {
+                        defaults |= Notification.DEFAULT_VIBRATE;
+                    }
+                    
+                    nb.setDefaults(defaults);
+                    
+                    if( android.os.Build.VERSION.SDK_INT < 16 ) {
+                        n = nb.getNotification();
                     }
                     else {
-                        retry = false;
+                        n = nb.build();
                     }
+                    
+                    handleNotification(context, n, id);
                 }
-                
-                handleNotification(messages.size());
             }
-            
-            Log.d(TAG, "Sleeping for " + interval + " ms");
-            this.postDelayed(r, interval);
+            else {
+                n = null;
+                id = 0;
+                handleNotification(context, n, id);
+            }                    
         }
     };
     
     @Override
     public void onCreate() {
         super.onCreate();
-        context = BackgroundQueryService.this;
+        context = BackgroundQueryService_old.this;
         Log.d(TAG, "Created CheckValve background query service.");
     }
     
@@ -124,9 +157,35 @@ public class BackgroundQueryService extends Service {
             t = new Thread() {
                 public void run() {
                     android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-                                        
+                    
+                    Thread q = new Thread();
+                    
                     try {
-                        resultHandler.post(r);
+                        for(;;) {
+                            if( ! querying ) {
+                                if( networkIsConnected() ) {
+                                    querying = true;
+                        
+                                    // Run the server queries in a separate thread
+                                    Log.d(TAG, "Running background query.");
+                                    q = new Thread(new BackgroundServerQuery(context, resultHandler));
+                                    q.start();
+                                }
+                                else {
+                                    Log.w(TAG, "Cannot query servers: no network connection.");
+                                }
+                            }
+                            else {
+                                Log.d(TAG, "Background query is still running on thread " + q.toString());
+                            }
+                            
+                            Log.d(TAG, "Sleeping for " + interval + " ms");
+                            Thread.sleep(interval);
+                        }
+                    }
+                    catch( InterruptedException ie ) {
+                        Log.d(TAG, "Background query thread was interrupted.");
+                        return;
                     }
                     catch( Exception e ) {
                         Log.e(TAG, "Caught an exception:", e);
@@ -139,7 +198,7 @@ public class BackgroundQueryService extends Service {
             Log.d(TAG, "Started CheckValve background query service.");
         }
 
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
         
     @Override
@@ -162,77 +221,25 @@ public class BackgroundQueryService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        resultHandler.removeCallbacksAndMessages(null);
         t.interrupt();
+                
+        resultHandler.removeCallbacksAndMessages(null);
         running = false;
         
         Log.d(TAG, "Stopped CheckValve background query service.");
     }
     
-    @SuppressWarnings("deprecation")
-    private static void handleNotification(int numServersDown) {
+    private static void handleNotification(Context c, Notification n, int id) {
         String tag = "CheckValve";
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        
-        if( numServersDown == 0 ) {
+        NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if( id == 0 ) {
             Log.d(TAG, "All servers are up.");
             nm.cancel(tag, 1);
         }
         else {
-            String messageText = new String();
-            
-            if( numServersDown == 1 ) {
-                messageText = context.getString(R.string.notification_single_server_down);
-            }
-            else {                        
-                messageText = String.format(
-                        context.getString(R.string.notification_multiple_servers_down),
-                        Integer.valueOf(numServersDown).toString());
-            }
-            
-            Intent intent = new Intent(context, com.github.daparker.checkvalve.CheckValve.class);
-            intent.putExtra(Values.EXTRA_QUERY_SERVERS, true);
-            
-            PendingIntent pending = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent, 0);
-            
-            Notification n = null;
-            int defaults = 0;
-            
-            getSettings();
-            
-            // Show a notification of how many servers did not respond
-            Notification.Builder nb = new Notification.Builder(context)
-                    .setSmallIcon(R.drawable.checkvalve_statusbar)
-                    .setContentIntent(pending)
-                    .setContentText(messageText)
-                    .setContentTitle(context.getString(R.string.notification_title))
-                    .setTicker(context.getString(R.string.notification_ticker_text))
-                    .setOnlyAlertOnce(true)
-                    .setAutoCancel(true);
-            
-            if( useLED ) {
-                defaults |= Notification.DEFAULT_LIGHTS;
-            }
-            
-            if( useSound ) {
-                defaults |= Notification.DEFAULT_SOUND;
-            }
-            
-            if( useVibrate ) {
-                defaults |= Notification.DEFAULT_VIBRATE;
-            }
-            
-            nb.setDefaults(defaults);
-            
-            if( android.os.Build.VERSION.SDK_INT < 16 ) {
-                n = nb.getNotification();
-            }
-            else {
-                n = nb.build();
-            }
-            
-            Log.d(TAG, "Showing notification.");
-            nm.notify(tag, 1, n);
+            Log.d(TAG, "Showing notification [tag=" + tag + "][id=" + id + "]");
+            nm.notify(tag, id, n);
         }
     }
     
