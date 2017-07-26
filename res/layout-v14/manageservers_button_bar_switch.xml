@@ -123,7 +123,7 @@ along with the CheckValve source code.  If not, see
         android:background="@color/steam_blue"
         android:gravity="bottom|left" />
 
-    <CheckBox
+    <Switch
         android:id="@+id/buttonbar_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

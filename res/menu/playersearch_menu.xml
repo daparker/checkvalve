@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2015 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2017 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -23,6 +23,7 @@ along with the CheckValve source code.  If not, see
 
     <item
         android:id="@+id/back"
-        android:title="@string/menu_back"/>
+        android:title="@string/menu_back"
+        android:showAsAction="ifRoom"/>
 
 </menu>
