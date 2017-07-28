@@ -1,4 +1,4 @@
-#CheckValve HLDS/SRCDS Admin App for Android
+# CheckValve HLDS/SRCDS Admin App for Android
 
 CheckValve is a server query app for HLDS/SRCDS game server admins which includes the following features:
 
