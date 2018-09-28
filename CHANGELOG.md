@@ -1,6 +1,55 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.8**
+- Updated the app to target Android Oreo per the new Google Play requirements
+- Removed support for Android versions prior to Honeycomb
+
+**2.0.7**
+- Fixed duplicate nickname error when saving changes on the Edit Server screen (issue #10)
+
+**2.0.6**
+- Added notifications (Settings > Notifications)
+- Added RECEIVE_BOOT_COMPLETED permission
+- Added a checkbox on the Manage Servers screen to enable/disable each server
+- Fixed a few bugs
+
+**2.0.5**
+- Added server nicknames
+- Added server ping
+- Added option for default RCON font size
+- Added backup/restore support (Settings > Backups)
+- Added READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE permissions for reading/writing backups
+- Added debug mode to see more information about server queries and response times
+- Fixed NumberFormatException caused by invalid integers in some input fields
+- Fixed NullPointerException caused by invalid engine type during RCON connection
+- Fixed UI bugs on the Manage Servers screen
+- Fixed button text wrapping on the Add Server and Edit Server screens
+- Various coding and efficiency improvements
+- RCON improvements:
+  - Volume keys increase/decrease font size while in a session
+  - Added SourceMod commands to the suggestions (must be enabled in Settings)
+  - Added the logaddress command to the suggestions (for GoldSrc servers)
+
+**2.0.4**
+- Added UTF-8 support for server information, player names, and chat messages
+
+**2.0.3**
+- Fixed a crash when resuming CheckValve after the Chat Viewer was left open for a long time
+- Fixed HLTV query issue
+- Redesigned About screen with links for support
+- Added support for the old GoldSrc query response
+- Up/Down arrow keys scroll through RCON command history
+- RCON will reconnect automatically when the device changes connections
+- Server field on Chat Relay Details screen will auto-fill with previously used hosts
+
+**2.0.2**
+- Fixed a bug which prevented RCON from working with GoldSrc servers
+- Fixed a bug which caused the "Warn if a command is unsafe" option to not be honored
+
+**2.0.1**
+- Added an action bar for devices which do not have a dedicated menu button (Honeycomb and above)
+
 **2.0.0**
 
 Bug Fixes
@@ -60,52 +109,3 @@ New Features
     - IP
     - Port
     - Password
-
-Notes
-- While the target SDK version has been increased, the minimum SDK version remains 8 (Froyo).
-- I am trying very hard to keep the minimum SDK version at 8 so that CheckValve will continue to work on older devices.  However, changes to the Android API are making it increasingly difficult to stay comaptible with any SDK version below 11 (Honeycomb), and the minimum SDK may need to be rasied in the near future out of necessity.
-
-**2.0.1**
-- Added an action bar for devices which do not have a dedicated menu button (Honeycomb and above)
-
-**2.0.2**
-- Fixed a bug which prevented RCON from working with GoldSrc servers
-- Fixed a bug which caused the "Warn if a command is unsafe" option to not be honored
-
-**2.0.3**
-- Fixed a crash when resuming CheckValve after the Chat Viewer was left open for a long time
-- Fixed HLTV query issue
-- Redesigned About screen with links for support
-- Added support for the old GoldSrc query response
-- Up/Down arrow keys scroll through RCON command history
-- RCON will reconnect automatically when the device changes connections
-- Server field on Chat Relay Details screen will auto-fill with previously used hosts
-
-**2.0.4**
-- Added UTF-8 support for server information, player names, and chat messages
-
-**2.0.5**
-- Added server nicknames
-- Added server ping
-- Added option for default RCON font size
-- Added backup/restore support (Settings > Backups)
-- Added READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE permissions for reading/writing backups
-- Added debug mode to see more information about server queries and response times
-- Fixed NumberFormatException caused by invalid integers in some input fields
-- Fixed NullPointerException caused by invalid engine type during RCON connection
-- Fixed UI bugs on the Manage Servers screen
-- Fixed button text wrapping on the Add Server and Edit Server screens
-- Various coding and efficiency improvements
-- RCON improvements:
-  - Volume keys increase/decrease font size while in a session
-  - Added SourceMod commands to the suggestions (must be enabled in Settings)
-  - Added the logaddress command to the suggestions (for GoldSrc servers)
-
-**2.0.6**
-- Added notifications (Settings > Notifications)
-- Added RECEIVE_BOOT_COMPLETED permission
-- Added a checkbox on the Manage Servers screen to enable/disable each server
-- Fixed a few bugs
-
-**2.0.7**
-- Fixed duplicate nickname error when saving changes on the Edit Server screen (issue #10)
