@@ -72,11 +72,7 @@ public class RestoreBackupActivity extends Activity {
             else {
                 AlertDialog.Builder alertDialogBuilder;
 
-                if( android.os.Build.VERSION.SDK_INT >= 11 )
-                    alertDialogBuilder = new AlertDialog.Builder(RestoreBackupActivity.this, AlertDialog.THEME_HOLO_DARK);
-                else
-                    alertDialogBuilder = new AlertDialog.Builder(RestoreBackupActivity.this);
-
+                alertDialogBuilder = new AlertDialog.Builder(RestoreBackupActivity.this, AlertDialog.THEME_HOLO_DARK);
                 alertDialogBuilder.setTitle(R.string.title_confirm_restore);
                 alertDialogBuilder.setMessage(R.string.msg_restore_backup);
                 alertDialogBuilder.setCancelable(false);
@@ -164,10 +160,7 @@ public class RestoreBackupActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }

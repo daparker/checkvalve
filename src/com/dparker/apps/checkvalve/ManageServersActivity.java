@@ -84,11 +84,7 @@ public class ManageServersActivity extends Activity {
 
             AlertDialog.Builder alertDialogBuilder;
 
-            if( android.os.Build.VERSION.SDK_INT >= 11 )
-                alertDialogBuilder = new AlertDialog.Builder(ManageServersActivity.this, AlertDialog.THEME_HOLO_DARK);
-            else
-                alertDialogBuilder = new AlertDialog.Builder(ManageServersActivity.this);
-
+            alertDialogBuilder = new AlertDialog.Builder(ManageServersActivity.this, AlertDialog.THEME_HOLO_DARK);
             alertDialogBuilder.setTitle(R.string.title_confirm_delete);
             alertDialogBuilder.setMessage(R.string.msg_delete_server);
             alertDialogBuilder.setCancelable(false);
@@ -189,10 +185,7 @@ public class ManageServersActivity extends Activity {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
@@ -363,7 +356,7 @@ public class ManageServersActivity extends Activity {
 
             params.setMargins(0, 50, 0, 0);
             serverRow.setLayoutParams(params);
-            serverRow.setGravity(Gravity.LEFT|Gravity.BOTTOM);
+            serverRow.setGravity(Gravity.START|Gravity.BOTTOM);
 
             server_table.addView(serverRow, params);
 

@@ -52,10 +52,7 @@ public class DebugConsoleActivity extends Activity {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }

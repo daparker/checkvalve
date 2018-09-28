@@ -511,16 +511,10 @@ public class ChatViewerActivity extends Activity {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
 
-        // Required for InetAddress.getByName() to work on the UI thread in newer APIs
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }

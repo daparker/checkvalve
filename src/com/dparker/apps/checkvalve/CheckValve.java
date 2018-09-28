@@ -77,14 +77,7 @@ public class CheckValve extends Activity {
 
         super.onCreate(savedInstanceState);
         
-        if( android.os.Build.VERSION.SDK_INT < 11 ) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            UserVisibleMessage.showNote(
-                    CheckValve.this,
-                    Values.FILE_HIDE_ANDROID_VERSION_NOTE,
-                    R.string.note_android_version_support);
-        }
-        else if( android.os.Build.VERSION.SDK_INT >= 14 ) {
+        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
             if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
@@ -332,11 +325,8 @@ public class CheckValve extends Activity {
                         }
                     }
                     
-                    // Background service is only supported on Honeycomb and above
-                    if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-                        if( data.getBooleanExtra(Values.EXTRA_RESTART_SERVICE, false) ) {
-                            restartService();
-                        }
+                    if( data.getBooleanExtra(Values.EXTRA_RESTART_SERVICE, false) ) {
+                        restartService();
                     }
                 }
                 else {
@@ -781,12 +771,8 @@ public class CheckValve extends Activity {
     }
 
     public void getSettings() {
-        settings = database.getSettingsAsBundle();
-        
-        // Background service is only supported on Honeycomb and above
-        if( android.os.Build.VERSION.SDK_INT >= 11 ) {
-            checkServiceState();
-        }
+        settings = database.getSettingsAsBundle();        
+        checkServiceState();
     }
 
     public void checkServiceState() {
@@ -927,11 +913,7 @@ public class CheckValve extends Activity {
     public void deleteServer( final long rowId ) {
         AlertDialog.Builder alertDialogBuilder;
 
-        if( android.os.Build.VERSION.SDK_INT >= 11 )
-            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this, AlertDialog.THEME_HOLO_DARK);
-        else
-            alertDialogBuilder = new AlertDialog.Builder(CheckValve.this);
-
+        alertDialogBuilder = new AlertDialog.Builder(CheckValve.this, AlertDialog.THEME_HOLO_DARK);
         alertDialogBuilder.setTitle(R.string.title_confirm_delete);
         alertDialogBuilder.setMessage(R.string.msg_delete_server);
         alertDialogBuilder.setCancelable(false);
@@ -1031,23 +1013,13 @@ public class CheckValve extends Activity {
     private void toggleDebugMode() {
         if( debugMode == false ) {
             debugMode = true;
-            
-            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);
-            
-            if( android.os.Build.VERSION.SDK_INT >= 11 )
-                invalidateOptionsMenu();
-            else
-                this.findViewById(R.id.checkvalve_debug_button_layout).setVisibility(View.VISIBLE);
+            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);            
+            invalidateOptionsMenu();
         }
         else {
-            debugMode = false;
-            
-            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_disabled);
-            
-            if( android.os.Build.VERSION.SDK_INT >= 11 )
-                invalidateOptionsMenu();
-            else
-                this.findViewById(R.id.checkvalve_debug_button_layout).setVisibility(View.GONE);
+            debugMode = false;            
+            UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_disabled);            
+            invalidateOptionsMenu();
         }
     }
 }
