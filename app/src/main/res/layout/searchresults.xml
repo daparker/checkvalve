@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/searchresults_scrollview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#262626"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/searchresults_parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#262626"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/searchresults_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="15dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/title_search_results"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <TableLayout
+            android:id="@+id/searchresults_message_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="0" >
+        </TableLayout>
+
+        <TableLayout
+            android:id="@+id/searchresults_main_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:shrinkColumns="0" >
+        </TableLayout>
+    </LinearLayout>
+
+</ScrollView>

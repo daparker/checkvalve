@@ -1,0 +1,4 @@
+#Fri Aug 23 11:34:49 EDT 2019
+base.0=/home/dparker/StudioProjects/CheckValve-2.0-dev/app/build/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/filechooser_parent_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/filechooser_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/steam_blue"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/filechooser_dismiss_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/button_dismiss"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/filechooser_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#262626"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingTop="10dp"
+        android:text="@string/title_file_chooser"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/filechooser_current_folder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/filechooser_title"
+        android:background="#262626"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingTop="0dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+
+    <ScrollView
+        android:id="@+id/filechooser_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/filechooser_button_layout"
+        android:layout_below="@id/filechooser_current_folder"
+        android:orientation="vertical"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical" >
+
+        <LinearLayout
+            android:id="@+id/filechooser_file_list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/filechooser_textview_no_files"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/msg_backup_no_files"
+        android:visibility="gone" />
+
+</RelativeLayout>

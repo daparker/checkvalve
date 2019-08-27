@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+
+This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+
+CheckValve is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+CheckValve is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the CheckValve source code.  If not, see
+<http://www.gnu.org/licenses/>.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.daparker.checkvalve"
+    android:installLocation="auto"
+    android:versionCode="21"
+    android:versionName="2.0.9" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@style/checkvalveTheme" >
+        <activity
+            android:name="com.github.daparker.checkvalve.CheckValve"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.github.daparker.checkvalve.AddServerActivity"
+            class="AddServerActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ManageServersActivity"
+            class="ManageServersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.EditServerActivity"
+            class="EditServerActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ShowPlayersActivity"
+            class="ShowPlayersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.PlayerSearchActivity"
+            class="PlayerSearchActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.SearchPlayersActivity"
+            class="SearchPlayersActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RconActivity"
+            class="RconActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RconPasswordActivity"
+            class="RconPasswordActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.AboutActivity"
+            class="AboutActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ChatViewerActivity"
+            class="ChatActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ChatRelayDetailsActivity"
+            class="ChatRelayDetailsActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.SettingsActivity"
+            class="SettingsActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.ShowNoteActivity"
+            class="ShowNoteActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:theme="@style/checkvalveTheme_Dialog" />
+        <activity
+            android:name="com.github.daparker.checkvalve.DebugConsoleActivity"
+            class="DebugConsoleActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.CreateBackupActivity"
+            class="CreateBackupActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.RestoreBackupActivity"
+            class="RestoreBackupActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <activity
+            android:name="com.github.daparker.checkvalve.backup.FileChooserActivity"
+            class="FileChooserActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        
+        <receiver android:name="com.github.daparker.checkvalve.BootCompletedReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        
+        <service
+            android:name="com.github.daparker.checkvalve.BackgroundQueryService"
+            android:exported="false" />
+    </application>
+
+</manifest>
