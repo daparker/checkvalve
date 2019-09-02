@@ -106,3 +106,15 @@ Notes
 - Added RECEIVE_BOOT_COMPLETED permission
 - Added a checkbox on the Manage Servers screen to enable/disable each server
 - Fixed a few bugs
+
+**2.0.7**
+- Fixed a bug which prevented the Edit Server screen from saving changes
+
+**2.0.8**
+- Updated the app to target Android Oreo per the new Google Play requirements
+- Removed support for Android versions prior to Honeycomb
+
+**2.0.9**
+- Fixed crashes when creating or restoring backup files on Android 6 and above
+- Removed support for Android versions prior to 4.0 (Ice Cream Sandwich)
+

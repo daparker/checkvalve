@@ -1,0 +1,26 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v11/values-v11.xml",
+            "map": [
+                {
+                    "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/values-v11/themes.xml",
+                    "from": {
+                        "startLines": "23,25",
+                        "startColumns": "4,4",
+                        "startOffsets": "755,834",
+                        "endColumns": "77,103",
+                        "endOffsets": "828,933"
+                    },
+                    "to": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,126",
+                        "endColumns": "70,96",
+                        "endOffsets": "121,218"
+                    }
+                }
+            ]
+        }
+    ]
+}
