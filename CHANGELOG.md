@@ -1,6 +1,11 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.10**
+- Fixed background queries not working in Android Oreo and above (issue #11)
+- Fixed notifications not working on Android Oreo and above (issue #12)
+- Fixed some typos in the source code
+
 **2.0.9**
 - Fixed crashes when creating or restoring backup files on Android 6 and above
 - Removed support for Android versions prior to 4.0 (Ice Cream Sandwich)

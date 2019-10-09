@@ -1,21 +1,21 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
 MERGED from [com.android.support:support-compat:28.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/dd1cf78f22bdd94f550130b281f27c97/support-compat-28.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.android.support:versionedparcelable:28.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/8bb2478d12c0baf5b421024800cd7dbb/versionedparcelable-28.0.0/AndroidManifest.xml:17:1-25:12
 MERGED from [android.arch.lifecycle:runtime:1.1.1] /home/dparker/.gradle/caches/transforms-2/files-2.1/2a54fb7d4a09e43fd13a659c38a9bf2a/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
-INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-136:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
+INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:22:1-142:12
 	package
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:23:5-42
 		INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml
 		INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:26:5-32
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:26:5-33
 		INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml
 		INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml
 	xmlns:android
@@ -47,7 +47,7 @@ ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManif
 	android:name
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:32:22-78
 application
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:34:5-134:19
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:34:5-140:19
 MERGED from [com.android.support:support-compat:28.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/dd1cf78f22bdd94f550130b281f27c97/support-compat-28.0.0/AndroidManifest.xml:22:5-94
 MERGED from [com.android.support:support-compat:28.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/dd1cf78f22bdd94f550130b281f27c97/support-compat-28.0.0/AndroidManifest.xml:22:5-94
 MERGED from [com.android.support:versionedparcelable:28.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/8bb2478d12c0baf5b421024800cd7dbb/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
@@ -63,191 +63,203 @@ MERGED from [com.android.support:versionedparcelable:28.0.0] /home/dparker/.grad
 	android:theme
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:38:9-47
 activity#com.dparker.apps.checkvalve.CheckValve
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:39:9-47:20
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:39:9-48:20
 	android:label
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:42:13-45
 	android:configChanges
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:41:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:40:13-66
-intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:43:13-46:29
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:40:13-39
+intent-filter#action:name:android.intent.action.MAIN+action:name:android.intent.action.VIEW+category:name:android.intent.category.LAUNCHER
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:43:13-47:29
 action#android.intent.action.MAIN
 ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:44:17-69
 	android:name
 		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:44:25-66
+action#android.intent.action.VIEW
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:45:17-69
+	android:name
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:45:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:45:17-77
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:46:17-77
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:45:27-74
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:46:27-74
 activity#com.dparker.apps.checkvalve.AddServerActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:48:9-52:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:49:9-53:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:50:13-38
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:51:13-38
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:51:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:52:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:52:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:53:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:49:13-73
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:50:13-46
 activity#com.dparker.apps.checkvalve.ManageServersActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:53:9-56:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:54:9-57:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:55:13-42
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:56:13-42
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:56:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:57:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:54:13-77
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:55:13-50
 activity#com.dparker.apps.checkvalve.EditServerActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:57:9-61:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:58:9-62:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:59:13-39
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:60:13-39
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:60:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:61:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:61:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:62:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:58:13-74
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:59:13-47
 activity#com.dparker.apps.checkvalve.ShowPlayersActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:62:9-66:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:63:9-67:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:64:13-40
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:65:13-40
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:65:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:66:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:66:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:67:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:63:13-75
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:64:13-48
 activity#com.dparker.apps.checkvalve.PlayerSearchActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:67:9-71:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:68:9-72:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:69:13-41
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:70:13-41
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:70:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:71:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:71:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:72:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:68:13-76
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:69:13-49
 activity#com.dparker.apps.checkvalve.SearchPlayersActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:72:9-75:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:73:9-76:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:74:13-42
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:75:13-42
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:75:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:76:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:73:13-77
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:74:13-50
 activity#com.dparker.apps.checkvalve.RconActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:76:9-79:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:77:9-80:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:78:13-33
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:79:13-33
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:79:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:80:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:77:13-68
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:78:13-41
 activity#com.dparker.apps.checkvalve.RconPasswordActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:80:9-84:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:81:9-85:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:82:13-41
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:83:13-41
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:83:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:84:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:84:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:85:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:81:13-76
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:82:13-49
 activity#com.dparker.apps.checkvalve.AboutActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:85:9-89:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:86:9-90:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:87:13-34
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:88:13-34
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:88:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:89:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:89:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:90:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:86:13-69
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:87:13-42
 activity#com.dparker.apps.checkvalve.ChatViewerActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:90:9-93:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:91:9-94:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:92:13-33
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:93:13-33
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:93:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:94:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:91:13-74
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:92:13-47
 activity#com.dparker.apps.checkvalve.ChatRelayDetailsActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:94:9-98:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:95:9-99:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:96:13-45
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:97:13-45
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:97:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:98:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:98:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:99:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:95:13-80
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:96:13-53
 activity#com.dparker.apps.checkvalve.SettingsActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:99:9-102:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:100:9-103:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:101:13-37
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:102:13-37
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:102:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:103:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:100:13-72
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:101:13-45
 activity#com.dparker.apps.checkvalve.ShowNoteActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:103:9-107:61
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:104:9-108:61
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:105:13-37
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:106:13-37
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:106:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:107:13-83
 	android:theme
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:107:13-58
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:108:13-58
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:104:13-72
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:105:13-45
 activity#com.dparker.apps.checkvalve.DebugConsoleActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:108:9-111:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:109:9-112:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:110:13-41
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:111:13-41
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:111:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:112:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:109:13-76
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:110:13-49
 activity#com.dparker.apps.checkvalve.CreateBackupActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:112:9-115:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:113:9-116:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:114:13-41
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:115:13-41
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:115:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:116:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:113:13-76
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:114:13-49
 activity#com.dparker.apps.checkvalve.RestoreBackupActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:116:9-119:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:117:9-120:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:118:13-42
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:119:13-42
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:119:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:120:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:117:13-77
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:118:13-50
 activity#com.dparker.apps.checkvalve.backup.FileChooserActivity
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:120:9-123:86
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:121:9-124:86
 	class
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:122:13-40
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:123:13-40
 	android:configChanges
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:123:13-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:124:13-83
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:121:13-82
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:122:13-55
 receiver#com.dparker.apps.checkvalve.BootCompletedReceiver
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:125:9-129:20
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:126:9-130:20
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:125:19-83
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:126:19-56
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:126:13-128:29
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:127:13-129:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:127:17-79
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:128:17-79
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:127:25-76
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:128:25-76
 service#com.dparker.apps.checkvalve.BackgroundQueryService
-ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:131:9-133:40
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:132:9-134:40
 	android:exported
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:133:13-37
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:134:13-37
 	android:name
-		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:132:13-78
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:133:13-51
+service#com.dparker.apps.checkvalve.BackgroundJobService
+ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:136:9-139:72
+	android:exported
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:138:13-37
+	android:permission
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:139:13-69
+	android:name
+		ADDED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml:137:13-49
 uses-sdk
 INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /home/dparker/StudioProjects/CheckValve-2.0/app/src/main/AndroidManifest.xml

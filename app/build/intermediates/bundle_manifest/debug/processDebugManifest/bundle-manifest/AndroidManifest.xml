@@ -20,8 +20,8 @@ along with the CheckValve source code.  If not, see
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dparker.apps.checkvalve"
     android:installLocation="auto"
-    android:versionCode="24"
-    android:versionName="2.0.9" >
+    android:versionCode="25"
+    android:versionName="2.0.10" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -39,6 +39,7 @@ along with the CheckValve source code.  If not, see
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
+        android:testOnly="true"
         android:theme="@style/checkvalveTheme" >
         <activity
             android:name="com.dparker.apps.checkvalve.CheckValve"
@@ -46,6 +47,7 @@ along with the CheckValve source code.  If not, see
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -136,6 +138,10 @@ along with the CheckValve source code.  If not, see
         <service
             android:name="com.dparker.apps.checkvalve.BackgroundQueryService"
             android:exported="false" />
+        <service
+            android:name="com.dparker.apps.checkvalve.BackgroundJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

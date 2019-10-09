@@ -4,20 +4,20 @@
         "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/menu-v11/rcon_menu.xml"
     },
     {
-        "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable-hdpi_icon.png.flat",
-        "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/drawable-hdpi/icon.png"
-    },
-    {
         "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/layout_notification_template_part_time.xml.flat",
         "source": "/home/dparker/.gradle/caches/transforms-2/files-2.1/dd1cf78f22bdd94f550130b281f27c97/support-compat-28.0.0/res/layout/notification_template_part_time.xml"
     },
     {
-        "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable-mdpi_icon.png.flat",
-        "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/drawable-mdpi/icon.png"
+        "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable-hdpi_icon.png.flat",
+        "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/drawable-hdpi/icon.png"
     },
     {
         "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable-mdpi-v4_notification_bg_low_normal.9.png.flat",
         "source": "/home/dparker/.gradle/caches/transforms-2/files-2.1/dd1cf78f22bdd94f550130b281f27c97/support-compat-28.0.0/res/drawable-mdpi-v4/notification_bg_low_normal.9.png"
+    },
+    {
+        "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable-mdpi_icon.png.flat",
+        "source": "/home/dparker/StudioProjects/CheckValve-2.0/app/src/main/res/drawable-mdpi/icon.png"
     },
     {
         "merged": "/home/dparker/StudioProjects/CheckValve-2.0/app/build/intermediates/res/merged/debug/drawable_icon.png.flat",
