@@ -20,13 +20,18 @@
 package com.dparker.apps.checkvalve;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -108,6 +113,12 @@ public class CheckValve extends Activity {
         if( currentIntent != null ) {
             if( currentIntent.hasExtra(Values.EXTRA_QUERY_SERVERS) ) {
                 currentIntent.removeExtra(Values.EXTRA_QUERY_SERVERS);
+            }
+        }
+
+        if( Build.VERSION.SDK_INT >= 21 ) {
+            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) ) {
+                BackgroundJobUtil.scheduleJob(CheckValve.this, false);
             }
         }
 
@@ -286,14 +297,6 @@ public class CheckValve extends Activity {
         if( database == null ) database = new DatabaseProvider(CheckValve.this);
 
         switch( request ) {
-            case Values.ACTIVITY_RCON:
-            case Values.ACTIVITY_CHAT:
-            case Values.ACTIVITY_ABOUT:
-            case Values.ACTIVITY_SHOW_PLAYERS:
-            case Values.ACTIVITY_DEBUG_CONSOLE:
-            case Values.ACTIVITY_SHOW_NOTE:
-                break;
-
             case Values.ACTIVITY_ADD_NEW_SERVER:
             case Values.ACTIVITY_MANAGE_SERVERS:
             case Values.ACTIVITY_UPDATE_SERVER:
@@ -324,11 +327,14 @@ public class CheckValve extends Activity {
                         }
                     }
 
-                    if( data.getBooleanExtra(Values.EXTRA_RESTART_SERVICE, false) ) {
-                        restartService();
+                    if( Build.VERSION.SDK_INT < 21 ) {
+                        if( data.getBooleanExtra(Values.EXTRA_RESTART_SERVICE, false) )
+                            restartService();
+                        else
+                            checkServiceState();
                     }
                     else {
-                        checkServiceState();
+                        checkJobState();
                     }
                 }
                 else {
@@ -336,6 +342,13 @@ public class CheckValve extends Activity {
                     UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
                 }
                 break;
+
+            case Values.ACTIVITY_RCON:
+            case Values.ACTIVITY_CHAT:
+            case Values.ACTIVITY_ABOUT:
+            case Values.ACTIVITY_SHOW_PLAYERS:
+            case Values.ACTIVITY_DEBUG_CONSOLE:
+            case Values.ACTIVITY_SHOW_NOTE:
             default:
                 break;
         }
@@ -449,8 +462,8 @@ public class CheckValve extends Activity {
             /*
              * Build and display the messages table if there are errors to be displayed
              */
-            if( !messages.isEmpty() ) {
-                int m = 0;
+            if( ! messages.isEmpty() ) {
+                int m;
 
                 for( m = 0; m < messages.size(); m++ ) {
                     TextView errorMessage = new TextView(CheckValve.this);
@@ -745,7 +758,7 @@ public class CheckValve extends Activity {
     };
 
     public void refreshView() {
-        String tag = new String();
+        String tag;
 
         for( int i = 0; i < server_info_table.getChildCount(); i++ ) {
             server_info_table.getChildAt(i).setVisibility(View.VISIBLE);
@@ -785,17 +798,29 @@ public class CheckValve extends Activity {
 
         // Start the service if it's not running but should be
         if( !BackgroundQueryService.isRunning() ) {
-            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
+            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) ) {
                 Log.i(TAG, "Starting background query service");
                 startService(serviceIntent);
             }
         }
         // Stop the service if it is running but shouldn't be
         else {
-            if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == false ) {
+            if( ! settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) ) {
                 Log.i(TAG, "Stopping background query service");
                 stopService(serviceIntent);
             }
+        }
+    }
+
+    @TargetApi(21)
+    public void checkJobState() {
+        if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) ) {
+            Log.i(TAG, "Starting background query job");
+            BackgroundJobUtil.scheduleJob(CheckValve.this, true);
+        }
+        else {
+            Log.i(TAG, "Canceling background query job");
+            BackgroundJobUtil.cancelJob(CheckValve.this);
         }
     }
 
@@ -807,7 +832,7 @@ public class CheckValve extends Activity {
             stopService(serviceIntent);
         }
 
-        if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) == true ) {
+        if( settings.getBoolean(Values.SETTING_ENABLE_NOTIFICATIONS) ) {
             Log.i(TAG, "Starting background query service");
             startService(serviceIntent);
         }
@@ -883,7 +908,7 @@ public class CheckValve extends Activity {
 
                     if( challengeResponse == null ) {
                         p.dismiss();
-                        String host = server + ":" + Integer.toString(port);
+                        String host = server + ":" + port;
                         String message = String.format(CheckValve.this.getString(R.string.msg_no_challenge_response), host);
                         UserVisibleMessage.showMessage(CheckValve.this, message);
                     }
@@ -1014,7 +1039,7 @@ public class CheckValve extends Activity {
 
     @SuppressLint("NewApi")
     private void toggleDebugMode() {
-        if( debugMode == false ) {
+        if( ! debugMode ) {
             debugMode = true;
             UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_debug_mode_enabled);
             invalidateOptionsMenu();
