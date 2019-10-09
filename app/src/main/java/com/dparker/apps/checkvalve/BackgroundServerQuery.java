@@ -36,7 +36,6 @@ import java.util.ArrayList;
 
 @SuppressLint("DefaultLocale")
 public class BackgroundServerQuery implements Runnable {
-    private DatagramSocket socket;
     private Handler handler;
     private Context context;
     private ArrayList<String> messages;
@@ -79,10 +78,12 @@ public class BackgroundServerQuery implements Runnable {
         Log.d(TAG, "Done.");
     }
 
-    public void queryServers() throws UnsupportedEncodingException {
+    private void queryServers() throws UnsupportedEncodingException {
         // Get the server list from the database
         DatabaseProvider database = new DatabaseProvider(context);
         ServerRecord[] serverList = database.getEnabledServers();
+        DatagramSocket socket;
+
         database.close();
 
         // The outgoing data only needs to be set up once
@@ -95,17 +96,16 @@ public class BackgroundServerQuery implements Runnable {
         bufferOut.put(Values.A2S_INFO_QUERY.getBytes("UTF-8"));
         bufferOut.put((byte) 0x00);
 
-        messages = new ArrayList<String>();
+        messages = new ArrayList<>();
 
         for( int i = 0; i < serverList.length; i++ ) {
             ServerRecord sr = serverList[i];
 
-            String serverName = new String();
+            String serverName;
             String serverURL = sr.getServerURL();
             String serverNickname = sr.getServerNickname();
             int serverPort = sr.getServerPort();
             int serverTimeout = sr.getServerTimeout();
-            int serverListPos = sr.getServerListPosition();
 
             // Use the nickname in error rows if there is one, otherwise use
             // the URL and port 
@@ -137,7 +137,7 @@ public class BackgroundServerQuery implements Runnable {
 
                 // Show an error if the connection attempt failed
                 if( !socket.isConnected() ) {
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
                     continue;
                 }
 
@@ -158,7 +158,7 @@ public class BackgroundServerQuery implements Runnable {
                 if( packetHeader != Values.INT_PACKET_HEADER ) {
                     String rcv = "0x" + String.format("%8s", Integer.toHexString(packetHeader)).replace(' ', '0').toUpperCase();
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
 
                     continue;
                 }
@@ -169,28 +169,28 @@ public class BackgroundServerQuery implements Runnable {
                     // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ', '0').toUpperCase();
 
-                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + Integer.toString(serverPort)
+                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort
                             + " does not match expected values 0x49 or 0x6d");
 
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
 
                     continue;
                 }
             }
             catch( SocketTimeoutException e ) {
                 Log.d(TAG, "queryServers(): No response from server " + serverName);
-                addErrorRow(serverName, serverListPos);
+                addErrorRow(serverName);
             }
             catch( Exception e ) {
                 Log.d(TAG, "queryServers(): Caught an exception:", e);
-                addErrorRow(serverName, serverListPos);
+                addErrorRow(serverName);
             }
 
             status++;
         }
     }
 
-    public void addErrorRow(String host, int pos) {
+    private void addErrorRow(String host) {
         messages.add(host);
     }
 }
