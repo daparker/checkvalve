@@ -145,8 +145,16 @@ public final class Values {
     public static final int QUERY_ENGINE = 1;
     public static final int QUERY_INFO = 2;
 
-    // Premission request values
+    // Permission request values
     public static final int PERMISSIONS_REQUEST = 123;
+
+    // Job ID for scheduled jobs
+    public static final int JOB_ID = 1;
+
+    // Notification channel values
+    public static final String CHANNEL_ID = "CHECKVALVE_NOTIFICATION_CHANNEL";
+    public static final String CHANNEL_NAME = "CheckValve Notifications";
+    public static final String CHANNEL_DESCRIPTION = "CheckValve notification channel";
 
     public static final Bundle getSettings(Context c) {
         DatabaseProvider d = new DatabaseProvider(c);
