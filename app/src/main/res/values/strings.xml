@@ -33,7 +33,7 @@ along with the CheckValve source code.  If not, see
         &#8226; <a href="https://github.com/daparker/checkvalve/issues">Report an issue on GitHub</a>\n\n
         &#8226; <a href="https://sites.google.com/site/checkvalveapp/documentation/app/change-log">View the change log</a>\n\n
         &#8226; <a href="mailto:checkvalvedev@gmail.com">E-mail the developer</a></string>
-    <string name="app_version">CheckValve version 2.0.9</string>
+    <string name="app_version">CheckValve version 2.0.10</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_connect">Connect</string>
