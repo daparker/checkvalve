@@ -88,7 +88,7 @@ public class BackgroundQueryService extends Service {
 
                 if( !messages.isEmpty() ) {
                     // If this was the first try then try again
-                    if( retry == false ) {
+                    if( ! retry ) {
                         retry = true;
                         querying = true;
                         new Thread(new BackgroundServerQuery(context, resultHandler)).start();
@@ -106,8 +106,6 @@ public class BackgroundQueryService extends Service {
             this.postDelayed(r, interval);
         }
     }
-
-    ;
 
     @Override
     public void onCreate() {
@@ -134,7 +132,6 @@ public class BackgroundQueryService extends Service {
                     }
                     catch( Exception e ) {
                         Log.e(TAG, "Caught an exception:", e);
-                        return;
                     }
                 }
             };
@@ -181,7 +178,7 @@ public class BackgroundQueryService extends Service {
         running = false;
     }
 
-    @SuppressWarnings("deprecation")
+
     private static void handleNotification(int numServersDown) {
         String tag = "CheckValve";
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -191,7 +188,7 @@ public class BackgroundQueryService extends Service {
             nm.cancel(tag, 1);
         }
         else {
-            String messageText = new String();
+            String messageText;
 
             if( numServersDown == 1 ) {
                 messageText = context.getString(R.string.notification_single_server_down);
@@ -207,7 +204,7 @@ public class BackgroundQueryService extends Service {
 
             PendingIntent pending = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
 
-            Notification n = null;
+            Notification n;
             int defaults = 0;
 
             getSettings();
