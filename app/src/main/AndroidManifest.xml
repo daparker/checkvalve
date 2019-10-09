@@ -22,8 +22,8 @@ along with the CheckValve source code.  If not, see
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dparker.apps.checkvalve"
     android:installLocation="auto"
-    android:versionCode="24"
-    android:versionName="2.0.9" >
+    android:versionCode="26"
+    android:versionName="2.0.10" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -37,100 +37,106 @@ along with the CheckValve source code.  If not, see
         android:label="@string/app_name"
         android:theme="@style/checkvalveTheme" >
         <activity
-            android:name="com.dparker.apps.checkvalve.CheckValve"
+            android:name=".CheckValve"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.dparker.apps.checkvalve.AddServerActivity"
+            android:name=".AddServerActivity"
             class="AddServerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.ManageServersActivity"
+            android:name=".ManageServersActivity"
             class="ManageServersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.EditServerActivity"
+            android:name=".EditServerActivity"
             class="EditServerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.ShowPlayersActivity"
+            android:name=".ShowPlayersActivity"
             class="ShowPlayersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.PlayerSearchActivity"
+            android:name=".PlayerSearchActivity"
             class="PlayerSearchActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.SearchPlayersActivity"
+            android:name=".SearchPlayersActivity"
             class="SearchPlayersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.RconActivity"
+            android:name=".RconActivity"
             class="RconActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.RconPasswordActivity"
+            android:name=".RconPasswordActivity"
             class="RconPasswordActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.AboutActivity"
+            android:name=".AboutActivity"
             class="AboutActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.ChatViewerActivity"
+            android:name=".ChatViewerActivity"
             class="ChatActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.ChatRelayDetailsActivity"
+            android:name=".ChatRelayDetailsActivity"
             class="ChatRelayDetailsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.SettingsActivity"
+            android:name=".SettingsActivity"
             class="SettingsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.ShowNoteActivity"
+            android:name=".ShowNoteActivity"
             class="ShowNoteActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
-            android:name="com.dparker.apps.checkvalve.DebugConsoleActivity"
+            android:name=".DebugConsoleActivity"
             class="DebugConsoleActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.CreateBackupActivity"
+            android:name=".CreateBackupActivity"
             class="CreateBackupActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.RestoreBackupActivity"
+            android:name=".RestoreBackupActivity"
             class="RestoreBackupActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
-            android:name="com.dparker.apps.checkvalve.backup.FileChooserActivity"
+            android:name=".backup.FileChooserActivity"
             class="FileChooserActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         
-        <receiver android:name="com.dparker.apps.checkvalve.BootCompletedReceiver" >
+        <receiver android:name=".BootCompletedReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        
+
         <service
-            android:name="com.dparker.apps.checkvalve.BackgroundQueryService"
+            android:name=".BackgroundQueryService"
             android:exported="false" />
+
+        <service
+            android:name=".BackgroundJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>
