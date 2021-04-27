@@ -47,10 +47,10 @@ along with the CheckValve source code.  If not, see
         android:background="@color/steam_gray"
         android:drawableLeft="@android:drawable/ic_dialog_info"
         android:drawablePadding="10dp"
-        android:gravity="center|center_vertical"
+        android:gravity="start|center_vertical"
         android:padding="10dp"
         android:text=""
-        android:textSize="16sp" />
+        android:textSize="14sp" />
 
     <RelativeLayout
         android:id="@+id/restorebackup_edittext_layout"

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CheckValve-2.0.iml" filepath="$PROJECT_DIR$/CheckValve-2.0.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/checkvalve.iml" filepath="$PROJECT_DIR$/checkvalve.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/checkvalve.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.iml" />
     </modules>
   </component>
 </project>

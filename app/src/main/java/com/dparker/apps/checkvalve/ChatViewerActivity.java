@@ -51,8 +51,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.github.koraktor.steamcondenser.servers.GoldSrcServer;
-import com.github.koraktor.steamcondenser.servers.SourceServer;
+import com.github.koraktor.steamcondenser.servers.GameServer;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -112,10 +111,8 @@ public class ChatViewerActivity extends Activity {
     private int rowNum;
     private int rconPort;
     private int rconTimeout;
-    private int engine;
 
-    private SourceServer s;
-    private GoldSrcServer g;
+    private GameServer srv;
 
     private OnClickListener sayButtonListener = new OnClickListener() {
         public void onClick(View v) {
@@ -431,28 +428,20 @@ public class ChatViewerActivity extends Activity {
     private Handler engineQueryHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            engine = msg.what;
-
-            if( engine == -1 ) {
-                p.dismiss();
-                UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_rcon_general_error);
-            }
-            else {
+            if( msg.obj != null ) {
                 try {
-                    if( engine == Values.ENGINE_GOLDSRC ) {
-                        g = (GoldSrcServer) msg.obj;
-                        new Thread(new RconAuth(rconPassword, g, rconAuthHandler)).start();
-                    }
-                    else {
-                        s = (SourceServer) msg.obj;
-                        new Thread(new RconAuth(rconPassword, s, rconAuthHandler)).start();
-                    }
+                    srv = (GameServer)msg.obj;
+                    new Thread(new RconAuth(rconPassword, srv, rconAuthHandler)).start();
                 }
                 catch( Exception e ) {
                     p.dismiss();
                     Log.w(TAG, "checkRCON(): Caught an exception:", e);
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_rcon_general_error);
                 }
+            }
+            else {
+                p.dismiss();
+                UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_rcon_general_error);
             }
         }
     };
@@ -464,11 +453,7 @@ public class ChatViewerActivity extends Activity {
 
             switch( msg.what ) {
                 case 0:
-                    if( engine == Values.ENGINE_GOLDSRC )
-                        g = (GoldSrcServer) msg.obj;
-                    else
-                        s = (SourceServer) msg.obj;
-
+                    srv = (GameServer) msg.obj;
                     rconIsAuthenticated = true;
 
                     if( message != null )
@@ -534,9 +519,7 @@ public class ChatViewerActivity extends Activity {
                     thisIntent.getStringExtra(Values.EXTRA_SERVER));
 
             UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
-
             Log.w(TAG, "onCreate(): Unknown host " + thisIntent.getStringExtra(Values.EXTRA_SERVER));
-
             finish();
         }
         catch( Exception e ) {
@@ -658,8 +641,7 @@ public class ChatViewerActivity extends Activity {
         super.onDestroy();
         shutdownNetworkEventReceiver();
         shutdownChatRelayConnection();
-        if( g != null ) g.disconnect();
-        if( s != null ) s.disconnect();
+        if( srv != null ) srv.disconnect();
     }
 
     @Override
@@ -754,11 +736,7 @@ public class ChatViewerActivity extends Activity {
         message = new String();
         sending.setText(R.string.status_rcon_sending);
         runFadeInAnimation(ChatViewerActivity.this, sending);
-
-        if( engine == Values.ENGINE_GOLDSRC )
-            new Thread(new RconQuery(command, g, popUpHandler)).start();
-        else
-            new Thread(new RconQuery(command, s, popUpHandler)).start();
+        new Thread(new RconQuery(command, srv, popUpHandler)).start();
     }
 
     public void getChatRelayDetails(String ip, String port, String pswd) {

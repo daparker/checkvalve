@@ -139,7 +139,8 @@ public final class Values {
     public static final byte BYTE_A2S_INFO = (byte) 0x54;
     public static final byte BYTE_A2S_PLAYER = (byte) 0x55;
     public static final byte BYTE_A2S_RULES = (byte) 0x56;
-    public static final String A2S_INFO_QUERY = "Source Engine Query";
+    public static final byte[] CHALLENGE_QUERY = { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF };
+    public static final String A2S_INFO_QUERY = "Source Engine Query\0";
 
     // Server query types
     public static final int QUERY_ENGINE = 1;
@@ -155,6 +156,10 @@ public final class Values {
     public static final String CHANNEL_ID = "CHECKVALVE_NOTIFICATION_CHANNEL";
     public static final String CHANNEL_NAME = "CheckValve Notifications";
     public static final String CHANNEL_DESCRIPTION = "CheckValve notification channel";
+
+    // Byte constants
+    public static final byte BYTE_ZERO = (byte) 0x00;
+    public static final byte BYTE_ONE = (byte) 0x01;
 
     public static final Bundle getSettings(Context c) {
         DatabaseProvider d = new DatabaseProvider(c);

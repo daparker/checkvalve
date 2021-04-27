@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.dparker.apps.checkvalve.exceptions.NullResponseException;
 import com.github.koraktor.steamcondenser.servers.GameServer;
 
 import java.net.DatagramPacket;
@@ -76,20 +77,13 @@ public class EngineQuery implements Runnable {
 
             DatagramSocket socket = new DatagramSocket();
 
-            // A2S_INFO query string
-            String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
-
-            socket.setSoTimeout(t * 1000);
-
-            // Byte buffers for packet data
-            byte[] bufferOut = queryString.getBytes("ISO8859_1");
-            byte[] bufferIn = new byte[2048];
-
             // UDP datagram packets
-            DatagramPacket packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            DatagramPacket packetIn = new DatagramPacket(bufferIn, bufferIn.length);
+            byte[] arrayIn = new byte[2048];
+            DatagramPacket packetIn = new DatagramPacket(arrayIn, arrayIn.length);
+            DatagramPacket packetOut = PacketFactory.getPacket(Values.BYTE_A2S_INFO, Values.A2S_INFO_QUERY.getBytes());
 
             // Connect to the remote server
+            socket.setSoTimeout(t * 1000);
             socket.connect(InetAddress.getByName(s), p);
 
             // Show an error if the connection attempt failed
@@ -104,87 +98,116 @@ public class EngineQuery implements Runnable {
             // Receive the response packet from the server
             socket.receive(packetIn);
 
-            // Start at byte 6 in the response data
-            byteNum = 6;
+            if( arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE ) {
+                byte[] challengeResponse = new byte[]{
+                        arrayIn[5], arrayIn[6], arrayIn[7], arrayIn[8]
+                };
 
-            // Skip all data before the app ID
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
+                packetIn = new DatagramPacket(arrayIn, arrayIn.length);
+                packetOut = PacketFactory.getPacket(
+                        Values.BYTE_A2S_INFO,
+                        Values.A2S_INFO_QUERY.getBytes(),
+                        challengeResponse
+                );
 
-            byteNum++;
+                // Send the query string to the server
+                socket.send(packetOut);
 
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
+                // Receive the response packet from the server
+                socket.receive(packetIn);
+            }
 
-            byteNum++;
+            if( arrayIn[4] == Values.BYTE_SOURCE_INFO ) {
+                // Start at byte 6 in the response data
+                byteNum = 6;
 
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            // Get the old Steam application ID
-            firstByte = (int) (bufferIn[byteNum] & 0xff);
-            secondByte = (int) (bufferIn[byteNum + 1] & 0xff);
-            appId = firstByte | (secondByte << 8);
-
-            // If the app ID is less than 200 then the engine is assumed to be GoldSource,
-            // but we'll check for the 64-bit game ID later and use that if possible since
-            // it's more accurate
-            engine = (appId < 200) ? Values.ENGINE_GOLDSRC : Values.ENGINE_SOURCE;
-
-            // Skip the next 9 bytes
-            byteNum += 9;
-
-            // Skip the game version string
-            while( bufferIn[byteNum] != 0x00 )
-                byteNum++;
-
-            byteNum++;
-
-            // If we're not at the end of the array then get the additional data
-            if( byteNum < bufferIn.length ) {
-                // This byte is the Extra Data Flag (EDF)
-                int EDF = (int) bufferIn[byteNum];
-                byteNum++;
-
-                // Skip the port number if included
-                if( (EDF & 0x80) > 0 ) byteNum += 2;
-
-                // Skip the SteamID if included
-                if( (EDF & 0x10) > 0 ) byteNum += 8;
-
-                // Skip SourceTV information if included
-                if( (EDF & 0x40) > 0 ) {
-                    byteNum += 2;
-
-                    while( bufferIn[byteNum] != 0x00 )
-                        byteNum++;
-
+                // Skip all data before the app ID
+                while (arrayIn[byteNum] != 0x00)
                     byteNum++;
-                }
 
-                // Skip the server tags (sv_tags) if included
-                if( (EDF & 0x20) > 0 ) {
-                    while( bufferIn[byteNum] != 0 )
-                        byteNum++;
+                byteNum++;
 
+                while (arrayIn[byteNum] != 0x00)
                     byteNum++;
-                }
 
-                // Get the 64-bit game ID if it's included
-                if( (EDF & 0x01) > 0 ) {
-                    // Get the app ID from the lowest 24 bits of the game ID
-                    appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(bufferIn, byteNum, 3).put((byte) 0x00).getInt(0);
+                byteNum++;
 
-                    // Use this app ID to determine the engine
-                    engine = (appId < 200) ? Values.ENGINE_GOLDSRC : Values.ENGINE_SOURCE;
+                while (arrayIn[byteNum] != 0x00)
+                    byteNum++;
+
+                byteNum++;
+
+                while (arrayIn[byteNum] != 0x00)
+                    byteNum++;
+
+                byteNum++;
+
+                // Get the old Steam application ID
+                firstByte = (int) (arrayIn[byteNum] & 0xff);
+                secondByte = (int) (arrayIn[byteNum + 1] & 0xff);
+                appId = firstByte | (secondByte << 8);
+
+                // If the app ID is less than 200 then the engine is assumed to be GoldSource,
+                // but we'll check for the 64-bit game ID later and use that if possible since
+                // it's more accurate
+                engine = (appId < 200) ? Values.ENGINE_GOLDSRC : Values.ENGINE_SOURCE;
+
+                // Skip the next 9 bytes
+                byteNum += 9;
+
+                // Skip the game version string
+                while (arrayIn[byteNum] != 0x00)
+                    byteNum++;
+
+                byteNum++;
+
+                // If we're not at the end of the array then get the additional data
+                if (byteNum < arrayIn.length) {
+                    // This byte is the Extra Data Flag (EDF)
+                    int EDF = (int) arrayIn[byteNum];
+                    byteNum++;
+
+                    // Skip the port number if included
+                    if ((EDF & 0x80) > 0) byteNum += 2;
+
+                    // Skip the SteamID if included
+                    if ((EDF & 0x10) > 0) byteNum += 8;
+
+                    // Skip SourceTV information if included
+                    if ((EDF & 0x40) > 0) {
+                        byteNum += 2;
+
+                        while (arrayIn[byteNum] != 0x00)
+                            byteNum++;
+
+                        byteNum++;
+                    }
+
+                    // Skip the server tags (sv_tags) if included
+                    if ((EDF & 0x20) > 0) {
+                        while (arrayIn[byteNum] != 0)
+                            byteNum++;
+
+                        byteNum++;
+                    }
+
+                    // Get the 64-bit game ID if it's included
+                    if ((EDF & 0x01) > 0) {
+                        // Get the app ID from the lowest 24 bits of the game ID
+                        appId = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).put(arrayIn, byteNum, 3).put((byte) 0x00).getInt(0);
+
+                        // Use this app ID to determine the engine
+                        engine = (appId < 200) ? Values.ENGINE_GOLDSRC : Values.ENGINE_SOURCE;
+                    }
                 }
+            }
+            else if( arrayIn[4] == Values.BYTE_GOLDSRC_INFO ) {
+                engine = Values.ENGINE_GOLDSRC;
+            }
+            else {
+                Log.d(TAG, "getServerEngine(): Response did not match expected types.");
+                socket.close();
+                throw new NullResponseException();
             }
 
             socket.close();
@@ -203,7 +226,7 @@ public class EngineQuery implements Runnable {
             GameServer result = Server.getServer(engine, InetAddress.getByName(server), port);
             return result;
         }
-        // Handle a socket timeout
+        // Handle an exception (socket timeout or incorrect response type)
         catch( Exception e ) {
             Log.w(TAG, "getServerEngine(): Caught an exception:", e);
             return null;

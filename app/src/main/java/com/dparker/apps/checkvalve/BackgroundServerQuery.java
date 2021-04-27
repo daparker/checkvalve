@@ -16,7 +16,6 @@
  * along with the CheckValve source code.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package com.dparker.apps.checkvalve;
 
 import android.annotation.SuppressLint;
@@ -86,16 +85,6 @@ public class BackgroundServerQuery implements Runnable {
 
         database.close();
 
-        // The outgoing data only needs to be set up once
-        byte[] arrayOut = new byte[25];
-        ByteBuffer bufferOut = ByteBuffer.wrap(arrayOut);
-
-        bufferOut.order(ByteOrder.BIG_ENDIAN);
-        bufferOut.putInt(Values.INT_PACKET_HEADER);
-        bufferOut.put(Values.BYTE_A2S_INFO);
-        bufferOut.put(Values.A2S_INFO_QUERY.getBytes("UTF-8"));
-        bufferOut.put((byte) 0x00);
-
         messages = new ArrayList<>();
 
         for( int i = 0; i < serverList.length; i++ ) {
@@ -107,8 +96,7 @@ public class BackgroundServerQuery implements Runnable {
             int serverPort = sr.getServerPort();
             int serverTimeout = sr.getServerTimeout();
 
-            // Use the nickname in error rows if there is one, otherwise use
-            // the URL and port 
+            // Use the nickname in error rows if there is one, otherwise use the URL and port
             if( serverNickname.length() > 0 ) {
                 serverName = serverNickname;
             }
@@ -122,14 +110,11 @@ public class BackgroundServerQuery implements Runnable {
                 socket = new DatagramSocket();
                 socket.setSoTimeout(serverTimeout * 1000);
 
-                // Byte buffers for packet data
+                // Byte array for packet data
                 byte[] arrayIn = new byte[1400];
 
-                ByteBuffer bufferIn = ByteBuffer.wrap(arrayIn);
-                bufferIn.order(ByteOrder.BIG_ENDIAN);
-
                 // UDP datagram packets
-                DatagramPacket packetOut = new DatagramPacket(arrayOut, arrayOut.length);
+                DatagramPacket packetOut = PacketFactory.getPacket(Values.BYTE_A2S_INFO, Values.A2S_INFO_QUERY.getBytes());
                 DatagramPacket packetIn = new DatagramPacket(arrayIn, arrayIn.length);
 
                 // Connect to the remote server
@@ -149,9 +134,38 @@ public class BackgroundServerQuery implements Runnable {
                 // Receive the response packet from the server
                 socket.receive(packetIn);
 
+                // If we received a challenge response then send another query for the server info
+                if( arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE ) {
+                    Log.d(TAG, "queryServers(): Received a challenge response from " + serverURL + ":" + serverPort);
+
+                    byte[] challengeResponse = new byte[] {
+                            arrayIn[5], arrayIn[6], arrayIn[7], arrayIn[8]
+                    };
+
+                    // UDP datagram packets
+                    packetOut = PacketFactory.getPacket(
+                            Values.BYTE_A2S_INFO,
+                            Values.A2S_INFO_QUERY.getBytes(),
+                            challengeResponse
+                    );
+
+                    packetIn = new DatagramPacket(arrayIn, arrayIn.length);
+
+                    // Send the query string to the server
+                    socket.send(packetOut);
+
+                    // Receive the response packet from the server
+                    socket.receive(packetIn);
+                }
+
                 // Close the UDP socket
                 socket.close();
 
+                // Byte buffer for the received packet data
+                ByteBuffer bufferIn = ByteBuffer.wrap(arrayIn);
+                bufferIn.order(ByteOrder.BIG_ENDIAN);
+
+                // Get the 4-byte header from the packet data
                 int packetHeader = bufferIn.getInt();
 
                 // Make sure the packet includes the expected header bytes
@@ -163,17 +177,17 @@ public class BackgroundServerQuery implements Runnable {
                     continue;
                 }
 
+                // Get the 1-byte packet type
                 byte packetType = bufferIn.get();
 
+                // Make sure the packet type matches what we expect it to
                 if( packetType != Values.BYTE_SOURCE_INFO && packetType != Values.BYTE_GOLDSRC_INFO ) {
-                    // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ', '0').toUpperCase();
 
                     Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort
                             + " does not match expected values 0x49 or 0x6d");
 
                     addErrorRow(serverName);
-
                     continue;
                 }
             }

@@ -25,36 +25,35 @@ import android.content.Intent;
 import android.util.Log;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
-
     final static String TAG = BootCompletedReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if( Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()) ) {
-            if( android.os.Build.VERSION.SDK_INT >= 21 ) {
-                Log.d(TAG, "[CHECKVALVE]: SDK >= 21; calling BackgroundJobUtil.scheduleJob()");
-                BackgroundJobUtil.scheduleJob(context, true);
-            }
-            else {
-                DatabaseProvider db = new DatabaseProvider(context);
+            DatabaseProvider db = new DatabaseProvider(context);
 
-                try {
-                    boolean enabled = db.getBooleanSetting(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATIONS);
+            try {
+                boolean enabled = db.getBooleanSetting(DatabaseProvider.SETTINGS_ENABLE_NOTIFICATIONS);
 
-                    if( enabled ) {
+                if( enabled ) {
+                    if (android.os.Build.VERSION.SDK_INT >= 21) {
+                        Log.d(TAG, "[CHECKVALVE]: Calling BackgroundJobUtil.scheduleJob()");
+                        BackgroundJobUtil.scheduleJob(context, true);
+                    }
+                    else {
                         Log.d(TAG, "[CHECKVALVE] Starting background query service.");
                         context.startService(new Intent(context, BackgroundQueryService.class));
                     }
-                    else {
-                        Log.d(TAG, "[CHECKVALVE] Background service is disabled in settings.");
-                    }
                 }
-                catch( Exception e ) {
-                    Log.w(TAG, "[CHECKVALVE] Caught an exception:", e);
+                else {
+                    Log.d(TAG, "[CHECKVALVE] Background service is disabled in settings.");
                 }
-                finally {
-                    db.close();
-                }
+            }
+            catch( Exception e ) {
+                Log.w(TAG, "[CHECKVALVE] Caught an exception:", e);
+            }
+            finally {
+                db.close();
             }
         }
     }

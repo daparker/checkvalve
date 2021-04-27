@@ -29,8 +29,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+//import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
+//import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -136,8 +138,8 @@ public class CreateBackupActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         String timestamp = sdf.format(new Date());
         String defaultFilename = "checkvalve_backup_" + timestamp + ".bkp";
-        storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
+        //storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        storageDir = this.getExternalFilesDir(null);
         cancelButton = (Button) findViewById(R.id.createbackup_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
@@ -147,8 +149,13 @@ public class CreateBackupActivity extends Activity {
         field_save_as = (EditText) findViewById(R.id.createbackup_field_save_as);
         field_save_as.setText(defaultFilename);
 
+        String ap = storageDir.getAbsolutePath();
+        String shortPath = ap.substring(
+                ap.lastIndexOf("/", ap.lastIndexOf("/")-1)).substring(1);
+
         help_text = (TextView) findViewById(R.id.createbackup_help_text);
-        help_text.setText(String.format(this.getString(R.string.help_text_create_backup), storageDir.getName()));
+        //help_text.setText(String.format(this.getString(R.string.help_text_create_backup), storageDir.getName()));
+        help_text.setText(String.format(this.getString(R.string.help_text_create_backup), shortPath));
 
         includeServers = true;
         includeSettings = true;

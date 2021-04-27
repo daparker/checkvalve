@@ -102,7 +102,8 @@ public class FileChooserActivity extends Activity {
 
         this.findViewById(R.id.filechooser_dismiss_button).setOnClickListener(dismissButtonListener);
 
-        storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        //storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        storageDir = this.getExternalFilesDir(null);
         breadcrumbs.add(storageDir.getName());
 
         showFiles(storageDir);

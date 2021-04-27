@@ -1,6 +1,19 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.13**
+- Fixed notifications being enabled after a device reboot when disabled in settings
+- Made the RCON console text selectable
+
+**2.0.12**
+- Updated server queries to support Valve's upcoming protocol changes
+- Updated the app to target Android 10 per the new Google Play requirements
+- Changed the backup file read and write location to CheckValve's files folder
+- Fixed the player search attempting to query disabled servers
+
+**2.0.11**
+- Fixed a bug when sending a "say" message from the Chat Viewer to an HLDS server
+
 **2.0.10**
 - Fixed background queries not working in Android Oreo and above (issue #11)
 - Fixed notifications not working on Android Oreo and above (issue #12)

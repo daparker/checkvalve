@@ -13,7 +13,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
+//import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.os.Handler;
 
@@ -34,7 +35,7 @@ public class BackgroundJobService extends JobService {
     private static Context context;
     private static Thread t;
 
-    private static Runnable r = new Runnable() {
+    private static final Runnable r = new Runnable() {
         public void run() {
             Thread q = new Thread();
 

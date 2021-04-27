@@ -60,39 +60,39 @@ import java.util.concurrent.TimeoutException;
 
 public class RconActivity extends Activity {
     private static final String TAG = RconActivity.class.getSimpleName();
+
     private static Bundle settings;
 
-    private Animation fade_in;
-    private Animation fade_out;
+    private static Animation fade_in;
+    private static Animation fade_out;
 
-    private ProgressDialog p;
+    private static ProgressDialog p;
+    private static Context context;
 
-    private TextView rcon_console;
-    private TextView sending;
-    private AutoCompleteTextView field_command;
-    private Button send_button;
-    private Toast toastMessage;
+    private static TextView rcon_console;
+    private static TextView sending;
+    private static AutoCompleteTextView field_command;
+    private static Toast toastMessage;
 
-    private String password;
-    private String command;
-    private String[] unsafeCommands;
-    private String server;
-    private int port;
-    private int timeout;
-    private int last;
-    private int pos;
-    private boolean rconIsAuthenticated;
-    private boolean enableHistory;
-    private boolean volumeButtons;
-    private float defaultFontSize;
-    private float scaledDensity;
+    private static String password;
+    private static String command;
+    private static String[] unsafeCommands;
+    private static String server;
+    private static int port;
+    private static int timeout;
+    private static int last;
+    private static int pos;
+    private static boolean rconIsAuthenticated;
+    private static boolean enableHistory;
+    private static boolean volumeButtons;
+    private static float scaledDensity;
 
-    private GameServer srv;
+    private static GameServer srv;
     private Thread receiverThread;
     private NetworkEventReceiver receiverRunnable;
     private ArrayList<String> commandHistory;
 
-    private OnClickListener sendButtonListener = new OnClickListener() {
+    private final OnClickListener sendButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Send" button was clicked
@@ -107,7 +107,7 @@ public class RconActivity extends Activity {
         }
     };
 
-    private OnKeyListener keyListener = new OnKeyListener() {
+    private final OnKeyListener keyListener = new OnKeyListener() {
         public boolean onKey(View v, int k, KeyEvent e) {
             /*
              * "Enter" or "Done" key was pressed
@@ -188,7 +188,7 @@ public class RconActivity extends Activity {
     };
 
     // Handler for the server query thread
-    private Handler progressHandler = new Handler() {
+    private static class staticProgressHandler extends Handler {
         public void handleMessage(Message msg) {
             p.dismiss();
 
@@ -197,22 +197,24 @@ public class RconActivity extends Activity {
 
                 if( !rconIsAuthenticated ) {
                     if( password.length() == 0 )
-                        getPassword();
+                        getPassword(context);
                     else
                         rconAuthenticate();
                 }
             }
             else {
                 Log.w(TAG, "EngineQuery returned a null object.");
-                UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
+                UserVisibleMessage.showMessage(context, R.string.msg_rcon_general_error);
             }
         }
-    };
+    }
+
+    private static final staticProgressHandler progressHandler = new staticProgressHandler();
 
     // Handler for the "Sending" pop-up thread
-    private Handler popUpHandler = new Handler() {
+    private static class staticPopUpHandler extends Handler {
         public void handleMessage(Message msg) {
-            runFadeOutAnimation(RconActivity.this, sending);
+            runFadeOutAnimation(sending);
 
             switch( msg.what ) {
                 case 0:
@@ -226,26 +228,28 @@ public class RconActivity extends Activity {
                         showBadPasswordMessage();
                     }
                     else if( msg.obj.getClass() == RCONBanException.class ) {
-                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_ban_exception);
+                        UserVisibleMessage.showMessage(context, R.string.msg_rcon_ban_exception);
                     }
                     else if( msg.obj.getClass() == TimeoutException.class ) {
-                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_disconnected);
+                        UserVisibleMessage.showMessage(context, R.string.msg_rcon_disconnected);
                     }
                     else {
-                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
+                        UserVisibleMessage.showMessage(context, R.string.msg_rcon_general_error);
                     }
                     break;
             }
 
             command = "";
         }
-    };
+    }
+    private static final staticPopUpHandler popUpHandler = new staticPopUpHandler();
+
 
     // Handler for the RCON authentication thread
-    private Handler rconAuthHandler = new Handler() {
+    private static class staticRconAuthHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            runFadeOutAnimation(RconActivity.this, sending);
+            runFadeOutAnimation(sending);
 
             switch( msg.what ) {
                 case -1:
@@ -264,25 +268,25 @@ public class RconActivity extends Activity {
 
                         if( msg.obj.getClass() == RCONNoAuthException.class ) {
                             // Failed authentication
-                            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_no_rcon_auth);
-                            getPassword();
+                            UserVisibleMessage.showMessage(context, R.string.msg_no_rcon_auth);
+                            getPassword(context);
                         }
                         else if( msg.obj.getClass() == RCONBanException.class ) {
                             // RCONNoAuthException
-                            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_ban_exception);
+                            UserVisibleMessage.showMessage(context, R.string.msg_rcon_ban_exception);
                         }
                         else if( msg.obj.getClass() == TimeoutException.class ) {
                             // TimeoutException (happens if RCON password was already sent)
-                            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_timeout_exception);
+                            UserVisibleMessage.showMessage(context, R.string.msg_rcon_timeout_exception);
                         }
                         else {
                             // Any other exception
-                            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
+                            UserVisibleMessage.showMessage(context, R.string.msg_rcon_general_error);
                         }
                     }
                     catch( Exception e ) {
                         Log.e(TAG, "rconAuthHandler caught an exception:", e);
-                        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_rcon_general_error);
+                        UserVisibleMessage.showMessage(context, R.string.msg_rcon_general_error);
                     }
 
                     break;
@@ -290,10 +294,12 @@ public class RconActivity extends Activity {
 
             p.dismiss();
         }
-    };
+    }
+    private static final staticRconAuthHandler rconAuthHandler = new staticRconAuthHandler();
+
 
     // Handler for the network event receiver thread
-    private Handler networkEventHandler = new Handler() {
+    private static class staticNetworkEventHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             /*
@@ -308,22 +314,20 @@ public class RconActivity extends Activity {
 
             switch( msg.what ) {
                 case -2:
+                    Activity a = (Activity) context;
                     Log.e(TAG, "The network event receiver has aborted");
-                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
-                    finish();
+                    UserVisibleMessage.showMessage(context, R.string.msg_general_error);
+                    a.finish();
                     break;
 
                 case -1:
-                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_connection_lost);
+                    UserVisibleMessage.showMessage(context, R.string.msg_connection_lost);
                     closeRconConnection();
                     rconIsAuthenticated = false;
                     break;
 
-                case 0:
-                    break;
-
                 case 1:
-                    UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_network_change);
+                    UserVisibleMessage.showMessage(context, R.string.msg_network_change);
                     closeRconConnection();
                     rconIsAuthenticated = false;
                     getServerType();
@@ -334,7 +338,8 @@ public class RconActivity extends Activity {
                     break;
             }
         }
-    };
+    }
+    private static final staticNetworkEventHandler networkEventHandler = new staticNetworkEventHandler();
 
     @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
@@ -345,10 +350,11 @@ public class RconActivity extends Activity {
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
+        context = RconActivity.this;
         settings = Values.getSettings(RconActivity.this);
 
         // Get RCON settings
-        defaultFontSize = (float) settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE);
+        float defaultFontSize = (float) settings.getInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE);
         volumeButtons = settings.getBoolean(Values.SETTING_RCON_VOLUME_BUTTONS);
         enableHistory = settings.getBoolean(Values.SETTING_RCON_ENABLE_HISTORY);
 
@@ -367,12 +373,12 @@ public class RconActivity extends Activity {
         fade_in = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_in);
         fade_out = AnimationUtils.loadAnimation(RconActivity.this, R.anim.fade_out);
 
-        rcon_console = (TextView) findViewById(R.id.rcon_console);
-        sending = (TextView) findViewById(R.id.rcon_sending);
-        send_button = (Button) findViewById(R.id.rcon_send_button);
+        Button send_button = findViewById(R.id.rcon_send_button);
+
+        rcon_console = findViewById(R.id.rcon_console);
+        sending = findViewById(R.id.rcon_sending);
 
         send_button.setOnClickListener(sendButtonListener);
-        rcon_console.setMovementMethod(ScrollingMovementMethod.getInstance());
         rcon_console.setHorizontallyScrolling(true);
         rcon_console.setTextSize(defaultFontSize);
 
@@ -381,17 +387,17 @@ public class RconActivity extends Activity {
         String[] commandList = getCommandList();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, commandList);
 
-        field_command = (AutoCompleteTextView) findViewById(R.id.rcon_field_command);
+        field_command = findViewById(R.id.rcon_field_command);
         field_command.setAdapter(adapter);
         field_command.setOnKeyListener(keyListener);
 
         // Hack to disable auto-complete if desired by the user
-        if( settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS) == true )
+        if( settings.getBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS) )
             field_command.setThreshold(1);
         else
             field_command.setThreshold(1000);
 
-        if( settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) == true )
+        if( settings.getBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND) )
             unsafeCommands = this.getResources().getStringArray(R.array.unsafe_commands);
         else
             unsafeCommands = null;
@@ -404,23 +410,8 @@ public class RconActivity extends Activity {
         }
 
         receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
-
-        if( receiverRunnable == null ) {
-            Log.e(TAG, "onCreate(): NetworkEventReceiver object is null, cannot continue");
-            UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
-            finish();
-        }
-        else {
-            receiverThread = new Thread(receiverRunnable);
-
-            if( receiverThread == null ) {
-                Log.e(TAG, "onCreate(): NetworkEventReceiver thread is null, cannot continue");
-                UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_general_error);
-                finish();
-            }
-
-            receiverThread.start();
-        }
+        receiverThread = new Thread(receiverRunnable);
+        receiverThread.start();
 
         getServerType();
     }
@@ -451,23 +442,23 @@ public class RconActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.back:
-                finish();
-                return true;
-            case R.id.clear_console:
-                rcon_console.setText("");
-                rcon_console.scrollTo(0, 0);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.back ) {
+            finish();
+            return true;
+        }
+        else if( item.getItemId() == R.id.clear_console ) {
+            rcon_console.setText("");
+            rcon_console.scrollTo(0, 0);
+            return true;
+        }
+        else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void onActivityResult(int request, int result, Intent data) {
@@ -485,9 +476,9 @@ public class RconActivity extends Activity {
 
     public String[] getCommandList() {
         Resources res = getResources();
-        String[] result = null;
+        String[] result;
 
-        if( settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM) == false ) {
+        if( ! settings.getBoolean(Values.SETTING_RCON_INCLUDE_SM) ) {
             // Get the list of standard commands
             result = res.getStringArray(R.array.all_commands);
         }
@@ -521,7 +512,7 @@ public class RconActivity extends Activity {
         if( unsafeCommands != null ) {
             if( !force ) {
                 // Get the bare command without any arguments
-                String bareCommand = (command.indexOf(" ") != -1) ? command.substring(0, command.indexOf(" ")) : command;
+                String bareCommand = (command.contains(" ")) ? command.substring(0, command.indexOf(" ")) : command;
 
                 if( Arrays.asList(unsafeCommands).contains(bareCommand) ) {
                     // Show a warning and force user acknowledgment
@@ -533,20 +524,20 @@ public class RconActivity extends Activity {
 
         field_command.setText("");
 
-        runFadeInAnimation(RconActivity.this, sending);
+        runFadeInAnimation(sending);
 
         new Thread(new RconQuery(command, srv, popUpHandler)).start();
     }
 
-    public void getServerType() {
+    public static void getServerType() {
         // Show the progress dialog
-        p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_connecting), true, false);
+        p = ProgressDialog.show(context, "", context.getText(R.string.status_connecting), true, false);
 
         // Run the server queries in a new thread
         new Thread(new EngineQuery(server, port, timeout, progressHandler)).start();
     }
 
-    public void scrollToBottomOfText() {
+    public static void scrollToBottomOfText() {
         /*
          * This is based on code I found at:
          * http://groups.google.com/group/android-developers/browse_thread/thread/8752156cca1e3742
@@ -562,28 +553,31 @@ public class RconActivity extends Activity {
         rcon_console.scrollTo(0, difference);
     }
 
-    public void rconAuthenticate() {
-        p = ProgressDialog.show(this, "", RconActivity.this.getText(R.string.status_rcon_verifying_password), true, false);
+    public static void rconAuthenticate() {
+        p = ProgressDialog.show(context, "", context.getText(R.string.status_rcon_verifying_password), true, false);
         new Thread(new RconAuth(password, srv, rconAuthHandler)).start();
     }
 
-    public void runFadeInAnimation(Context c, View v) {
+    public static void runFadeInAnimation(View v) {
         v.startAnimation(fade_in);
     }
 
-    public void runFadeOutAnimation(Context c, View v) {
+    public static void runFadeOutAnimation(View v) {
         v.startAnimation(fade_out);
     }
 
-    public void getPassword() {
-        Intent rconPasswordIntent = new Intent();
-        rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
-        startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
+    public static void getPassword(Context c) {
+        if( c instanceof Activity ) {
+            Activity a = (Activity) c;
+            Intent rconPasswordIntent = new Intent();
+            rconPasswordIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.RconPasswordActivity");
+            a.startActivityForResult(rconPasswordIntent, Values.ACTIVITY_RCON_PASSWORD_DIALOG);
+        }
     }
 
-    public void showBadPasswordMessage() {
-        UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_no_rcon_auth);
-        getPassword();
+    public static void showBadPasswordMessage() {
+        UserVisibleMessage.showMessage(context, R.string.msg_no_rcon_auth);
+        getPassword(context);
     }
 
     @SuppressLint({"InlinedApi", "NewApi"})
@@ -595,22 +589,18 @@ public class RconActivity extends Activity {
         alertDialogBuilder.setMessage(R.string.msg_send_unsafe_command);
         alertDialogBuilder.setCancelable(false);
 
-        alertDialogBuilder.setPositiveButton(R.string.button_send, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                /*
-                 *  "Send" button was clicked
-                 */
-                sendCommand(true);
-            }
+        alertDialogBuilder.setPositiveButton(R.string.button_send, (dialog, id) -> {
+            /*
+             *  "Send" button was clicked
+             */
+            sendCommand(true);
         });
 
-        alertDialogBuilder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                /*
-                 * "Cancel" button was clicked
-                 */
-                dialog.cancel();
-            }
+        alertDialogBuilder.setNegativeButton(R.string.button_cancel, (dialog, id) -> {
+            /*
+             * "Cancel" button was clicked
+             */
+            dialog.cancel();
         });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -643,7 +633,7 @@ public class RconActivity extends Activity {
         }
     }
 
-    public void closeRconConnection() {
+    public static void closeRconConnection() {
         try {
             if( srv != null ) srv.disconnect();
         }

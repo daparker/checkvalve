@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2020 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -20,12 +20,12 @@ along with the CheckValve source code.  If not, see
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dparker.apps.checkvalve"
     android:installLocation="auto"
-    android:versionCode="24"
-    android:versionName="2.0.9" >
+    android:versionCode="34"
+    android:versionName="2.0.13" >
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="28" />
+        android:targetSdkVersion="29" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -35,7 +35,7 @@ along with the CheckValve source code.  If not, see
 
     <application
         android:allowBackup="true"
-        android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@style/checkvalveTheme" >
@@ -45,85 +45,69 @@ along with the CheckValve source code.  If not, see
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.dparker.apps.checkvalve.AddServerActivity"
-            class="AddServerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.ManageServersActivity"
-            class="ManageServersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.EditServerActivity"
-            class="EditServerActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.ShowPlayersActivity"
-            class="ShowPlayersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.PlayerSearchActivity"
-            class="PlayerSearchActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.SearchPlayersActivity"
-            class="SearchPlayersActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.RconActivity"
-            class="RconActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.RconPasswordActivity"
-            class="RconPasswordActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.AboutActivity"
-            class="AboutActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.ChatViewerActivity"
-            class="ChatActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.ChatRelayDetailsActivity"
-            class="ChatRelayDetailsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.SettingsActivity"
-            class="SettingsActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.ShowNoteActivity"
-            class="ShowNoteActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/checkvalveTheme_Dialog" />
         <activity
             android:name="com.dparker.apps.checkvalve.DebugConsoleActivity"
-            class="DebugConsoleActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.CreateBackupActivity"
-            class="CreateBackupActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.RestoreBackupActivity"
-            class="RestoreBackupActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
         <activity
             android:name="com.dparker.apps.checkvalve.backup.FileChooserActivity"
-            class="FileChooserActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
 
         <receiver android:name="com.dparker.apps.checkvalve.BootCompletedReceiver" >
@@ -135,6 +119,10 @@ along with the CheckValve source code.  If not, see
         <service
             android:name="com.dparker.apps.checkvalve.BackgroundQueryService"
             android:exported="false" />
+        <service
+            android:name="com.dparker.apps.checkvalve.BackgroundJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

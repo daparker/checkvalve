@@ -29,6 +29,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class ChallengeResponseQuery implements Runnable {
     private Handler handler;
@@ -74,21 +75,12 @@ public class ChallengeResponseQuery implements Runnable {
 
     public void getChallengeResponse() {
         try {
-            // Byte arrays for packet data
+            // Byte arrays for packet data and challenge response
             byte[] arrayIn = new byte[9];
-            byte[] arrayOut = new byte[9];
-
-            ByteBuffer bufferOut = ByteBuffer.wrap(arrayOut);
-            bufferOut.order(ByteOrder.BIG_ENDIAN);
-
-            // Use A2S_PLAYER query string with 0xFFFFFFFF to get the challenge number
-            bufferOut.putInt(Values.INT_PACKET_HEADER);
-            bufferOut.put(Values.BYTE_A2S_PLAYER);
-            bufferOut.putInt(Values.INT_PACKET_HEADER);
-            bufferOut.flip();
+            challengeResponse = new byte[4];
 
             // UDP datagram packets
-            DatagramPacket packetOut = new DatagramPacket(arrayOut, arrayOut.length);
+            DatagramPacket packetOut = PacketFactory.getPacket(Values.BYTE_A2S_PLAYER, Values.CHALLENGE_QUERY);
             DatagramPacket packetIn = new DatagramPacket(arrayIn, arrayIn.length);
 
             // Create a socket for querying the server
@@ -113,13 +105,20 @@ public class ChallengeResponseQuery implements Runnable {
             // Close the socket
             socket.close();
 
-            // Store the challenge response in a byte array
-            challengeResponse = packetIn.getData();
+            if( arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE ) {
+                // Store the challenge response in a byte array
+                challengeResponse[0] = arrayIn[5];
+                challengeResponse[1] = arrayIn[6];
+                challengeResponse[2] = arrayIn[7];
+                challengeResponse[3] = arrayIn[8];
 
-            Log.d(TAG, "Received packet contains " + packetIn.getLength() + " bytes");
-            Log.d(TAG, "Challenge response contains " + challengeResponse.length + " bytes");
-
-            Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + ByteBuffer.wrap(challengeResponse).getInt(5) + "; status=" + status);
+                Log.d(TAG, "Received packet contains " + packetIn.getLength() + " bytes");
+                Log.d(TAG, "Challenge response contains " + challengeResponse.length + " bytes");
+                Log.d(TAG, "getChallengeResponse() finished: challengeResponse=" + ByteBuffer.wrap(challengeResponse).getInt() + "; status=" + status);
+            }
+            else if( arrayIn[4] == Values.BYTE_A2S_PLAYER_RESPONSE ) {
+                // Handle full player query response
+            }
         }
         catch( Exception e ) {
             Log.w(TAG, "getChallengeResponse(): Caught an exception:", e);

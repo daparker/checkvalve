@@ -74,20 +74,15 @@ public class ServerCheck implements Runnable {
 
         int status = 0;
 
-        // A2S_INFO query string
-        String queryString = "\u00FF\u00FF\u00FF\u00FF\u0054Source Engine Query\0";
-
         try {
             // Create a UDP socket
             DatagramSocket socket = new DatagramSocket();
             socket.setSoTimeout(timeout * 1000);
 
-            // Byte buffers for packet data
-            byte[] bufferOut = queryString.getBytes("ISO8859_1");
             byte[] bufferIn = new byte[1400];
 
             // UDP datagram packets
-            DatagramPacket packetOut = new DatagramPacket(bufferOut, bufferOut.length);
+            DatagramPacket packetOut = PacketFactory.getPacket(Values.BYTE_A2S_INFO, Values.A2S_INFO_QUERY.getBytes());
             DatagramPacket packetIn = new DatagramPacket(bufferIn, bufferIn.length);
 
             // Connect to the remote server
@@ -101,6 +96,11 @@ public class ServerCheck implements Runnable {
 
             // Close the UDP socket
             socket.close();
+
+            /*
+             * We don't need to worry about parsing a challenge response here. Any response at all
+             * is good enough to assume that the server is up and reachable.
+             */
         }
         catch( UnknownHostException e ) {
             status = 1;

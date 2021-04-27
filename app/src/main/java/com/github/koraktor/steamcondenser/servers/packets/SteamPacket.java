@@ -9,6 +9,8 @@ package com.github.koraktor.steamcondenser.servers.packets;
 
 import com.github.koraktor.steamcondenser.PacketBuffer;
 
+import java.util.Arrays;
+
 /**
  * This module implements the basic functionality used by most of the packets
  * used in communication with master, Source or GoldSrc servers.

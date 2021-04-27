@@ -893,35 +893,10 @@ public class CheckValve extends Activity {
             }
         };
 
-        final Handler challengeResponseHandler = new Handler() {
-            public void handleMessage(Message msg) {
-                Log.d(TAG, "handleMessage(): msg=" + msg.toString());
-
-                if( msg.what != 0 ) {
-                    p.dismiss();
-                    Log.d(TAG, "handleMessage(): msg.what=" + msg.what);
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_general_error);
-                }
-                else {
-                    Bundle b = (Bundle) msg.obj;
-                    byte[] challengeResponse = b.getByteArray(Values.EXTRA_CHALLENGE_RESPONSE);
-
-                    if( challengeResponse == null ) {
-                        p.dismiss();
-                        String host = server + ":" + port;
-                        String message = String.format(CheckValve.this.getString(R.string.msg_no_challenge_response), host);
-                        UserVisibleMessage.showMessage(CheckValve.this, message);
-                    }
-                    else {
-                        new Thread(new QueryPlayers(CheckValve.this, rowId, challengeResponse, playerQueryHandler)).start();
-                    }
-                }
-            }
-        };
-
         p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
-        new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
+        //new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
+        new Thread(new QueryPlayers(CheckValve.this, rowId, playerQueryHandler)).start();
     }
 
     public void playerSearch() {

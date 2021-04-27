@@ -35,8 +35,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+//import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
+//import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -180,7 +182,15 @@ public class RestoreBackupActivity extends Activity {
             database = new DatabaseProvider(RestoreBackupActivity.this);
 
         // Default backup file location
-        storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        //storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        //String sep = File.separator;
+        storageDir = this.getExternalFilesDir(null);
+        //String[] pathArray = storageDir.getAbsolutePath().split(sep);
+        //String shortPath = sep + pathArray[pathArray.length-2]
+        //        + sep + pathArray[pathArray.length-1];
+        String ap = storageDir.getAbsolutePath();
+        String shortPath = ap.substring(
+                ap.lastIndexOf("/", ap.lastIndexOf("/")-1)).substring(1);
 
         // Set button listeners
         this.findViewById(R.id.restorebackup_cancel_button).setOnClickListener(cancelButtonListener);
@@ -190,7 +200,8 @@ public class RestoreBackupActivity extends Activity {
         field_backup_file = (EditText) findViewById(R.id.restorebackup_field_backup_file);
 
         help_text = (TextView) findViewById(R.id.restorebackup_help_text);
-        help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), storageDir.getName()));
+        //help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), storageDir.getName()));
+        help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), shortPath));
 
         file_details_table = (TableLayout) findViewById(R.id.restorebackup_file_details_table);
 

@@ -37,14 +37,12 @@ public class QueryPlayers implements Runnable {
 
     private int status;
     private long rowId;
-    private byte[] challengeResponse;
     private Context context;
     private Handler handler;
 
-    public QueryPlayers(Context context, long rowId, byte[] challengeResponse, Handler handler) {
+    public QueryPlayers(Context context, long rowId, Handler handler) {
         this.context = context;
         this.rowId = rowId;
-        this.challengeResponse = challengeResponse;
         this.handler = handler;
     }
 
@@ -74,10 +72,6 @@ public class QueryPlayers implements Runnable {
         // Player array to be returned
         ArrayList<PlayerRecord> playerList = null;
 
-        // Byte buffers for packet data
-        byte[] bufferOut;
-        byte[] bufferIn;
-
         String[] packets;
 
         // String variables
@@ -106,145 +100,171 @@ public class QueryPlayers implements Runnable {
         int kills = 0;
         float time = 0;
 
-        // Integer variables
         try {
-            socket = new DatagramSocket();
-            socket.setSoTimeout(serverTimeout * 1000);
-
-            // Challenge response becomes the A2S_PLAYER query by changing 0x41 to 0x55
-            bufferOut = challengeResponse;
-            bufferOut[4] = Values.BYTE_A2S_PLAYER;
-
-            bufferIn = new byte[1400];
+            // Byte array for the incoming data
+            byte[] arrayIn = new byte[1400];
 
             // UDP datagram packets
-            packetOut = new DatagramPacket(bufferOut, bufferOut.length);
-            packetIn = new DatagramPacket(bufferIn, bufferIn.length);
+            packetOut = PacketFactory.getPacket(Values.BYTE_A2S_PLAYER, Values.CHALLENGE_QUERY);
+            packetIn = new DatagramPacket(arrayIn, arrayIn.length);
+
+            // Create a socket for querying the server
+            socket = new DatagramSocket();
+            socket.setSoTimeout(serverTimeout * 1000);
 
             // Connect to the remote server
             socket.connect(InetAddress.getByName(serverURL), serverPort);
 
-            // Show an error if the connection attempt failed
+            // Bail out if the connection failed
             if( !socket.isConnected() ) {
-                if( !socket.isClosed() )
+                if (!socket.isClosed() )
                     socket.close();
 
                 throw new SocketException();
             }
 
-            // Send the A2S_PLAYER query string and get the response packet
+            // Send the query string and get the response packet
             socket.send(packetOut);
             socket.receive(packetIn);
 
-            ByteBuffer buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
-            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            // If we received a challenge response then query again to get the player data
+            if( arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE ) {
+                // Store the challenge response in a byte array
+                byte[] challengeResponse = new byte[] {
+                        arrayIn[5], arrayIn[6], arrayIn[7], arrayIn[8]
+                };
 
-            // Get the header info to see if data has been split over multiple packets
-            header = buffer.getInt();
+                // UDP datagram packets
+                packetOut = PacketFactory.getPacket(Values.BYTE_A2S_PLAYER, challengeResponse);
+                packetIn = new DatagramPacket(arrayIn, arrayIn.length);
 
-            numpackets = 1;
+                // Show an error if the connection attempt failed
+                if( !socket.isConnected() ) {
+                    if( !socket.isClosed() )
+                        socket.close();
 
-            // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
-            if( header == Values.INT_SPLIT_HEADER ) {
-                /*
-                 * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet (packet
-                 * 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we need to check
-                 * the sequence number of each packet to know how many header bytes to strip.
-                 */
-
-                buffer.getInt();    // Discard the answer ID
-                numpackets = (short) buffer.get();
-                thispacket = (short) buffer.get();
-                buffer.get();       // Discard the next byte
-
-                // Initialize the array to hold the number of packets in this response
-                packets = new String[numpackets];
-
-                // If this is packet 0 then skip the next 5 header bytes
-                if( thispacket == 0 ) {
-                    buffer.position(buffer.position() + 6);
-                    numplayers = (short) buffer.get();
+                    throw new SocketException();
                 }
 
-                packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
+                // Send the A2S_PLAYER query string and get the response packet
+                socket.send(packetOut);
+                socket.receive(packetIn);
+            }
 
-                for( int i = 1; i < numpackets; i++ ) {
-                    // Receive the response packet from the server
-                    socket.receive(packetIn);
+            if( arrayIn[4] == Values.BYTE_A2S_PLAYER_RESPONSE ) {
+                ByteBuffer bufferIn = ByteBuffer.wrap(arrayIn, 0, packetIn.getLength());
+                bufferIn.order(ByteOrder.LITTLE_ENDIAN);
 
-                    buffer = ByteBuffer.wrap(bufferIn, 0, packetIn.getLength());
+                // Get the header info to see if data has been split over multiple packets
+                header = bufferIn.getInt();
 
-                    // Get rid of 12 header bytes
-                    buffer.position(9);
-                    thispacket = (short) buffer.get();
-                    buffer.position(buffer.position() + 2);
+                numpackets = 1;
 
-                    // If this is packet 0 then skip the next 6 header bytes
-                    if( thispacket == 0 ) {
-                        buffer.position(buffer.position() + 6);
-                        numplayers = (short) buffer.get();
+                // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
+                if (header == Values.INT_SPLIT_HEADER) {
+                    /*
+                     * If there are multiple packets, each packet will have 12 header bytes, but the "first" packet (packet
+                     * 0) will have an additional 6 header bytes. UDP packets can arrive in any order, so we need to check
+                     * the sequence number of each packet to know how many header bytes to strip.
+                     */
+
+                    bufferIn.getInt();    // Discard the answer ID
+                    numpackets = (short) bufferIn.get();
+                    thispacket = (short) bufferIn.get();
+                    bufferIn.get();       // Discard the next byte
+
+                    // Initialize the array to hold the number of packets in this response
+                    packets = new String[numpackets];
+
+                    // If this is packet 0 then skip the next 5 header bytes
+                    if (thispacket == 0) {
+                        bufferIn.position(bufferIn.position() + 6);
+                        numplayers = (short) bufferIn.get();
                     }
 
-                    packets[thispacket] = new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1");
+                    packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
+
+                    for (int i = 1; i < numpackets; i++) {
+                        // Receive the response packet from the server
+                        socket.receive(packetIn);
+
+                        bufferIn = ByteBuffer.wrap(arrayIn, 0, packetIn.getLength());
+
+                        // Get rid of 12 header bytes
+                        bufferIn.position(9);
+                        thispacket = (short) bufferIn.get();
+                        bufferIn.position(bufferIn.position() + 2);
+
+                        // If this is packet 0 then skip the next 6 header bytes
+                        if (thispacket == 0) {
+                            bufferIn.position(bufferIn.position() + 6);
+                            numplayers = (short) bufferIn.get();
+                        }
+
+                        packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
+                    }
+                } else {
+                    // Get number of players (6th byte)
+                    bufferIn.get();
+                    numplayers = (short) bufferIn.get();
+                    packets = new String[]{new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1")};
+                }
+
+                socket.close();
+
+                if (numplayers == 0) {
+                    status = -2;
+                    return null;
+                }
+
+                // Initialize the return array once we know how many elements we need
+                playerList = new ArrayList<PlayerRecord>();
+
+                for (int i = 0; i < numpackets; i++) {
+                    byte[] byteArray = packets[i].getBytes("ISO8859_1");
+                    PacketData pd = new PacketData(byteArray);
+
+                    while (pd.hasRemaining()) {
+                        name = new String();
+                        totaltime = new String();
+                        kills = 0;
+
+                        index = (int) pd.getByte(); // Get this player's index
+                        name = pd.getUTF8String(); // Determine the length of the player name
+                        kills = pd.getInt();       // Get the number of kills
+                        time = pd.getFloat();      // Get the connected time
+
+                        // Parse the time into hours, minutes, and seconds
+                        seconds = (short) (time % 60);
+                        time -= seconds;
+                        minutes = (short) ((time / 60) % 60);
+                        hours = (short) (Math.floor(time / 3600));
+
+                        // Values less than 10 should be left-padded with a zero
+                        String hourString = (hours < 10) ? "0" + Integer.toString(hours) : Integer.toString(hours);
+                        String minuteString = (minutes < 10) ? "0" + Integer.toString(minutes) : Integer.toString(minutes);
+                        String secondString = (seconds < 10) ? "0" + Integer.toString(seconds) : Integer.toString(seconds);
+
+                        // Assemble a string representation of the connected time
+                        totaltime = hourString + ":" + minuteString + ":" + secondString;
+
+                        Log.d(TAG, "Adding player [index=" + index + "][name=" + name + "][kills=" + kills + "][time=" + totaltime + "]");
+
+                        playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
+                    }
                 }
             }
             else {
-                // Get number of players (6th byte)
-                buffer.get();
-                numplayers = (short) buffer.get();
-                packets = new String[]{new String(bufferIn, buffer.position(), buffer.remaining(), "ISO8859_1")};
-            }
-
-            socket.close();
-
-            if( numplayers == 0 ) {
-                status = -2;
+                Log.w(TAG, "queryPlayers(): Received packet is not a proper response!");
                 return null;
             }
-
-            // Initialize the return array once we know how many elements we need
-            playerList = new ArrayList<PlayerRecord>();
-
-            for( int i = 0; i < numpackets; i++ ) {
-                byte[] byteArray = packets[i].getBytes("ISO8859_1");
-                PacketData pd = new PacketData(byteArray);
-
-                while( pd.hasRemaining() ) {
-                    name = new String();
-                    totaltime = new String();
-                    kills = 0;
-
-                    index = (int) pd.getByte(); // Get this player's index
-                    name = pd.getUTF8String(); // Determine the length of the player name
-                    kills = pd.getInt();       // Get the number of kills
-                    time = pd.getFloat();      // Get the connected time
-
-                    // Parse the time into hours, minutes, and seconds
-                    seconds = (short) (time % 60);
-                    time -= seconds;
-                    minutes = (short) ((time / 60) % 60);
-                    hours = (short) (Math.floor(time / 3600));
-
-                    // Values less than 10 should be left-padded with a zero
-                    String hourString = (hours < 10) ? "0" + Integer.toString(hours) : Integer.toString(hours);
-                    String minuteString = (minutes < 10) ? "0" + Integer.toString(minutes) : Integer.toString(minutes);
-                    String secondString = (seconds < 10) ? "0" + Integer.toString(seconds) : Integer.toString(seconds);
-
-                    // Assemble a string representation of the connected time
-                    totaltime = hourString + ":" + minuteString + ":" + secondString;
-
-                    Log.d(TAG, "Adding player [index=" + index + "][name=" + name + "][kills=" + kills + "][time=" + totaltime + "]");
-
-                    playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
-                }
-            }
-
-            return playerList;
         }
         catch( Exception e ) {
             status = -1;
             Log.w(TAG, "queryPlayers(): Caught an exception:", e);
             return null;
         }
+
+        return playerList;
     }
 }
