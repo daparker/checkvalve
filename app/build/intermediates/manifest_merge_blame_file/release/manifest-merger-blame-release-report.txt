@@ -1,6 +1,6 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<!--
-3Copyright 2010-2020 by David A. Parker <parker.david.a@gmail.com>
+3Copyright 2010-2023 by David A. Parker <parker.david.a@gmail.com>
 4
 5This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 6
@@ -20,209 +20,222 @@
 20<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 21    package="com.dparker.apps.checkvalve"
 22    android:installLocation="auto"
-23    android:versionCode="34"
-24    android:versionName="2.0.13" >
+23    android:versionCode="36"
+24    android:versionName="2.0.14" >
 25
 26    <uses-sdk
 27        android:minSdkVersion="14"
-27-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml
-28        android:targetSdkVersion="29" />
-28-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml
+28        android:targetSdkVersion="31" />
 29
 30    <uses-permission android:name="android.permission.INTERNET" />
-30-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:28:5-67
-30-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:28:22-64
+30-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:27:5-67
+30-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:27:22-64
 31    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-31-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:29:5-79
-31-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:29:22-76
+31-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:28:5-79
+31-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:28:22-76
 32    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-32-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:30:5-80
-32-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:30:22-77
+32-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:29:5-80
+32-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:29:22-77
 33    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-33-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:31:5-81
-33-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:31:22-78
+33-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:30:5-81
+33-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:30:22-78
 34    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-34-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:32:5-81
-34-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:32:22-78
+34-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:31:5-81
+34-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:31:22-78
 35
-36    <application
-36-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:34:5-123:19
-37        android:allowBackup="true"
-37-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:35:9-35
-38        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-38-->[androidx.core:core:1.0.0] /home/dparker/.gradle/caches/transforms-2/files-2.1/4fa96a30a609219e9d73eea686ac383a/core-1.0.0/AndroidManifest.xml:22:18-86
-39        android:icon="@drawable/icon"
-39-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:36:9-38
-40        android:label="@string/app_name"
-40-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:37:9-41
-41        android:theme="@style/checkvalveTheme" >
-41-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:38:9-47
-42        <activity
-42-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:39:9-48:20
-43            android:name="com.dparker.apps.checkvalve.CheckValve"
-43-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:40:13-39
-44            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-44-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:41:13-83
-45            android:label="@string/app_name" >
-45-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:42:13-45
-46            <intent-filter>
-46-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:43:13-47:29
-47                <action android:name="android.intent.action.MAIN" />
-47-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:44:17-69
-47-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:44:25-66
-48                <action android:name="android.intent.action.VIEW" />
-48-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:45:17-69
-48-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:45:25-66
-49
-50                <category android:name="android.intent.category.LAUNCHER" />
-50-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:46:17-77
-50-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:46:27-74
-51            </intent-filter>
-52        </activity>
-53        <activity
-53-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:49:9-52:61
-54            android:name="com.dparker.apps.checkvalve.AddServerActivity"
-54-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:50:13-46
-55            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-55-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:51:13-83
-56            android:theme="@style/checkvalveTheme_Dialog" />
-56-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:52:13-58
-57        <activity
-57-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:53:9-55:86
-58            android:name="com.dparker.apps.checkvalve.ManageServersActivity"
-58-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:54:13-50
-59            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-59-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:55:13-83
+36    <permission
+36-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:22:5-24:47
+37        android:name="com.dparker.apps.checkvalve.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+37-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:23:9-81
+38        android:protectionLevel="signature" />
+38-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:24:9-44
+39
+40    <uses-permission android:name="com.dparker.apps.checkvalve.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+40-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:26:5-97
+40-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:26:22-94
+41
+42    <application
+42-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:33:5-122:19
+43        android:allowBackup="true"
+43-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:34:9-35
+44        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+44-->[androidx.core:core:1.12.0] /Users/daparker/.gradle/caches/transforms-3/294cb52a2e5000f1617ba7c15bf9beb9/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
+45        android:extractNativeLibs="true"
+46        android:icon="@drawable/icon"
+46-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:35:9-38
+47        android:label="@string/app_name"
+47-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:36:9-41
+48        android:theme="@style/checkvalveTheme" >
+48-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:37:9-47
+49        <activity
+49-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:38:9-47:20
+50            android:name="com.dparker.apps.checkvalve.CheckValve"
+50-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:39:13-39
+51            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+51-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:41:13-83
+52            android:exported="true" >
+52-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:40:13-36
+53            <intent-filter>
+53-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:42:13-46:29
+54                <action android:name="android.intent.action.MAIN" />
+54-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:43:17-69
+54-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:43:25-66
+55                <action android:name="android.intent.action.VIEW" />
+55-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:44:17-69
+55-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:44:25-66
+56
+57                <category android:name="android.intent.category.LAUNCHER" />
+57-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:45:17-77
+57-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:45:27-74
+58            </intent-filter>
+59        </activity>
 60        <activity
-60-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:56:9-59:61
-61            android:name="com.dparker.apps.checkvalve.EditServerActivity"
-61-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:57:13-47
+60-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:48:9-51:61
+61            android:name="com.dparker.apps.checkvalve.AddServerActivity"
+61-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:49:13-46
 62            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-62-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:58:13-83
+62-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:50:13-83
 63            android:theme="@style/checkvalveTheme_Dialog" />
-63-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:59:13-58
+63-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:51:13-58
 64        <activity
-64-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:60:9-63:61
-65            android:name="com.dparker.apps.checkvalve.ShowPlayersActivity"
-65-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:61:13-48
-66            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-66-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:62:13-83
-67            android:theme="@style/checkvalveTheme_Dialog" />
-67-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:63:13-58
-68        <activity
-68-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:64:9-67:61
-69            android:name="com.dparker.apps.checkvalve.PlayerSearchActivity"
-69-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:65:13-49
-70            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-70-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:66:13-83
-71            android:theme="@style/checkvalveTheme_Dialog" />
-71-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:67:13-58
-72        <activity
-72-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:68:9-70:86
-73            android:name="com.dparker.apps.checkvalve.SearchPlayersActivity"
-73-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:69:13-50
-74            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-74-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:70:13-83
+64-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:52:9-54:86
+65            android:name="com.dparker.apps.checkvalve.ManageServersActivity"
+65-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:53:13-50
+66            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+66-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:54:13-83
+67        <activity
+67-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:55:9-58:61
+68            android:name="com.dparker.apps.checkvalve.EditServerActivity"
+68-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:56:13-47
+69            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+69-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:57:13-83
+70            android:theme="@style/checkvalveTheme_Dialog" />
+70-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:58:13-58
+71        <activity
+71-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:59:9-62:61
+72            android:name="com.dparker.apps.checkvalve.ShowPlayersActivity"
+72-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:60:13-48
+73            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+73-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:61:13-83
+74            android:theme="@style/checkvalveTheme_Dialog" />
+74-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:62:13-58
 75        <activity
-75-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:71:9-73:86
-76            android:name="com.dparker.apps.checkvalve.RconActivity"
-76-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:72:13-41
-77            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-77-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:73:13-83
-78        <activity
-78-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:74:9-77:61
-79            android:name="com.dparker.apps.checkvalve.RconPasswordActivity"
-79-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:75:13-49
-80            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-80-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:76:13-83
-81            android:theme="@style/checkvalveTheme_Dialog" />
-81-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:77:13-58
+75-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:63:9-66:61
+76            android:name="com.dparker.apps.checkvalve.PlayerSearchActivity"
+76-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:64:13-49
+77            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+77-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:65:13-83
+78            android:theme="@style/checkvalveTheme_Dialog" />
+78-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:66:13-58
+79        <activity
+79-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:67:9-69:86
+80            android:name="com.dparker.apps.checkvalve.SearchPlayersActivity"
+80-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:68:13-50
+81            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+81-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:69:13-83
 82        <activity
-82-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:78:9-81:61
-83            android:name="com.dparker.apps.checkvalve.AboutActivity"
-83-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:79:13-42
-84            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-84-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:80:13-83
-85            android:theme="@style/checkvalveTheme_Dialog" />
-85-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:81:13-58
-86        <activity
-86-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:82:9-84:86
-87            android:name="com.dparker.apps.checkvalve.ChatViewerActivity"
-87-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:83:13-47
-88            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-88-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:84:13-83
+82-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:70:9-72:86
+83            android:name="com.dparker.apps.checkvalve.RconActivity"
+83-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:71:13-41
+84            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+84-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:72:13-83
+85        <activity
+85-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:73:9-76:61
+86            android:name="com.dparker.apps.checkvalve.RconPasswordActivity"
+86-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:74:13-49
+87            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+87-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:75:13-83
+88            android:theme="@style/checkvalveTheme_Dialog" />
+88-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:76:13-58
 89        <activity
-89-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:85:9-88:61
-90            android:name="com.dparker.apps.checkvalve.ChatRelayDetailsActivity"
-90-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:86:13-53
+89-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:77:9-80:61
+90            android:name="com.dparker.apps.checkvalve.AboutActivity"
+90-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:78:13-42
 91            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-91-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:87:13-83
+91-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:79:13-83
 92            android:theme="@style/checkvalveTheme_Dialog" />
-92-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:88:13-58
+92-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:80:13-58
 93        <activity
-93-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:89:9-91:86
-94            android:name="com.dparker.apps.checkvalve.SettingsActivity"
-94-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:90:13-45
+93-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:81:9-83:86
+94            android:name="com.dparker.apps.checkvalve.ChatViewerActivity"
+94-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:82:13-47
 95            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-95-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:91:13-83
+95-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:83:13-83
 96        <activity
-96-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:92:9-95:61
-97            android:name="com.dparker.apps.checkvalve.ShowNoteActivity"
-97-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:93:13-45
+96-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:84:9-87:61
+97            android:name="com.dparker.apps.checkvalve.ChatRelayDetailsActivity"
+97-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:85:13-53
 98            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-98-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:94:13-83
+98-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:86:13-83
 99            android:theme="@style/checkvalveTheme_Dialog" />
-99-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:95:13-58
+99-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:87:13-58
 100        <activity
-100-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:96:9-98:86
-101            android:name="com.dparker.apps.checkvalve.DebugConsoleActivity"
-101-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:97:13-49
+100-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:88:9-90:86
+101            android:name="com.dparker.apps.checkvalve.SettingsActivity"
+101-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:89:13-45
 102            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-102-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:98:13-83
+102-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:90:13-83
 103        <activity
-103-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:99:9-101:86
-104            android:name="com.dparker.apps.checkvalve.CreateBackupActivity"
-104-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:100:13-49
-105            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-105-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:101:13-83
-106        <activity
-106-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:102:9-104:86
-107            android:name="com.dparker.apps.checkvalve.RestoreBackupActivity"
-107-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:103:13-50
-108            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-108-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:104:13-83
-109        <activity
-109-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:105:9-107:86
-110            android:name="com.dparker.apps.checkvalve.backup.FileChooserActivity"
-110-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:106:13-55
-111            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
-111-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:107:13-83
-112
-113        <receiver android:name="com.dparker.apps.checkvalve.BootCompletedReceiver" >
-113-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:109:9-113:20
-113-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:109:19-56
-114            <intent-filter>
-114-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:110:13-112:29
-115                <action android:name="android.intent.action.BOOT_COMPLETED" />
-115-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:111:17-79
-115-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:111:25-76
-116            </intent-filter>
-117        </receiver>
-118
-119        <service
-119-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:115:9-117:40
-120            android:name="com.dparker.apps.checkvalve.BackgroundQueryService"
-120-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:116:13-51
-121            android:exported="false" />
-121-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:117:13-37
-122        <service
-122-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:119:9-122:72
-123            android:name="com.dparker.apps.checkvalve.BackgroundJobService"
-123-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:120:13-49
-124            android:exported="false"
-124-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:121:13-37
-125            android:permission="android.permission.BIND_JOB_SERVICE" />
-125-->/home/dparker/StudioProjects/checkvalve/app/src/main/AndroidManifest.xml:122:13-69
-126    </application>
+103-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:91:9-94:61
+104            android:name="com.dparker.apps.checkvalve.ShowNoteActivity"
+104-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:92:13-45
+105            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+105-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:93:13-83
+106            android:theme="@style/checkvalveTheme_Dialog" />
+106-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:94:13-58
+107        <activity
+107-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:95:9-97:86
+108            android:name="com.dparker.apps.checkvalve.DebugConsoleActivity"
+108-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:96:13-49
+109            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+109-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:97:13-83
+110        <activity
+110-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:98:9-100:86
+111            android:name="com.dparker.apps.checkvalve.CreateBackupActivity"
+111-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:99:13-49
+112            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+112-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:100:13-83
+113        <activity
+113-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:101:9-103:86
+114            android:name="com.dparker.apps.checkvalve.RestoreBackupActivity"
+114-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:102:13-50
+115            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+115-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:103:13-83
+116        <activity
+116-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:104:9-106:86
+117            android:name="com.dparker.apps.checkvalve.backup.FileChooserActivity"
+117-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:105:13-55
+118            android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+118-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:106:13-83
+119
+120        <receiver
+120-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:108:9-112:20
+121            android:name="com.dparker.apps.checkvalve.BootCompletedReceiver"
+121-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:108:19-56
+122            android:exported="false" >
+122-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:108:57-81
+123            <intent-filter>
+123-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:109:13-111:29
+124                <action android:name="android.intent.action.BOOT_COMPLETED" />
+124-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:110:17-79
+124-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:110:25-76
+125            </intent-filter>
+126        </receiver>
 127
-128</manifest>
+128        <service
+128-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:114:9-116:40
+129            android:name="com.dparker.apps.checkvalve.BackgroundQueryService"
+129-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:115:13-51
+130            android:exported="false" />
+130-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:116:13-37
+131        <service
+131-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:118:9-121:72
+132            android:name="com.dparker.apps.checkvalve.BackgroundJobService"
+132-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:119:13-49
+133            android:exported="false"
+133-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:120:13-37
+134            android:permission="android.permission.BIND_JOB_SERVICE" />
+134-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:121:13-69
+135    </application>
+136
+137</manifest>

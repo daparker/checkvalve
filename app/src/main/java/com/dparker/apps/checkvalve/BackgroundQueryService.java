@@ -202,7 +202,7 @@ public class BackgroundQueryService extends Service {
             Intent intent = new Intent(context, com.dparker.apps.checkvalve.CheckValve.class);
             intent.putExtra(Values.EXTRA_QUERY_SERVERS, true);
 
-            PendingIntent pending = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
+            PendingIntent pending = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_IMMUTABLE);
 
             Notification n;
             int defaults = 0;

@@ -1,6 +1,10 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.14**
+- Updated the app to target Android 12 (Snow Cone) per the new Google Play requirements
+- Fixed a bug affecting the options to show/hide the game version and current map
+
 **2.0.13**
 - Fixed notifications being enabled after a device reboot when disabled in settings
 - Made the RCON console text selectable
@@ -131,7 +135,3 @@ New Features
     - IP
     - Port
     - Password
-
-Notes
-- While the target SDK version has been increased, the minimum SDK version remains 8 (Froyo).
-- I am trying very hard to keep the minimum SDK version at 8 so that CheckValve will continue to work on older devices.  However, changes to the Android API are making it increasingly difficult to stay comaptible with any SDK version below 11 (Honeycomb), and the minimum SDK may need to be rasied in the near future out of necessity.
