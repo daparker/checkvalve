@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.dparker.apps.checkvalve"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 31
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -20,10 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    namespace 'com.dparker.apps.checkvalve'
 }
 
 dependencies {
     implementation files('libs/commons-compress-1.1.jar')
     implementation files('libs/commons-lang3-3.3.2.jar')
-    implementation 'androidx.core:core:1.0.0'
+    implementation 'androidx.core:core:1.12.0'
 }
