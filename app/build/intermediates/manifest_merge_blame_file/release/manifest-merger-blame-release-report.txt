@@ -20,12 +20,12 @@
 20<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 21    package="com.dparker.apps.checkvalve"
 22    android:installLocation="auto"
-23    android:versionCode="36"
+23    android:versionCode="38"
 24    android:versionName="2.0.14" >
 25
 26    <uses-sdk
 27        android:minSdkVersion="14"
-28        android:targetSdkVersion="31" />
+28        android:targetSdkVersion="33" />
 29
 30    <uses-permission android:name="android.permission.INTERNET" />
 30-->/Users/daparker/CheckValve/app/src/main/AndroidManifest.xml:27:5-67
