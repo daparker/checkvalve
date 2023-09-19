@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2023 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -1113,9 +1113,9 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         values.put(SETTINGS_RCON_INCLUDE_SM, includeSM);
         values.put(SETTINGS_SHOW_SERVER_NAME, showName);
         values.put(SETTINGS_SHOW_SERVER_IP, showIP);
-        values.put(SETTINGS_SHOW_SERVER_MAP, showGame);
+        values.put(SETTINGS_SHOW_SERVER_MAP, showMap);
         values.put(SETTINGS_SHOW_SERVER_PLAYERS, showPlayers);
-        values.put(SETTINGS_SHOW_SERVER_GAME, showMap);
+        values.put(SETTINGS_SHOW_SERVER_GAME, showGame);
         values.put(SETTINGS_SHOW_SERVER_TAGS, showTags);
         values.put(SETTINGS_SHOW_SERVER_PING, showPing);
         values.put(SETTINGS_USE_SERVER_NICKNAME, showNickname);
