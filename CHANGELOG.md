@@ -1,6 +1,11 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.15**
+- Updated the app to target Android 14 per the new Google Play requirements
+- Updated to allow any storage location (local or external) when creating or restoring a backup
+- General code cleanup and updates to address deprecated features, etc.
+
 **2.0.14**
 - Updated the app to target Android 12 (Snow Cone) per the new Google Play requirements
 - Fixed a bug affecting the options to show/hide the game version and current map
