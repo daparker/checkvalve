@@ -19,33 +19,32 @@
 
 package com.dparker.apps.checkvalve;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-//import android.support.v4.app.ActivityCompat;
-import androidx.core.app.ActivityCompat;
-//import android.support.v4.content.ContextCompat;
-import androidx.core.content.ContextCompat;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.dparker.apps.checkvalve.backup.BackupWriter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -55,22 +54,18 @@ public class CreateBackupActivity extends Activity {
 
     private boolean includeServers;
     private boolean includeSettings;
-    private boolean canWriteExternal;
-    private Button saveButton;
-    private Button cancelButton;
     private EditText field_save_as;
-    private TextView help_text;
-    private File storageDir;
+    private Uri chosenUri;
 
     private DatabaseProvider database;
 
-    private OnClickListener saveButtonListener = new OnClickListener() {
+    private final OnClickListener saveButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Save" button was clicked
              */
 
-            if( field_save_as.getText().toString().length() == 0 ) {
+            if( field_save_as.getText().toString().isEmpty() ) {
                 UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_empty_fields);
             }
             else {
@@ -79,7 +74,7 @@ public class CreateBackupActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -90,8 +85,18 @@ public class CreateBackupActivity extends Activity {
         }
     };
 
+    private final OnClickListener chooserButtonListener = new OnClickListener() {
+        public void onClick(View v) {
+            /*
+             * "..." button was clicked
+             */
+
+            runFileChooser();
+        }
+    };
+
     @SuppressLint("HandlerLeak")
-    private Handler backupWriterHandler = new Handler() {
+    private final Handler backupWriterHandler = new Handler() {
         public void handleMessage(Message msg) {
         switch( msg.what ) {
             case 0:
@@ -123,10 +128,8 @@ public class CreateBackupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         this.setContentView(R.layout.create_backup);
         this.setResult(1);
@@ -134,36 +137,20 @@ public class CreateBackupActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(CreateBackupActivity.this);
 
-        // Default backup file name
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-        String timestamp = sdf.format(new Date());
-        String defaultFilename = "checkvalve_backup_" + timestamp + ".bkp";
-        //storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        storageDir = this.getExternalFilesDir(null);
-        cancelButton = (Button) findViewById(R.id.createbackup_cancel_button);
-        cancelButton.setOnClickListener(cancelButtonListener);
+        this.findViewById(R.id.createbackup_cancel_button).setOnClickListener(cancelButtonListener);
+        this.findViewById(R.id.createbackup_save_button).setOnClickListener(saveButtonListener);
+        this.findViewById(R.id.createbackup_chooser_button).setOnClickListener(chooserButtonListener);
 
-        saveButton = (Button) findViewById(R.id.createbackup_save_button);
-        saveButton.setOnClickListener(saveButtonListener);
+        field_save_as = findViewById(R.id.createbackup_field_save_as);
+        field_save_as.setEnabled(false);
 
-        field_save_as = (EditText) findViewById(R.id.createbackup_field_save_as);
-        field_save_as.setText(defaultFilename);
-
-        String ap = storageDir.getAbsolutePath();
-        String shortPath = ap.substring(
-                ap.lastIndexOf("/", ap.lastIndexOf("/")-1)).substring(1);
-
-        help_text = (TextView) findViewById(R.id.createbackup_help_text);
-        //help_text.setText(String.format(this.getString(R.string.help_text_create_backup), storageDir.getName()));
-        help_text.setText(String.format(this.getString(R.string.help_text_create_backup), shortPath));
+        TextView help_text = findViewById(R.id.createbackup_help_text);
+        help_text.setText(String.format(this.getString(R.string.help_text_create_backup), Environment.DIRECTORY_DOWNLOADS));
 
         includeServers = true;
         includeSettings = true;
-        canWriteExternal = true;
 
-        if( ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-                canWriteExternal = false;
-        }
+        runFileChooser();
     }
 
     @Override
@@ -172,14 +159,6 @@ public class CreateBackupActivity extends Activity {
 
         if( database == null )
             database = new DatabaseProvider(CreateBackupActivity.this);
-
-        if( ! canWriteExternal ) {
-            String[] EXTERNAL_PERM = {
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            };
-
-            ActivityCompat.requestPermissions(this, EXTERNAL_PERM, Values.PERMISSIONS_REQUEST);
-        }
     }
 
     @Override
@@ -195,27 +174,12 @@ public class CreateBackupActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if( requestCode == Values.PERMISSIONS_REQUEST ) {
-            if( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
-                canWriteExternal = true;
-            }
-            else {
-                UserVisibleMessage.showMessage(this, R.string.msg_external_write_denied);
-                setResult(1);
-                finish();
-            }
-        }
     }
 
     public void checkboxHandler(View view) {
         boolean checkState = ((CheckBox) view).isChecked();
 
-        Log.i(TAG, "checkboxHandler(): View name=" + view.toString() + "; id=" + view.getId() + "; checked=" + checkState);
+        Log.i(TAG, "checkboxHandler(): View name=" + view + "; id=" + view.getId() + "; checked=" + checkState);
 
         if( view.getId() == R.id.createbackup_checkbox_include_servers )
             includeServers = checkState;
@@ -224,34 +188,91 @@ public class CreateBackupActivity extends Activity {
     }
 
     public void saveBackupFile() {
-        String filename = field_save_as.getText().toString().trim();
-        File backupFile = new File(storageDir, filename);
-        String filepath = backupFile.getAbsolutePath();
-
         try {
-            if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
-                if( backupFile.exists() ) {
-                    UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_backup_file_exists);
-                }
-                else {
-                    if( backupFile.createNewFile() ) {
-                        BackupWriter b = new BackupWriter(CreateBackupActivity.this, filepath, includeServers, includeSettings, backupWriterHandler);
-                        Thread t = new Thread(b);
-                        t.start();
-                    }
-                    else {
-                        UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_backup_file_create_failed);
-                    }
-                }
-            }
-            else {
-                UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_backup_storage_not_mounted);
-            }
+            Log.d(TAG, "saveBackupFile(): Backup file URI is " + chosenUri.toString());
+            BackupWriter b = new BackupWriter(CreateBackupActivity.this, chosenUri, includeServers, includeSettings, backupWriterHandler);
+            Thread t = new Thread(b);
+            t.start();
         }
-        catch( Exception e ) {
+        catch (Exception e) {
+            Log.i(TAG, "saveBackupFile(): Deleting file " + chosenUri.toString());
+            deleteBackupFile();
             Log.e(TAG, "saveBackupFile(): Caught an exception:", e);
             UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_general_error);
-            backupFile.delete();
+        }
+    }
+
+    public void runFileChooser() {
+        String filename;
+        Uri uri;
+
+        if( chosenUri == null ) {
+            // Default backup file name
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+            String timestamp = sdf.format(new Date());
+
+            filename = "checkvalve_" + timestamp;
+            uri = Uri.fromFile(new File(Environment.DIRECTORY_DOWNLOADS, filename));
+        }
+        else {
+            try {
+                String s = chosenUri.getLastPathSegment();
+
+                if( s.contains("/") ) {
+                    filename = s.substring(s.lastIndexOf('/'));
+                }
+                else {
+                    filename = s.split(":")[1];
+                }
+
+                uri = chosenUri;
+
+                Log.i(TAG, "Deleting file " + chosenUri.toString());
+                deleteBackupFile();
+            }
+            catch( Exception e ) {
+                Log.e(TAG, "runFileChooser(): Caught an exception:", e);
+                UserVisibleMessage.showMessage(CreateBackupActivity.this, R.string.msg_general_error);
+                return;
+            }
+        }
+
+        Intent createDocument = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        createDocument.addCategory(Intent.CATEGORY_OPENABLE);
+        createDocument.setType("text/plain");
+        createDocument.putExtra(Intent.EXTRA_TITLE, filename);
+
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
+            createDocument.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+
+        startActivityForResult(createDocument, Values.ACTIVITY_CREATE_DOCUMENT);
+    }
+
+    public void deleteBackupFile() {
+        try {
+            DocumentsContract.deleteDocument(getContentResolver(), chosenUri);
+            Log.d(TAG, "deleteBackupFile(): Deleted URI " + chosenUri.toString());
+        }
+        catch( FileNotFoundException e ) {
+            Log.e(TAG, "deleteBackupFile(): Caught an exception:", e);
+            Log.d(TAG, "deleteBackupFile(): URI " + chosenUri.toString() + " does not exist");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if( requestCode == Values.ACTIVITY_CREATE_DOCUMENT ) {
+            if( resultCode == Activity.RESULT_OK ) {
+                chosenUri = data.getData();
+                Log.d(TAG, "Chosen URI is " + chosenUri.toString());
+                String f = chosenUri.getLastPathSegment().split(":")[1];
+                field_save_as.setText(f);
+            }
+            else {
+                UserVisibleMessage.showMessage(CreateBackupActivity.this, "Canceled.");
+            }
         }
     }
 }

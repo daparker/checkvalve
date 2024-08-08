@@ -20,6 +20,7 @@
 package com.dparker.apps.checkvalve.backup;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -31,6 +32,8 @@ import com.dparker.apps.checkvalve.Values;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -38,6 +41,7 @@ import java.util.Locale;
 public class BackupWriter implements Runnable {
     private static final String TAG = BackupWriter.class.getSimpleName();
 
+    private Uri fileUri;
     private String filename;
     private Context context;
     private Handler handler;
@@ -48,7 +52,17 @@ public class BackupWriter implements Runnable {
     public BackupWriter(Context context, String filename, boolean includeServers, boolean includeSettings, Handler handler) {
         this.context = context;
         this.handler = handler;
+        this.fileUri = null;
         this.filename = filename;
+        this.includeServers = includeServers;
+        this.includeSettings = includeSettings;
+    }
+
+    public BackupWriter(Context context, Uri fileUri, boolean includeServers, boolean includeSettings, Handler handler) {
+        this.context = context;
+        this.handler = handler;
+        this.fileUri = fileUri;
+        this.filename = null;
         this.includeServers = includeServers;
         this.includeSettings = includeSettings;
     }
@@ -72,8 +86,11 @@ public class BackupWriter implements Runnable {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.getDefault());
         String timestamp = sdf.format(new Date());
         String version = context.getString(R.string.app_version);
-        File backupFile = new File(filename);
         File filesDir = context.getFilesDir();
+        File backupFile = new File(filesDir, Values.FILE_DUMMY_TEMP);
+
+        OutputStream os;
+        BufferedWriter bw;
 
         File[] markerFiles = new File[]{
                 new File(filesDir, Values.FILE_HIDE_CHAT_RELAY_NOTE),
@@ -84,7 +101,15 @@ public class BackupWriter implements Runnable {
             if( database == null )
                 database = new DatabaseProvider(context);
 
-            BufferedWriter bw = new BufferedWriter(new FileWriter(backupFile));
+            if( fileUri != null ) {
+                os = context.getContentResolver().openOutputStream(fileUri);
+                bw = new BufferedWriter(new OutputStreamWriter(os));
+            }
+            else {
+                backupFile = new File(filename);
+                bw = new BufferedWriter(new FileWriter(backupFile));
+            }
+
             StringBuilder sb = database.getBackupData(includeServers, includeSettings);
             int versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
             int backupVersion = 1;
@@ -123,15 +148,14 @@ public class BackupWriter implements Runnable {
             else {
                 Log.e(TAG, "saveBackupFile(): getBackupData() returned a null value!");
                 bw.close();
-                backupFile.delete();
+                if( filename != null ) backupFile.delete();
                 return 1;
             }
         }
         catch( Exception e ) {
             Log.e(TAG, "saveBackupFile(): Caught an exception:", e);
-            backupFile.delete();
+            if( filename != null ) backupFile.delete();
             throw e;
-            //return 2;
         }
         finally {
             database.close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -33,16 +33,16 @@ import java.util.concurrent.TimeoutException;
 public class RconAuth implements Runnable {
     private static final String TAG = RconAuth.class.getSimpleName();
 
-    private Handler handler;
-    private String password;
-    private GameServer srv;
+    private final Handler handler;
+    private final String password;
+    private final GameServer srv;
     private Object obj;
 
     /**
      * Class for authenticating RCON.
      *
      * @param p The RCON password to use
-     * @param g The GameServer on which to execute the command
+     * @param s The GameServer on which to execute the command
      * @param h The Handler to use
      */
     public RconAuth(String p, GameServer s, Handler h) {
@@ -55,9 +55,7 @@ public class RconAuth implements Runnable {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         Message msg = new Message();
-        int status = rconAuthenticate();
-
-        msg.what = status;
+        msg.what = rconAuthenticate();
 
         if( obj != null )
             msg.obj = obj;

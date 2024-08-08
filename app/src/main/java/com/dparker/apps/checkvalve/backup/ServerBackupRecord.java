@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -20,10 +20,15 @@
 package com.dparker.apps.checkvalve.backup;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.dparker.apps.checkvalve.exceptions.InvalidBackupFileException;
 
+import java.nio.charset.StandardCharsets;
+
 public class ServerBackupRecord {
+    private static final String TAG = ServerBackupRecord.class.getSimpleName();
+
     private String url;
     private String rcon;
     private String name;
@@ -123,13 +128,13 @@ public class ServerBackupRecord {
         }
 
         try {
-            if( s.length() > 0 )
-                rcon = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
+            if( ! s.isEmpty() )
+                rcon = new String(Base64.decode(s, Base64.DEFAULT), StandardCharsets.UTF_8);
             else
                 rcon = s;
         }
         catch( Exception e ) {
-            e.printStackTrace();
+            Log.e(TAG, "setRCONPassword(): Caught an exception:", e);
         }
     }
 

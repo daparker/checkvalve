@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -24,14 +24,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -49,6 +47,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.github.koraktor.steamcondenser.exceptions.RCONBanException;
 import com.github.koraktor.steamcondenser.exceptions.RCONNoAuthException;
@@ -100,7 +100,7 @@ public class RconActivity extends Activity {
 
             command = field_command.getText().toString().trim();
 
-            if( command.length() == 0 )
+            if( command.isEmpty() )
                 UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_empty_rcon_command);
             else
                 sendCommand(false);
@@ -115,7 +115,7 @@ public class RconActivity extends Activity {
             if( e.getKeyCode() == KeyEvent.KEYCODE_ENTER && e.getAction() == KeyEvent.ACTION_UP ) {
                 command = field_command.getText().toString().trim();
 
-                if( command.length() == 0 )
+                if( command.isEmpty() )
                     UserVisibleMessage.showMessage(RconActivity.this, R.string.msg_empty_rcon_command);
                 else
                     sendCommand(false);
@@ -196,7 +196,7 @@ public class RconActivity extends Activity {
                 srv = (GameServer) msg.obj;
 
                 if( !rconIsAuthenticated ) {
-                    if( password.length() == 0 )
+                    if( password.isEmpty() )
                         getPassword(context);
                     else
                         rconAuthenticate();
@@ -260,11 +260,11 @@ public class RconActivity extends Activity {
                     srv = (GameServer) msg.obj;
                     break;
                 case 1:
-                    Log.d(TAG, "rconAuthHandler [" + msg.toString() + "]");
+                    Log.d(TAG, "rconAuthHandler [" + msg + "]");
 
                     try {
                         Log.d(TAG, "Message object string = " + msg.obj.toString());
-                        Log.d(TAG, "Message object class = " + msg.obj.getClass().toString());
+                        Log.d(TAG, "Message object class = " + msg.obj.getClass());
 
                         if( msg.obj.getClass() == RCONNoAuthException.class ) {
                             // Failed authentication
@@ -345,10 +345,8 @@ public class RconActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         context = RconActivity.this;
         settings = Values.getSettings(RconActivity.this);
@@ -385,7 +383,7 @@ public class RconActivity extends Activity {
         sending.setVisibility(View.INVISIBLE);
 
         String[] commandList = getCommandList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, commandList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.autocomplete_textview_custom, commandList);
 
         field_command = findViewById(R.id.rcon_field_command);
         field_command.setAdapter(adapter);
@@ -403,7 +401,7 @@ public class RconActivity extends Activity {
             unsafeCommands = null;
 
         if( enableHistory ) {
-            commandHistory = new ArrayList<String>();
+            commandHistory = new ArrayList<>();
             commandHistory.add(0, "");
             last = 0;
             pos = 0;
@@ -457,7 +455,7 @@ public class RconActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 

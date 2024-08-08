@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -24,9 +24,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -34,6 +31,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
@@ -81,10 +79,8 @@ public class CheckValve extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.main);
 
@@ -95,13 +91,13 @@ public class CheckValve extends Activity {
         queryIsRunning = false;
 
         selectedServerRowId = 0;
-        server_info_table = (TableLayout) findViewById(R.id.checkvalve_server_info_table);
-        message_table = (TableLayout) findViewById(R.id.checkvalve_message_table);
+        server_info_table = findViewById(R.id.checkvalve_server_info_table);
+        message_table = findViewById(R.id.checkvalve_message_table);
         message_table.setVisibility(View.INVISIBLE);
 
         this.findViewById(R.id.checkvalve_debug_button).setOnClickListener(debugButtonListener);
 
-        TextView titleBar = (TextView) findViewById(R.id.checkvalve_title);
+        TextView titleBar = findViewById(R.id.checkvalve_title);
         titleBar.setOnLongClickListener(titleBarClickListener);
 
         Log.d(TAG, "onCreate(): Getting settings");
@@ -172,14 +168,13 @@ public class CheckValve extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         int menuResId;
 
-        if( debugMode == true )
+        if( debugMode )
             menuResId = R.menu.main_menu_debug;
         else
             menuResId = R.menu.main_menu;
@@ -191,57 +186,46 @@ public class CheckValve extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.quit:
-                // "Quit" option was selected
-                quit();
-                break;
-
-            case R.id.new_server:
-                // "Add New Server" option was selected
-                addNewServer();
-                break;
-
-            case R.id.manage_servers:
-                // "Manage Server List" option was selected
-                if( database.getServerCount() == 0 )
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
-                else
-                    manageServers();
-
-                break;
-
-            case R.id.player_search:
-                // "Player Search" option was selected
-                if( database.getServerCount() == 0 )
-                    UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
-                else
-                    playerSearch();
-
-                break;
-
-            case R.id.refresh:
-                // "Refresh" option was selected
-                queryServers();
-                break;
-
-            case R.id.about:
-                // "About" option was selected
-                about();
-                break;
-
-            case R.id.settings:
-                // "Settings" option was selected
-                settings();
-                break;
-
-            case R.id.debug:
-                // "Debug" option was clicked
-                showDebugConsole();
-                break;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.quit ) {
+            // "Quit" option was selected
+            quit();
+        }
+        else if ( item.getItemId() == R.id.new_server ) {
+            // "Add New Server" option was selected
+            addNewServer();
+        }
+        else if( item.getItemId() == R.id.manage_servers ) {
+            // "Manage Server List" option was selected
+            if (database.getServerCount() == 0)
+                UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
+            else
+                manageServers();
+        }
+        else if( item.getItemId() == R.id.player_search ) {
+            // "Player Search" option was selected
+            if (database.getServerCount() == 0)
+                UserVisibleMessage.showMessage(CheckValve.this, R.string.msg_empty_server_list);
+            else
+                playerSearch();
+        }
+        else if( item.getItemId() == R.id.refresh ) {
+            // "Refresh" option was selected
+            queryServers();
+        }
+        else if( item.getItemId() == R.id.about ) {
+            // "About" option was selected
+            about();
+        }
+        else if( item.getItemId() == R.id.settings ) {
+            // "Settings" option was selected
+            settings();
+        }
+        else if( item.getItemId() == R.id.debug ) {
+            // "Debug" option was clicked
+            showDebugConsole();
+        }
+        else {
+            return super.onOptionsItemSelected(item);
         }
 
         return true;
@@ -251,7 +235,7 @@ public class CheckValve extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        selectedServerRowId = (long) v.getId();
+        selectedServerRowId = v.getId();
 
         // Inflate the context menu
         MenuInflater inflater = getMenuInflater();
@@ -262,32 +246,31 @@ public class CheckValve extends Activity {
     public boolean onContextItemSelected(MenuItem item) {
         long id = selectedServerRowId;
 
-        switch( item.getItemId() ) {
-            case R.id.rcon:
-                // "RCON" option was selected
-                rcon(id);
-                break;
-            case R.id.view_chat:
-                // "View Chat" option was selected
-                chat(id);
-                break;
-            case R.id.show_players:
-                // "Show Players" option was selected
-                showPlayers(id);
-                break;
-            case R.id.edit_server:
-                // "Edit Server" option was selected
-                updateServer(id);
-                break;
-            case R.id.delete_server:
-                // "Delete Server" option was selected
-                deleteServer(id);
-                break;
-            case R.id.cancel:
-                // "Cancel" option was selected
-                break;
-            default:
-                return super.onContextItemSelected(item);
+        if( item.getItemId() == R.id.rcon ) {
+            // "RCON" option was selected
+            rcon(id);
+        }
+        else if( item.getItemId() == R.id.view_chat ) {
+            // "View Chat" option was selected
+            chat(id);
+        }
+        else if( item.getItemId() == R.id.show_players ) {
+            // "Show Players" option was selected
+            showPlayers(id);
+        }
+        else if( item.getItemId() == R.id.edit_server ) {
+            // "Edit Server" option was selected
+            updateServer(id);
+        }
+        else if( item.getItemId() == R.id.delete_server ) {
+            // "Delete Server" option was selected
+            deleteServer(id);
+        }
+        else if( item.getItemId() == R.id.cancel ) {
+            // "Cancel" option was selected
+        }
+        else {
+            return super.onContextItemSelected(item);
         }
 
         return true;
@@ -355,7 +338,7 @@ public class CheckValve extends Activity {
     }
 
     // Define the touch listener for table rows
-    private OnTouchListener tableRowTouchListener = new OnTouchListener() {
+    private final OnTouchListener tableRowTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             int id = v.getId();
             int action = m.getAction();
@@ -379,7 +362,7 @@ public class CheckValve extends Activity {
     };
 
     // Define the focus change listener for table rows
-    private OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener() {
+    private final OnFocusChangeListener tableRowFocusChangeListener = new OnFocusChangeListener() {
         public void onFocusChange(View v, boolean f) {
             int id = v.getId();
             int count = server_info_table.getChildCount();
@@ -391,14 +374,14 @@ public class CheckValve extends Activity {
         }
     };
 
-    private OnLongClickListener titleBarClickListener = new OnLongClickListener() {
+    private final OnLongClickListener titleBarClickListener = new OnLongClickListener() {
         public boolean onLongClick(View v) {
             toggleDebugMode();
             return true;
         }
     };
 
-    private OnClickListener debugButtonListener = new OnClickListener() {
+    private final OnClickListener debugButtonListener = new OnClickListener() {
         public void onClick(View v) {
             v.setBackgroundColor(CheckValve.this.getResources().getColor(R.color.steam_blue));
             showDebugConsole();
@@ -441,7 +424,7 @@ public class CheckValve extends Activity {
     }
 
     // Handler for the server query thread
-    Handler progressHandler = new Handler() {
+    Handler progressHandler = new Handler(Looper.myLooper()) {
         public void handleMessage(Message msg) {
             queryIsRunning = false;
 
@@ -505,7 +488,7 @@ public class CheckValve extends Activity {
                     serverValue.setId(i * 300);
 
                     if( settings.getBoolean(Values.SETTING_USE_SERVER_NICKNAME) ) {
-                        serverValue.setText((serverNickname.length() > 0) ? serverNickname : serverName);
+                        serverValue.setText((!serverNickname.isEmpty()) ? serverNickname : serverName);
                     }
                     else {
                         serverValue.setText(serverName);
@@ -546,7 +529,7 @@ public class CheckValve extends Activity {
                     gameValue.setPadding(3, 0, 3, 0);
                     gameValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-                    if( gameVersion.length() > 0 )
+                    if( ! gameVersion.isEmpty() )
                         gameValue.setText(serverGame + " [" + gameVersion + "]");
                     else
                         gameValue.setText(serverGame);
@@ -596,7 +579,7 @@ public class CheckValve extends Activity {
                     tagsValue.setPadding(3, 0, 3, 0);
                     tagsValue.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-                    if( serverTags.length() > 0 )
+                    if( ! serverTags.isEmpty() )
                         tagsValue.setText(serverTags);
                     else
                         tagsValue.setText(CheckValve.this.getText(R.string.msg_no_tags));
@@ -713,12 +696,6 @@ public class CheckValve extends Activity {
                             spacerRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     );
-                    /*
-                    server_info_table.addView(
-                            nicknameRow,
-                            new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-                    );
-                    */
                     server_info_table.addView(
                             serverRow,
                             new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -784,12 +761,6 @@ public class CheckValve extends Activity {
 
         server_info_table.invalidate();
     }
-
-    //    public Bundle getSettings() {
-    //        if( database == null ) database = new DatabaseProvider(CheckValve.this);
-    //        Bundle s = database.getSettingsAsBundle();
-    //        return s;
-    //    }
 
     public void checkServiceState() {
         serviceIntent = new Intent(this, BackgroundQueryService.class);
@@ -859,12 +830,7 @@ public class CheckValve extends Activity {
     }
 
     public void showPlayers(final long rowId) {
-        final ServerRecord sr = database.getServer(rowId);
-        final String server = sr.getServerURL();
-        final int port = sr.getServerPort();
-        final int timeout = sr.getServerTimeout();
-
-        final Handler playerQueryHandler = new Handler() {
+        final Handler playerQueryHandler = new Handler(Looper.myLooper()) {
             @SuppressWarnings("unchecked")
             public void handleMessage(Message msg) {
                 p.dismiss();
@@ -895,7 +861,6 @@ public class CheckValve extends Activity {
 
         p = ProgressDialog.show(this, "", getText(R.string.status_querying_servers), true, false);
 
-        //new Thread(new ChallengeResponseQuery(server, port, timeout, rowId, challengeResponseHandler)).start();
         new Thread(new QueryPlayers(CheckValve.this, rowId, playerQueryHandler)).start();
     }
 
@@ -982,7 +947,7 @@ public class CheckValve extends Activity {
         chatIntent.putExtra(Values.EXTRA_TIMEOUT, t);
         chatIntent.putExtra(Values.EXTRA_PASSWORD, r);
 
-        if( n != null && n.length() > 0 ) {
+        if( n != null && (! n.isEmpty()) ) {
             chatIntent.putExtra(Values.EXTRA_NICKNAME, n);
         }
         startActivityForResult(chatIntent, Values.ACTIVITY_CHAT);

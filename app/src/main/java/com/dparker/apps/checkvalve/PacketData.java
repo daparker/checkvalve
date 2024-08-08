@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -23,13 +23,14 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 /*
  * Define the PacketData class
  */
 public class PacketData {
     private static final String TAG = PacketData.class.getSimpleName();
-    private ByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
 
     /**
      * Construct a new instance of the PacketData class.
@@ -115,13 +116,12 @@ public class PacketData {
     public String getString() {
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.get();
 
-        String str = new String(tmpArray);
-        return str;
+        return new String(tmpArray);
     }
 
     /**
@@ -138,13 +138,12 @@ public class PacketData {
 
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.position(oldPos);
 
-        String str = new String(tmpArray);
-        return str;
+        return new String(tmpArray);
     }
 
     /**
@@ -158,14 +157,13 @@ public class PacketData {
     public String getString(String characterSet) {
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.get();
 
         try {
-            String str = new String(tmpArray, characterSet);
-            return str;
+            return new String(tmpArray, characterSet);
         }
         catch( Exception e ) {
             Log.w(TAG, "getString(): Caught an exception:", e);
@@ -188,14 +186,13 @@ public class PacketData {
 
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.position(oldPos);
 
         try {
-            String str = new String(tmpArray, characterSet);
-            return str;
+            return new String(tmpArray, characterSet);
         }
         catch( Exception e ) {
             Log.w(TAG, "getStringAt(): Caught an exception:", e);
@@ -215,14 +212,13 @@ public class PacketData {
     public String getUTF8String() {
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.get();
 
         try {
-            String str = new String(tmpArray, "UTF-8");
-            return str;
+            return new String(tmpArray, StandardCharsets.UTF_8);
         }
         catch( Exception e ) {
             Log.w(TAG, "getUTF8String(): Caught an exception:", e);
@@ -246,14 +242,13 @@ public class PacketData {
 
         int pos = byteBuffer.position();
         int len = 0;
-        while( byteBuffer.get(pos++) != (byte) 0x00 ) len++;
+        while( byteBuffer.get(pos++) != Values.BYTE_ZERO ) len++;
         byte[] tmpArray = new byte[len];
         byteBuffer.get(tmpArray, 0, tmpArray.length);
         byteBuffer.position(oldPos);
 
         try {
-            String str = new String(tmpArray, "UTF-8");
-            return str;
+            return new String(tmpArray, StandardCharsets.UTF_8);
         }
         catch( Exception e ) {
             Log.w(TAG, "getUTF8StringAt(): Caught an exception:", e);
@@ -306,8 +301,7 @@ public class PacketData {
      * after the end of the String.
      */
     public void skipString() {
-        while( byteBuffer.hasRemaining() && (byteBuffer.get() != (byte) 0x00) ) {
-        }
+        while( byteBuffer.hasRemaining() && (byteBuffer.get() != Values.BYTE_ZERO) ) { }
     }
 
     /**

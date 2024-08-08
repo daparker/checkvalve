@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -26,19 +26,19 @@ import android.util.Log;
 import com.github.koraktor.steamcondenser.servers.GameServer;
 
 public class RconQuery implements Runnable {
-    private Handler handler;
-    private String response;
-    private String command;
-    private GameServer srv;
-    private Object obj;
-
     private static final String TAG = RconQuery.class.getSimpleName();
+
+    private final Handler handler;
+    private final String command;
+    private final GameServer srv;
+    private String response;
+    private Object obj;
 
     /**
      * Class for executing commands via RCON.
      *
      * @param c The command to execute
-     * @param g The GameServer on which to execute the command
+     * @param s The GameServer on which to execute the command
      * @param h The Handler to use
      */
     public RconQuery(String c, GameServer s, Handler h) {
@@ -51,9 +51,7 @@ public class RconQuery implements Runnable {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         Message msg = new Message();
-        int status = getRconResponse();
-
-        msg.what = status;
+        msg.what = getRconResponse();
 
         if( obj != null )
             msg.obj = obj;

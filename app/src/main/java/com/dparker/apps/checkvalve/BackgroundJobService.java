@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -32,8 +32,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Message;
-//import android.support.v4.app.NotificationCompat;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.os.Handler;
 
@@ -72,7 +70,7 @@ public class BackgroundJobService extends JobService {
                 }
             }
             else {
-                Log.w(TAG, "Background query is still running on thread " + q.toString());
+                Log.w(TAG, "Background query is still running on thread " + q);
             }
         }
     };
@@ -241,13 +239,7 @@ public class BackgroundJobService extends JobService {
             }
 
             nb.setDefaults(defaults);
-
-            if( Build.VERSION.SDK_INT < 16 ) {
-                n = nb.getNotification();
-            }
-            else {
-                n = nb.build();
-            }
+            n = nb.build();
 
             // Show the notification
             Log.d(TAG, "handleNotification(): Showing notification.");

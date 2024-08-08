@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -36,9 +36,9 @@ public class QueryPlayers implements Runnable {
     private static final String TAG = QueryPlayers.class.getSimpleName();
 
     private int status;
-    private long rowId;
-    private Context context;
-    private Handler handler;
+    private final long rowId;
+    private final Context context;
+    private final Handler handler;
 
     public QueryPlayers(Context context, long rowId, Handler handler) {
         this.context = context;
@@ -70,25 +70,18 @@ public class QueryPlayers implements Runnable {
         DatagramPacket packetIn;
 
         // Player array to be returned
-        ArrayList<PlayerRecord> playerList = null;
+        ArrayList<PlayerRecord> playerList;
 
         String[] packets;
+        String serverURL;
+        String name;
+        String totaltime;
 
-        // String variables
-        String serverURL = new String();
-
-        // Integer variables
-        int index = 0;
-        int serverPort = 0;
-        int serverTimeout = 0;
-
-        serverURL = sr.getServerURL();
-        serverPort = sr.getServerPort();
-        serverTimeout = sr.getServerTimeout();
-
-        int header = 0;
-        String name = new String();
-        String totaltime = new String();
+        int kills;
+        int index;
+        int header;
+        int serverPort;
+        int serverTimeout;
 
         short numplayers = 0;
         short numpackets = 0;
@@ -97,8 +90,11 @@ public class QueryPlayers implements Runnable {
         short minutes = 0;
         short seconds = 0;
 
-        int kills = 0;
-        float time = 0;
+        float time;
+
+        serverURL = sr.getServerURL();
+        serverPort = sr.getServerPort();
+        serverTimeout = sr.getServerTimeout();
 
         try {
             // Byte array for the incoming data
@@ -169,8 +165,8 @@ public class QueryPlayers implements Runnable {
                      */
 
                     bufferIn.getInt();    // Discard the answer ID
-                    numpackets = (short) bufferIn.get();
-                    thispacket = (short) bufferIn.get();
+                    numpackets = bufferIn.get();
+                    thispacket = bufferIn.get();
                     bufferIn.get();       // Discard the next byte
 
                     // Initialize the array to hold the number of packets in this response
@@ -179,7 +175,7 @@ public class QueryPlayers implements Runnable {
                     // If this is packet 0 then skip the next 5 header bytes
                     if (thispacket == 0) {
                         bufferIn.position(bufferIn.position() + 6);
-                        numplayers = (short) bufferIn.get();
+                        numplayers = bufferIn.get();
                     }
 
                     packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
@@ -192,13 +188,13 @@ public class QueryPlayers implements Runnable {
 
                         // Get rid of 12 header bytes
                         bufferIn.position(9);
-                        thispacket = (short) bufferIn.get();
+                        thispacket = bufferIn.get();
                         bufferIn.position(bufferIn.position() + 2);
 
                         // If this is packet 0 then skip the next 6 header bytes
                         if (thispacket == 0) {
                             bufferIn.position(bufferIn.position() + 6);
-                            numplayers = (short) bufferIn.get();
+                            numplayers = bufferIn.get();
                         }
 
                         packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
@@ -206,7 +202,7 @@ public class QueryPlayers implements Runnable {
                 } else {
                     // Get number of players (6th byte)
                     bufferIn.get();
-                    numplayers = (short) bufferIn.get();
+                    numplayers = bufferIn.get();
                     packets = new String[]{new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1")};
                 }
 
@@ -218,18 +214,14 @@ public class QueryPlayers implements Runnable {
                 }
 
                 // Initialize the return array once we know how many elements we need
-                playerList = new ArrayList<PlayerRecord>();
+                playerList = new ArrayList<>();
 
                 for (int i = 0; i < numpackets; i++) {
                     byte[] byteArray = packets[i].getBytes("ISO8859_1");
                     PacketData pd = new PacketData(byteArray);
 
                     while (pd.hasRemaining()) {
-                        name = new String();
-                        totaltime = new String();
-                        kills = 0;
-
-                        index = (int) pd.getByte(); // Get this player's index
+                        index = pd.getByte(); // Get this player's index
                         name = pd.getUTF8String(); // Determine the length of the player name
                         kills = pd.getInt();       // Get the number of kills
                         time = pd.getFloat();      // Get the connected time
@@ -249,7 +241,6 @@ public class QueryPlayers implements Runnable {
                         totaltime = hourString + ":" + minuteString + ":" + secondString;
 
                         Log.d(TAG, "Adding player [index=" + index + "][name=" + name + "][kills=" + kills + "][time=" + totaltime + "]");
-
                         playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                     }
                 }

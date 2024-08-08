@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -23,13 +23,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.dparker.apps.checkvalve.R;
 import com.dparker.apps.checkvalve.Values;
@@ -44,7 +45,7 @@ public class FileChooserActivity extends Activity {
     private TextView current_folder;
     private TextView no_files;
     private File storageDir;
-    private ArrayList<String> breadcrumbs = new ArrayList<String>();
+    private final ArrayList<String> breadcrumbs = new ArrayList<>();
 
     final OnClickListener dismissButtonListener = new OnClickListener() {
         public void onClick(View v) {
@@ -96,9 +97,9 @@ public class FileChooserActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.file_chooser);
 
-        file_list_layout = (LinearLayout) findViewById(R.id.filechooser_file_list_layout);
-        current_folder = (TextView) findViewById(R.id.filechooser_current_folder);
-        no_files = (TextView) findViewById(R.id.filechooser_textview_no_files);
+        file_list_layout = findViewById(R.id.filechooser_file_list_layout);
+        current_folder = findViewById(R.id.filechooser_current_folder);
+        no_files = findViewById(R.id.filechooser_textview_no_files);
 
         this.findViewById(R.id.filechooser_dismiss_button).setOnClickListener(dismissButtonListener);
 
@@ -121,12 +122,12 @@ public class FileChooserActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
     public void showFiles(File directory) {
-        if( !(directory != null) ) {
+        if( directory == null ) {
             Log.e(TAG, "showFiles(): Directory object is null");
             return;
         }

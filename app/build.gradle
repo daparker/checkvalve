@@ -5,8 +5,8 @@ android {
 
     defaultConfig {
         applicationId "com.dparker.apps.checkvalve"
-        minSdkVersion 14
-        targetSdkVersion 33
+        minSdkVersion 19
+        targetSdkVersion 34
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -25,5 +25,5 @@ android {
 dependencies {
     implementation files('libs/commons-compress-1.1.jar')
     implementation files('libs/commons-lang3-3.3.2.jar')
-    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.core:core:1.13.1'
 }

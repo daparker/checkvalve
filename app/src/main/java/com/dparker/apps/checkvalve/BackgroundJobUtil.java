@@ -1,3 +1,22 @@
+/*
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
+ *
+ * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
+ *
+ * CheckValve is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ *
+ * CheckValve is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the CheckValve source code.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package com.dparker.apps.checkvalve;
 
 import android.annotation.TargetApi;
@@ -24,8 +43,8 @@ public class BackgroundJobUtil {
             Bundle settings = Values.getSettings(context);
 
             int delay = settings.getInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY);
-            long minLatency = (delay * 60000);
-            long maxLatency = ((delay+1) * 60000);
+            long minLatency = (delay * 60000L);
+            long maxLatency = ((delay+1) * 60000L);
 
             builder.setMinimumLatency(minLatency);
             builder.setOverrideDeadline(maxLatency);

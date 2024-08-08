@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -24,8 +24,8 @@ package com.dparker.apps.checkvalve;
  * Define the ServerRecord class
  */
 public class ServerRecord {
+    private final String url;
     private String name;
-    private String url;
     private String rcon;
     private int port;
     private int timeout;

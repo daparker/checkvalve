@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -20,8 +20,10 @@
 package com.dparker.apps.checkvalve.backup;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.dparker.apps.checkvalve.DatabaseProvider;
@@ -30,20 +32,21 @@ import com.dparker.apps.checkvalve.exceptions.InvalidBackupFileException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
 
 public class BackupParser implements Runnable {
     private static final String TAG = BackupParser.class.getSimpleName();
 
+    private Uri u;
     private String f;
-    private Handler h;
-    private Context c;
     private DatabaseProvider database;
     private ServerBackupRecord[] servers;
     private SettingBackupRecord[] settings;
-    private VersionBackupRecord versionInfo;
     private String[] flags;
+    private final Handler h;
+    private final Context c;
 
     public BackupParser(Context context, String filename, Handler handler) {
         this.c = context;
@@ -51,11 +54,17 @@ public class BackupParser implements Runnable {
         this.h = handler;
     }
 
+    public BackupParser(Context context, Uri uri, Handler handler) {
+        this.c = context;
+        this.u = uri;
+        this.h = handler;
+    }
+
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
         Bundle b = new Bundle();
         boolean result = false;
-        int what = 0;
+        int what;
 
         try {
             database = new DatabaseProvider(c);
@@ -87,31 +96,44 @@ public class BackupParser implements Runnable {
     }
 
     public boolean getBackupData() throws InvalidBackupFileException {
-        File file = new File(f);
+        ParcelFileDescriptor pfd = null;
+        BufferedReader reader;
 
-        // Don't open a file larger than 1 MB
-        if( file.length() > 1048576 )
-            throw new InvalidBackupFileException();
+        try {
+            if( u != null )
+                pfd = c.getContentResolver().openFileDescriptor(u, "r");
+            else
+                pfd = ParcelFileDescriptor.open(new File(f), ParcelFileDescriptor.MODE_READ_ONLY);
+        }
+        catch( FileNotFoundException e ) {
+            Log.e(TAG, "getBackupData(): Caught an exception:", e);
+        }
 
-        file = null;
-
-        String line = new String();
+        String line;
         int numServers = 0;
         int numSettings = 0;
         int numFlags = 0;
-        int numVersionBackupRecords = 0;
+        int numVersions = 0;
         boolean PARSING_SERVER = false;
         boolean PARSING_SETTING = false;
         boolean PARSING_VERSION = false;
         boolean PARSING_FLAG = false;
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(f));
+            // Don't open a file larger than 1 MB
+            if ( pfd.getStatSize() > 1048576 ) {
+                Log.e(TAG, "getBackupData(): Selected file exceeds maximum allowed size.");
+                throw new InvalidBackupFileException();
+            }
+
+            // Create a new reader and set a mark at the beginning of the file
+            reader = new BufferedReader(new FileReader(pfd.getFileDescriptor()));
+            reader.mark((int)pfd.getStatSize()+1);
 
             // First pass: count the number of server, setting, version, and flag stanzas
             while( (line = reader.readLine()) != null ) {
                 if( line.equals("[version]") )
-                    numVersionBackupRecords++;
+                    numVersions++;
                 else if( line.equals("[server]") )
                     numServers++;
                 else if( line.equals("[setting]") )
@@ -120,23 +142,23 @@ public class BackupParser implements Runnable {
                     numFlags++;
             }
 
-            reader.close();
-
             // If there is not exactly 1 version stanza then the file is invalid
-            if( numVersionBackupRecords != 1 ) {
-                Log.e(TAG, "getBackupData(): File must contain exactly ONE version stanza (found " + numVersionBackupRecords + ").");
+            if( numVersions != 1 ) {
+                Log.e(TAG, "getBackupData(): File must contain exactly ONE version stanza (found " + numVersions + ").");
                 throw new InvalidBackupFileException();
             }
 
-            Log.i(TAG, "getBackupData(): Found " + numServers + " servers.");
-            Log.i(TAG, "getBackupData(): Found " + numSettings + " settings.");
-            Log.i(TAG, "getBackupData(): Found " + numFlags + " flags.");
+            Log.i(TAG, "getBackupData(): Found " + numServers + " server(s).");
+            Log.i(TAG, "getBackupData(): Found " + numSettings + " setting(s).");
+            Log.i(TAG, "getBackupData(): Found " + numFlags + " flag(s).");
 
             // Correctly-sized arrays for the backup data
             servers = new ServerBackupRecord[numServers];
             settings = new SettingBackupRecord[numSettings];
             flags = new String[numFlags];
-            versionInfo = new VersionBackupRecord();
+
+            // Version record
+            VersionBackupRecord versionInfo = new VersionBackupRecord();
 
             // Counters
             int serverRecordNum = 0;
@@ -146,14 +168,15 @@ public class BackupParser implements Runnable {
             int dataLine = 0;
             int x = 0;
 
-            reader = new BufferedReader(new FileReader(f));
+            // Move the reader back to the beginning of the file
+            reader.reset();
 
             // Second pass: do the heavy lifting
             while( (line = reader.readLine()) != null ) {
                 lineNumber++;
                 line = line.trim();
 
-                if( line.length() == 0 || line.charAt(0) == '#' ) continue;
+                if( line.isEmpty() || line.charAt(0) == '#' ) continue;
 
                 dataLine++;
 
@@ -167,7 +190,7 @@ public class BackupParser implements Runnable {
                     }
                     else {
                         reader.close();
-                        Log.e(TAG, "Backup data does not start with a version stanza");
+                        Log.e(TAG, "getBackupData(): Backup data does not start with a version stanza");
                         throw new InvalidBackupFileException();
                     }
                 }
@@ -322,6 +345,8 @@ public class BackupParser implements Runnable {
                     }
                 }
             }
+
+            pfd.close();
         }
         catch( InvalidBackupFileException ibfe ) {
             Log.e(TAG, "getBackupData(): Caught an exception:", ibfe);
@@ -337,10 +362,10 @@ public class BackupParser implements Runnable {
 
     public Bundle getSettingsData() throws InvalidBackupFileException {
         Bundle b = new Bundle();
-        String type = new String();
-        String name = new String();
+        String type;
+        String name;
 
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
 
         map.put(DatabaseProvider.SETTINGS_RCON_DEFAULT_FONT_SIZE, Values.SETTING_RCON_DEFAULT_FONT_SIZE);
         map.put(DatabaseProvider.SETTINGS_DEFAULT_QUERY_PORT, Values.SETTING_DEFAULT_QUERY_PORT);
@@ -420,8 +445,8 @@ public class BackupParser implements Runnable {
             }
         }
 
-        if( newSettings.size() > 0 ) {
-            Log.i(TAG, "restoreBackupData(): Calling updateSettings() with Bundle " + newSettings.toString());
+        if( ! newSettings.isEmpty() ) {
+            Log.i(TAG, "restoreBackupData(): Calling updateSettings() with Bundle " + newSettings);
 
             if( database.updateSettings(newSettings) ) {
                 Log.i(TAG, "restoreBackupData(): Successfully updated settings in database");
@@ -438,7 +463,7 @@ public class BackupParser implements Runnable {
             try {
                 for( String s : flags ) {
                     File f = new File(filesDir, s);
-                    if( !f.exists() ) f.createNewFile();
+                    if( ! f.exists() ) f.createNewFile();
                 }
             }
             catch( Exception e ) {
@@ -456,7 +481,7 @@ public class BackupParser implements Runnable {
     public void sortServersByPosition() throws InvalidBackupFileException {
         ServerBackupRecord[] tmp = new ServerBackupRecord[servers.length];
 
-        int x = 0;    // The index in the new array
+        int x;    // The index in the new array
 
         for( ServerBackupRecord s : servers ) {
             x = s.getListPos() - 1;

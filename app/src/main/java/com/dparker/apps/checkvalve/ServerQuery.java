@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -37,16 +37,15 @@ import java.util.ArrayList;
 
 @SuppressLint("DefaultLocale")
 public class ServerQuery implements Runnable {
-    private DatagramSocket socket;
-    private Handler handler;
-    private Context context;
+    private static final String TAG = ServerQuery.class.getSimpleName();
+
+    private final Handler handler;
+    private final Context context;
+    private final boolean debug;
+    private final QueryDebugLog debugLog;
     private ArrayList<String> messages;
     private ServerInfo[] serverInfo;
     private int status;
-    private boolean debug;
-    private QueryDebugLog debugLog;
-
-    private static final String TAG = ServerQuery.class.getSimpleName();
 
     /**
      * Construct a new instance of the ServerQuery class for collecting server information.
@@ -84,7 +83,7 @@ public class ServerQuery implements Runnable {
         msg.what = status;
         msg.obj = b;
 
-        Log.d(TAG, "msg=" + msg.toString());
+        Log.d(TAG, "msg=" + msg);
         Log.d(TAG, "handler=" + handler.toString());
         Log.d(TAG, "Returning msg to handler");
         this.handler.sendMessage(msg);
@@ -108,20 +107,20 @@ public class ServerQuery implements Runnable {
         }
 
         serverInfo = new ServerInfo[serverList.length];
-        messages = new ArrayList<String>();
+        messages = new ArrayList<>();
 
         for( int i = 0; i < serverList.length; i++ ) {
             ServerRecord sr = serverList[i];
 
-            long startTime = 0L;
-            long endTime = 0L;
-            long requestTime = 0L;
-            long queryStart = 0L;
-            long queryEnd = 0L;
-            long queryTime = 0L;
-            long parseStart = 0L;
-            long parseEnd = 0L;
-            long parseTime = 0L;
+            long startTime;
+            long endTime;
+            long requestTime;
+            long queryStart;
+            long queryEnd;
+            long queryTime;
+            long parseStart;
+            long parseEnd;
+            long parseTime;
 
             queryStart = System.currentTimeMillis();
 
@@ -130,7 +129,7 @@ public class ServerQuery implements Runnable {
                 debugLog.addMessage("> Start time: " + queryStart);
             }
 
-            String serverName = new String();
+            String serverName;
             String serverURL = sr.getServerURL();
             String serverNickname = sr.getServerNickname();
             long serverRowId = sr.getServerRowID();
@@ -142,7 +141,7 @@ public class ServerQuery implements Runnable {
 
             // Use the nickname in error rows if there is one, otherwise use
             // the URL and port 
-            if( serverNickname.length() > 0 ) {
+            if( ! serverNickname.isEmpty() ) {
                 serverName = serverNickname;
             }
             else {
@@ -152,11 +151,11 @@ public class ServerQuery implements Runnable {
             }
 
             if( debug ) {
-                debugLog.addMessage("> Server: " + serverURL + ":" + Integer.toString(serverPort));
+                debugLog.addMessage("> Server: " + serverURL + ":" + serverPort);
             }
 
             try {
-                socket = new DatagramSocket();
+                DatagramSocket socket = new DatagramSocket();
                 socket.setSoTimeout(serverTimeout * 1000);
                 socketTimeout = socket.getSoTimeout();
 
@@ -173,7 +172,7 @@ public class ServerQuery implements Runnable {
                 // Show an error if the connection attempt failed
                 if( !socket.isConnected() ) {
                     serverInfo[i] = null;
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
 
                     if( debug ) {
                         debugLog.addMessage("> Socket connect failed!");
@@ -194,7 +193,7 @@ public class ServerQuery implements Runnable {
                     debugLog.addMessage(">   Local addr: " + localAddr);
                     debugLog.addMessage(">   Local port: " + localPort);
                     debugLog.addMessage(">   Remote addr: " + serverIP);
-                    debugLog.addMessage(">   Remote port: " + Integer.toString(serverPort));
+                    debugLog.addMessage(">   Remote port: " + serverPort);
                     debugLog.addMessage(">   Timeout: " + timeout);
                 }
 
@@ -205,7 +204,7 @@ public class ServerQuery implements Runnable {
                 socket.send(packetOut);
 
                 if( debug ) {
-                    debugLog.addMessage("> Sent query to " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Sent query to " + serverIP + ":" + serverPort);
                 }
 
                 // Receive the response packet from the server
@@ -215,7 +214,7 @@ public class ServerQuery implements Runnable {
                     Log.d(TAG, "queryServers(): Received a challenge response from " + serverName + ":" + serverPort);
 
                     if( debug ) {
-                        debugLog.addMessage("> Received challenge from " + serverIP + ":" + Integer.toString(serverPort));
+                        debugLog.addMessage("> Received challenge from " + serverIP + ":" + serverPort);
                     }
 
                     byte[] challengeResponse = new byte[] {
@@ -239,7 +238,7 @@ public class ServerQuery implements Runnable {
                 }
 
                 if( debug ) {
-                    debugLog.addMessage("> Received response from " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Received response from " + serverIP + ":" + serverPort);
                 }
 
                 // Get the end time of the request
@@ -252,7 +251,7 @@ public class ServerQuery implements Runnable {
                 socket.close();
 
                 if( debug ) {
-                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + Integer.toString(serverPort));
+                    debugLog.addMessage("> Disconnected from " + serverIP + ":" + serverPort);
                     debugLog.addMessage("> Request took " + requestTime + " ms");
                 }
 
@@ -268,7 +267,7 @@ public class ServerQuery implements Runnable {
                     String rcv = "0x" + String.format("%8s", Integer.toHexString(packetHeader)).replace(' ', '0').toUpperCase();
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
                     serverInfo[i] = null;
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
 
                     if( debug ) {
                         debugLog.addMessage("> ERROR: Invalid response header: " + rcv);
@@ -281,7 +280,7 @@ public class ServerQuery implements Runnable {
 
                 if( packetType == Values.BYTE_SOURCE_INFO ) {
                     // Parse response in the Source (and newer GoldSrc) format
-                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + Integer.toString(serverPort));
+                    Log.i(TAG, "Parsing Source Engine response from " + serverIP + ":" + serverPort);
 
                     if( debug ) {
                         debugLog.addMessage("> Response type: Source");
@@ -306,7 +305,7 @@ public class ServerQuery implements Runnable {
                 }
                 else if( packetType == Values.BYTE_GOLDSRC_INFO ) {
                     // Parse response in the old GoldSrc format
-                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + Integer.toString(serverPort));
+                    Log.i(TAG, "Parsing GoldSrc Engine response from " + serverIP + ":" + serverPort);
 
                     if( debug ) {
                         debugLog.addMessage("> Response type: GoldSrc");
@@ -332,10 +331,10 @@ public class ServerQuery implements Runnable {
                 else {
                     // Packet type did not match 0x49 or 0x6D
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ', '0').toUpperCase();
-                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + Integer.toString(serverPort)
+                    Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort
                             + " does not match expected values 0x49 or 0x6d");
                     serverInfo[i] = null;
-                    addErrorRow(serverName, serverListPos);
+                    addErrorRow(serverName);
 
                     if( debug ) {
                         debugLog.addMessage("> ERROR: Invalid response type: " + rcv);
@@ -349,14 +348,14 @@ public class ServerQuery implements Runnable {
                     debugLog.addMessage("> ERROR: Socket timed out after " + socketTimeout + " ms");
                 }
                 serverInfo[i] = null;
-                addErrorRow(serverName, serverListPos);
+                addErrorRow(serverName);
             }
             catch( Exception e ) {
                 if( debug ) {
-                    debugLog.addMessage("> ERROR: Caught an exception: " + e.toString());
+                    debugLog.addMessage("> ERROR: Caught an exception: " + e);
                 }
                 serverInfo[i] = null;
-                addErrorRow(serverName, serverListPos);
+                addErrorRow(serverName);
             }
 
             queryEnd = System.currentTimeMillis();
@@ -379,19 +378,20 @@ public class ServerQuery implements Runnable {
         }
     }
 
-    public void addErrorRow(String host, int pos) {
+    public void addErrorRow(String host) {
         String message = String.format(context.getString(R.string.msg_no_response), host);
         messages.add(message);
     }
 
     private ServerInfo parseResponseFromSRCDS(byte[] data) {
-        String name = new String();
-        String map = new String();
-        String game = new String();
-        String version = new String();
+        String name;
+        String map;
+        String game;
+        String version;
         String tags = new String();
-        int numPlayers = 0;
-        int maxPlayers = 0;
+
+        int numPlayers;
+        int maxPlayers;
 
         PacketData pd = new PacketData(data);
 
@@ -402,15 +402,15 @@ public class ServerQuery implements Runnable {
             pd.skipString();                // Skip the next string (game server path)
             game = pd.getUTF8String();      // Get the game description
             pd.skip(2);                     // Skip the next 2 bytes (Steam application ID)
-            numPlayers = (int) pd.getByte(); // Get the current number of players
-            maxPlayers = (int) pd.getByte(); // Get the maximum number of players
+            numPlayers = pd.getByte(); // Get the current number of players
+            maxPlayers = pd.getByte(); // Get the maximum number of players
             pd.skip(5);                     // Skip 5 bytes
             version = pd.getUTF8String();   // Get the game version
 
             // If we're not at the end of the array then get the additional data
             if( pd.hasRemaining() ) {
                 // This byte is the Extra Data Flag (EDF)
-                int EDF = (int) pd.getByte();
+                int EDF = pd.getByte();
 
                 // Skip the port number if included (2 bytes)
                 if( (EDF & 0x80) > 0 ) pd.skip(2);
@@ -448,7 +448,7 @@ public class ServerQuery implements Runnable {
 
             if( debug ) {
                 debugLog.addMessage("> ERROR: Exception while parsing:");
-                debugLog.addMessage("> " + e.toString());
+                debugLog.addMessage("> " + e);
             }
 
             return null;
@@ -456,13 +456,14 @@ public class ServerQuery implements Runnable {
     }
 
     public ServerInfo parseResponseFromHLDS(byte[] data) {
-        String name = new String();
-        String map = new String();
-        String game = new String();
+        String name;
+        String map;
+        String game;
         String version = new String();
         String tags = new String();
-        int numPlayers = 0;
-        int maxPlayers = 0;
+
+        int numPlayers;
+        int maxPlayers;
 
         PacketData pd = new PacketData(data);
 
@@ -473,8 +474,8 @@ public class ServerQuery implements Runnable {
             map = pd.getUTF8String();       // Get the map name
             pd.skipString();                // Skip the game server path
             game = pd.getUTF8String();      // Get the game description
-            numPlayers = (int) pd.getByte(); // Get the current number of players
-            maxPlayers = (int) pd.getByte(); // Get the maximum number of players
+            numPlayers = pd.getByte();      // Get the current number of players
+            maxPlayers = pd.getByte();      // Get the maximum number of players
 
             ServerInfo result = new ServerInfo();
             result.setName(name);

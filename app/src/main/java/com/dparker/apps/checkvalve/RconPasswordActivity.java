@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -31,27 +31,23 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+
 /*
  * Define the RconPassword class
  */
 public class RconPasswordActivity extends Activity {
-    private static Bundle settings;
-
     private EditText field_password;
-    private Button submit_button;
-    private Button cancel_button;
-
-    private String password;
     private Intent returned;
 
-    private OnClickListener submitButtonListener = new OnClickListener() {
+    private final OnClickListener submitButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Submit" button was clicked
              */
-            password = field_password.getText().toString().trim();
+            String password = field_password.getText().toString().trim();
 
-            if( password.length() == 0 ) {
+            if( password.isEmpty() ) {
                 UserVisibleMessage.showMessage(RconPasswordActivity.this, R.string.msg_empty_rcon_password);
             }
             else {
@@ -62,7 +58,7 @@ public class RconPasswordActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -81,19 +77,17 @@ public class RconPasswordActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.rconpassword);
 
-        settings = Values.getSettings(RconPasswordActivity.this);
+        Bundle settings = Values.getSettings(RconPasswordActivity.this);
 
-        returned = new Intent();
-
-        submit_button = (Button) findViewById(R.id.rconpassword_submit_button);
+        Button submit_button = findViewById(R.id.rconpassword_submit_button);
         submit_button.setOnClickListener(submitButtonListener);
 
-        cancel_button = (Button) findViewById(R.id.rconpassword_cancel_button);
+        Button cancel_button = findViewById(R.id.rconpassword_cancel_button);
         cancel_button.setOnClickListener(cancelButtonListener);
 
-        field_password = (EditText) findViewById(R.id.rconpassword_field_password);
+        field_password = findViewById(R.id.rconpassword_field_password);
 
-        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
+        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) ) {
             ((CheckBox) findViewById(R.id.rconpassword_checkbox_show_password)).setChecked(true);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
@@ -101,6 +95,8 @@ public class RconPasswordActivity extends Activity {
             ((CheckBox) findViewById(R.id.rconpassword_checkbox_show_password)).setChecked(false);
             field_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
+
+        returned = new Intent();
     }
 
     @Override
@@ -124,8 +120,7 @@ public class RconPasswordActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 }

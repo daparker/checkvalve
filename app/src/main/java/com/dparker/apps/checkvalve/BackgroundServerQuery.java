@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -35,8 +35,8 @@ import java.util.ArrayList;
 
 @SuppressLint("DefaultLocale")
 public class BackgroundServerQuery implements Runnable {
-    private Handler handler;
-    private Context context;
+    private final Handler handler;
+    private final Context context;
     private ArrayList<String> messages;
     private int status;
 
@@ -87,9 +87,7 @@ public class BackgroundServerQuery implements Runnable {
 
         messages = new ArrayList<>();
 
-        for( int i = 0; i < serverList.length; i++ ) {
-            ServerRecord sr = serverList[i];
-
+        for (ServerRecord sr : serverList) {
             String serverName;
             String serverURL = sr.getServerURL();
             String serverNickname = sr.getServerNickname();
@@ -97,10 +95,9 @@ public class BackgroundServerQuery implements Runnable {
             int serverTimeout = sr.getServerTimeout();
 
             // Use the nickname in error rows if there is one, otherwise use the URL and port
-            if( serverNickname.length() > 0 ) {
+            if ( ! serverNickname.isEmpty() ) {
                 serverName = serverNickname;
-            }
-            else {
+            } else {
                 serverName = serverURL
                         .concat(":")
                         .concat(Integer.toString(serverPort));
@@ -121,7 +118,7 @@ public class BackgroundServerQuery implements Runnable {
                 socket.connect(InetAddress.getByName(serverURL), serverPort);
 
                 // Show an error if the connection attempt failed
-                if( !socket.isConnected() ) {
+                if (!socket.isConnected()) {
                     addErrorRow(serverName);
                     continue;
                 }
@@ -135,10 +132,10 @@ public class BackgroundServerQuery implements Runnable {
                 socket.receive(packetIn);
 
                 // If we received a challenge response then send another query for the server info
-                if( arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE ) {
+                if (arrayIn[4] == Values.BYTE_CHALLENGE_RESPONSE) {
                     Log.d(TAG, "queryServers(): Received a challenge response from " + serverURL + ":" + serverPort);
 
-                    byte[] challengeResponse = new byte[] {
+                    byte[] challengeResponse = new byte[]{
                             arrayIn[5], arrayIn[6], arrayIn[7], arrayIn[8]
                     };
 
@@ -169,7 +166,7 @@ public class BackgroundServerQuery implements Runnable {
                 int packetHeader = bufferIn.getInt();
 
                 // Make sure the packet includes the expected header bytes
-                if( packetHeader != Values.INT_PACKET_HEADER ) {
+                if (packetHeader != Values.INT_PACKET_HEADER) {
                     String rcv = "0x" + String.format("%8s", Integer.toHexString(packetHeader)).replace(' ', '0').toUpperCase();
                     Log.w(TAG, "Packet header " + rcv + " does not match expected value 0xFFFFFFFF");
                     addErrorRow(serverName);
@@ -181,7 +178,7 @@ public class BackgroundServerQuery implements Runnable {
                 byte packetType = bufferIn.get();
 
                 // Make sure the packet type matches what we expect it to
-                if( packetType != Values.BYTE_SOURCE_INFO && packetType != Values.BYTE_GOLDSRC_INFO ) {
+                if (packetType != Values.BYTE_SOURCE_INFO && packetType != Values.BYTE_GOLDSRC_INFO) {
                     String rcv = "0x" + String.format("%2s", Byte.toString(packetType)).replace(' ', '0').toUpperCase();
 
                     Log.w(TAG, "Response type " + rcv + " from " + serverIP + ":" + serverPort
@@ -190,12 +187,10 @@ public class BackgroundServerQuery implements Runnable {
                     addErrorRow(serverName);
                     continue;
                 }
-            }
-            catch( SocketTimeoutException e ) {
+            } catch (SocketTimeoutException e) {
                 Log.d(TAG, "queryServers(): No response from server " + serverName);
                 addErrorRow(serverName);
-            }
-            catch( Exception e ) {
+            } catch (Exception e) {
                 Log.d(TAG, "queryServers(): Caught an exception:", e);
                 addErrorRow(serverName);
             }

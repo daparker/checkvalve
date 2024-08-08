@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -34,6 +34,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class ShowPlayersActivity extends Activity {
@@ -41,7 +43,6 @@ public class ShowPlayersActivity extends Activity {
 
     private DatabaseProvider database;
     private TableLayout player_info_table;
-    private Button x_button;
     ArrayList<PlayerRecord> playerList;
 
     @Override
@@ -52,10 +53,10 @@ public class ShowPlayersActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.showplayers);
 
-        x_button = (Button) this.findViewById(R.id.showplayers_x_button);
+        Button x_button = this.findViewById(R.id.showplayers_x_button);
         x_button.setOnClickListener(xButtonListener);
 
-        player_info_table = (TableLayout) findViewById(R.id.showplayers_player_info_table);
+        player_info_table = findViewById(R.id.showplayers_player_info_table);
 
         if( database == null )
             database = new DatabaseProvider(ShowPlayersActivity.this);
@@ -84,12 +85,11 @@ public class ShowPlayersActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
-    private OnClickListener xButtonListener = new OnClickListener() {
+    private final OnClickListener xButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "X" button was clicked

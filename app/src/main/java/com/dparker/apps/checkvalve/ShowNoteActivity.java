@@ -57,6 +57,12 @@ public class ShowNoteActivity extends Activity {
         this.findViewById(R.id.shownote_dismiss_button).setOnClickListener(dismissButtonListener);
 
         Intent thisIntent = this.getIntent();
+
+        if( ! thisIntent.getBooleanExtra(Values.EXTRA_DO_NOT_SHOW, true) ) {
+            View doNotShowAgain = findViewById(R.id.shownote_do_not_show_layout);
+            doNotShowAgain.setVisibility(View.GONE);
+        }
+
         filename = thisIntent.getStringExtra(Values.EXTRA_FILE_NAME);
         int noteId = thisIntent.getIntExtra(Values.EXTRA_NOTE_ID, 0);
 

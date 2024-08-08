@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -40,8 +40,8 @@ public class NetworkEventReceiver implements Runnable {
     private int lastNetworkType;
     private BroadcastReceiver receiver;
     private IntentFilter filter;
-    private Context context;
-    private Handler handler;
+    private final Context context;
+    private final Handler handler;
     private int event;
 
     /**
@@ -90,7 +90,7 @@ public class NetworkEventReceiver implements Runnable {
                             Log.d(TAG, "No active network connections exist.");
                         }
                         else {
-                            String state = "";
+                            String state;
 
                             switch( n.getState() ) {
                                 case CONNECTING:
@@ -162,7 +162,6 @@ public class NetworkEventReceiver implements Runnable {
             unregisterReceiver();
             handler.sendEmptyMessage(-2);
             Log.i(TAG, "Shutting down network event receiver thread.");
-            return;
         }
     }
 

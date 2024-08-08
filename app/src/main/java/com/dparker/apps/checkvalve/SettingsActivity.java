@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -36,6 +36,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.dparker.apps.checkvalve.exceptions.InvalidDataTypeException;
 
 import java.io.File;
@@ -65,10 +67,6 @@ public class SettingsActivity extends Activity {
     private boolean refreshServers;
     private boolean queryServers;
 
-    private Button saveButton;
-    private Button cancelButton;
-    private Button plusButton;
-    private Button minusButton;
     private CheckBox checkbox_enable_notification_led;
     private CheckBox checkbox_enable_notification_sound;
     private CheckBox checkbox_enable_notification_vibrate;
@@ -95,12 +93,10 @@ public class SettingsActivity extends Activity {
     private EditText field_default_relay_password;
     private EditText field_background_query_frequency;
     private TextView field_default_rcon_font_size;
-    private TextView reset_do_not_show;
-    private TextView clear_saved_relays;
 
     private DatabaseProvider database;
 
-    private OnTouchListener buttonTouchListener = new OnTouchListener() {
+    private final OnTouchListener buttonTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             if( m.getAction() == MotionEvent.ACTION_DOWN ) {
                 v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
@@ -113,7 +109,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnTouchListener resetTouchListener = new OnTouchListener() {
+    private final OnTouchListener resetTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             if( m.getAction() == MotionEvent.ACTION_DOWN ) {
                 /*
@@ -136,7 +132,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnTouchListener clearSavedRelaysTouchListener = new OnTouchListener() {
+    private final OnTouchListener clearSavedRelaysTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             if( m.getAction() == MotionEvent.ACTION_DOWN ) {
                 database.deleteRelayHosts();
@@ -147,7 +143,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnTouchListener createBackupTouchListener = new OnTouchListener() {
+    private final OnTouchListener createBackupTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             if( m.getAction() == MotionEvent.ACTION_DOWN ) {
                 createBackup();
@@ -157,7 +153,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnTouchListener restoreBackupTouchListener = new OnTouchListener() {
+    private final OnTouchListener restoreBackupTouchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             if( m.getAction() == MotionEvent.ACTION_DOWN ) {
                 restoreBackup();
@@ -167,7 +163,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnClickListener saveButtonListener = new OnClickListener() {
+    private final OnClickListener saveButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Save" button was clicked
@@ -238,7 +234,7 @@ public class SettingsActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -255,10 +251,8 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         this.setContentView(R.layout.settings);
         this.setResult(0);
@@ -272,51 +266,51 @@ public class SettingsActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(SettingsActivity.this);
 
-        cancelButton = (Button) findViewById(R.id.settings_cancel_button);
+        Button cancelButton = findViewById(R.id.settings_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
         cancelButton.setOnTouchListener(buttonTouchListener);
         cancelButton.setFocusable(true);
         cancelButton.setFocusableInTouchMode(true);
 
-        saveButton = (Button) findViewById(R.id.settings_save_button);
+        Button saveButton = findViewById(R.id.settings_save_button);
         saveButton.setOnClickListener(saveButtonListener);
         saveButton.setOnTouchListener(buttonTouchListener);
 
-        plusButton = (Button) findViewById(R.id.settings_rcon_font_size_plus);
-        minusButton = (Button) findViewById(R.id.settings_rcon_font_size_minus);
+        Button plusButton = findViewById(R.id.settings_rcon_font_size_plus);
+        Button minusButton = findViewById(R.id.settings_rcon_font_size_minus);
 
-        checkbox_rcon_show_passwords = (CheckBox) findViewById(R.id.settings_checkbox_rcon_show_passwords);
-        checkbox_rcon_warn_unsafe_command = (CheckBox) findViewById(R.id.settings_checkbox_rcon_warn_unsafe_command);
-        checkbox_rcon_show_suggestions = (CheckBox) findViewById(R.id.settings_checkbox_rcon_show_suggestions);
-        checkbox_rcon_enable_history = (CheckBox) findViewById(R.id.settings_checkbox_rcon_enable_history);
-        checkbox_rcon_volume_buttons = (CheckBox) findViewById(R.id.settings_checkbox_rcon_volume_buttons);
-        checkbox_rcon_include_sm = (CheckBox) findViewById(R.id.settings_checkbox_rcon_include_sm);
-        checkbox_show_server_name = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_name);
-        checkbox_show_server_ip = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_ip);
-        checkbox_show_server_game_info = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_game);
-        checkbox_show_server_map_name = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_map);
-        checkbox_show_server_num_players = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_players);
-        checkbox_show_server_tags = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_tags);
-        checkbox_show_server_ping = (CheckBox) findViewById(R.id.settings_checkbox_servers_show_ping);
-        checkbox_use_server_nickname = (CheckBox) findViewById(R.id.settings_checkbox_servers_use_nickname);
-        checkbox_validate_new_servers = (CheckBox) findViewById(R.id.settings_checkbox_validate_new_servers);
-        checkbox_enable_notification_led = (CheckBox) findViewById(R.id.settings_checkbox_notification_led);
-        checkbox_enable_notification_sound = (CheckBox) findViewById(R.id.settings_checkbox_notification_sound);
-        checkbox_enable_notification_vibrate = (CheckBox) findViewById(R.id.settings_checkbox_notification_vibrate);
-        checkbox_enable_notifications = (CheckBox) findViewById(R.id.settings_checkbox_notifications);
+        checkbox_rcon_show_passwords = findViewById(R.id.settings_checkbox_rcon_show_passwords);
+        checkbox_rcon_warn_unsafe_command = findViewById(R.id.settings_checkbox_rcon_warn_unsafe_command);
+        checkbox_rcon_show_suggestions = findViewById(R.id.settings_checkbox_rcon_show_suggestions);
+        checkbox_rcon_enable_history = findViewById(R.id.settings_checkbox_rcon_enable_history);
+        checkbox_rcon_volume_buttons = findViewById(R.id.settings_checkbox_rcon_volume_buttons);
+        checkbox_rcon_include_sm = findViewById(R.id.settings_checkbox_rcon_include_sm);
+        checkbox_show_server_name = findViewById(R.id.settings_checkbox_servers_show_name);
+        checkbox_show_server_ip = findViewById(R.id.settings_checkbox_servers_show_ip);
+        checkbox_show_server_game_info = findViewById(R.id.settings_checkbox_servers_show_game);
+        checkbox_show_server_map_name = findViewById(R.id.settings_checkbox_servers_show_map);
+        checkbox_show_server_num_players = findViewById(R.id.settings_checkbox_servers_show_players);
+        checkbox_show_server_tags = findViewById(R.id.settings_checkbox_servers_show_tags);
+        checkbox_show_server_ping = findViewById(R.id.settings_checkbox_servers_show_ping);
+        checkbox_use_server_nickname = findViewById(R.id.settings_checkbox_servers_use_nickname);
+        checkbox_validate_new_servers = findViewById(R.id.settings_checkbox_validate_new_servers);
+        checkbox_enable_notification_led = findViewById(R.id.settings_checkbox_notification_led);
+        checkbox_enable_notification_sound = findViewById(R.id.settings_checkbox_notification_sound);
+        checkbox_enable_notification_vibrate = findViewById(R.id.settings_checkbox_notification_vibrate);
+        checkbox_enable_notifications = findViewById(R.id.settings_checkbox_notifications);
 
-        field_default_query_port = (EditText) findViewById(R.id.settings_field_default_query_port);
-        field_default_query_timeout = (EditText) findViewById(R.id.settings_field_default_query_timeout);
-        field_default_relay_host = (EditText) findViewById(R.id.settings_field_default_relay_host);
-        field_default_relay_port = (EditText) findViewById(R.id.settings_field_default_relay_port);
-        field_default_relay_password = (EditText) findViewById(R.id.settings_field_default_relay_password);
-        field_background_query_frequency = (EditText) findViewById(R.id.settings_field_background_query_frequency);
-        field_default_rcon_font_size = (TextView) findViewById(R.id.settings_field_default_rcon_font_size);
+        field_default_query_port = findViewById(R.id.settings_field_default_query_port);
+        field_default_query_timeout = findViewById(R.id.settings_field_default_query_timeout);
+        field_default_relay_host = findViewById(R.id.settings_field_default_relay_host);
+        field_default_relay_port = findViewById(R.id.settings_field_default_relay_port);
+        field_default_relay_password = findViewById(R.id.settings_field_default_relay_password);
+        field_background_query_frequency = findViewById(R.id.settings_field_background_query_frequency);
+        field_default_rcon_font_size = findViewById(R.id.settings_field_default_rcon_font_size);
 
-        reset_do_not_show = (TextView) findViewById(R.id.settings_reset_do_not_show);
+        TextView reset_do_not_show = findViewById(R.id.settings_reset_do_not_show);
         reset_do_not_show.setOnTouchListener(resetTouchListener);
 
-        clear_saved_relays = (TextView) findViewById(R.id.settings_clear_saved_relays);
+        TextView clear_saved_relays = findViewById(R.id.settings_clear_saved_relays);
         clear_saved_relays.setOnTouchListener(clearSavedRelaysTouchListener);
 
         findViewById(R.id.settings_create_backup).setOnTouchListener(createBackupTouchListener);
@@ -370,9 +364,8 @@ public class SettingsActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void onActivityResult(int request, int result, Intent data) {
@@ -454,77 +447,76 @@ public class SettingsActivity extends Activity {
     public void settingCheckboxHandler(View view) {
         boolean checked = ((CheckBox) view).isChecked();
 
-        switch( view.getId() ) {
-            case R.id.settings_checkbox_rcon_show_passwords:
-                rconShowPasswords = checked;
-                break;
-            case R.id.settings_checkbox_rcon_warn_unsafe_command:
-                rconWarnUnsafeCommand = checked;
-                break;
-            case R.id.settings_checkbox_rcon_show_suggestions:
-                rconShowSuggestions = checked;
-                checkbox_rcon_include_sm.setEnabled(rconShowSuggestions);
-                break;
-            case R.id.settings_checkbox_rcon_enable_history:
-                rconEnableHistory = checked;
-                break;
-            case R.id.settings_checkbox_rcon_volume_buttons:
-                rconVolumeButtons = checked;
-                break;
-            case R.id.settings_checkbox_rcon_include_sm:
-                rconIncludeSM = checked;
-                break;
-            case R.id.settings_checkbox_servers_show_name:
-                showServerName = checked;
-                checkbox_use_server_nickname.setEnabled(checked);
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_ip:
-                showServerIP = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_game:
-                showServerGameInfo = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_map:
-                showServerMapName = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_players:
-                showServerNumPlayers = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_tags:
-                showServerTags = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_show_ping:
-                showServerPing = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_servers_use_nickname:
-                useServerNickname = checked;
-                refreshServers = true;
-                break;
-            case R.id.settings_checkbox_validate_new_servers:
-                validateNewServers = checked;
-            case R.id.settings_checkbox_notification_led:
-                enableNotificationLED = checked;
-                break;
-            case R.id.settings_checkbox_notification_sound:
-                enableNotificationSound = checked;
-                break;
-            case R.id.settings_checkbox_notification_vibrate:
-                enableNotificationVibrate = checked;
-                break;
-            case R.id.settings_checkbox_notifications:
-                enableNotifications = checked;
-                checkbox_enable_notification_led.setEnabled(checked);
-                checkbox_enable_notification_sound.setEnabled(checked);
-                checkbox_enable_notification_vibrate.setEnabled(checked);
-                field_background_query_frequency.setEnabled(checked);
-                break;
+        if( view.getId() == R.id.settings_checkbox_rcon_show_passwords ) {
+            rconShowPasswords = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_rcon_warn_unsafe_command ) {
+            rconWarnUnsafeCommand = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_rcon_show_suggestions ) {
+            rconShowSuggestions = checked;
+            checkbox_rcon_include_sm.setEnabled(rconShowSuggestions);
+        }
+        else if( view.getId() == R.id.settings_checkbox_rcon_enable_history ) {
+            rconEnableHistory = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_rcon_volume_buttons ) {
+            rconVolumeButtons = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_rcon_include_sm ) {
+            rconIncludeSM = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_name ) {
+            showServerName = checked;
+            checkbox_use_server_nickname.setEnabled(checked);
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_ip ) {
+            showServerIP = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_game ) {
+            showServerGameInfo = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_map ) {
+            showServerMapName = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_players ) {
+            showServerNumPlayers = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_tags ) {
+            showServerTags = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_show_ping ) {
+            showServerPing = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_servers_use_nickname ) {
+            useServerNickname = checked;
+            refreshServers = true;
+        }
+        else if( view.getId() == R.id.settings_checkbox_validate_new_servers ) {
+            validateNewServers = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_notification_led ) {
+            enableNotificationLED = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_notification_sound ) {
+            enableNotificationSound = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_notification_vibrate ) {
+            enableNotificationVibrate = checked;
+        }
+        else if( view.getId() == R.id.settings_checkbox_notifications ) {
+            enableNotifications = checked;
+            checkbox_enable_notification_led.setEnabled(checked);
+            checkbox_enable_notification_sound.setEnabled(checked);
+            checkbox_enable_notification_vibrate.setEnabled(checked);
+            field_background_query_frequency.setEnabled(checked);
         }
     }
 
@@ -539,7 +531,7 @@ public class SettingsActivity extends Activity {
         String defaultRelayHost;
         String defaultRelayPassword;
 
-        int result = 0;
+        int result;
 
         try {
             try {
@@ -607,7 +599,7 @@ public class SettingsActivity extends Activity {
             b.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, enableNotifications);
             b.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, backgroundQueryFrequency);
 
-            Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b.toString());
+            Log.i(TAG, "saveSettings(): Calling updateSettings() with Bundle " + b);
 
             if( database.updateSettings(b) ) {
                 Log.i(TAG, "Success!");

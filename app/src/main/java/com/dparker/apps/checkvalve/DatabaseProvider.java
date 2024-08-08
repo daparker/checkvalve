@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -32,6 +32,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.dparker.apps.checkvalve.exceptions.InvalidDataTypeException;
+
+import java.nio.charset.StandardCharsets;
 
 /*
  * Define the DatabaseProvider class
@@ -133,7 +135,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                     + ");";
 
     // Settings columns which contain boolean values
-    private static String[] boolCols = new String[]{
+    private static final String[] boolCols = new String[]{
             SETTINGS_ENABLE_NOTIFICATION_LED,
             SETTINGS_ENABLE_NOTIFICATION_SOUND,
             SETTINGS_ENABLE_NOTIFICATION_VIBRATE,
@@ -155,7 +157,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             SETTINGS_VALIDATE_NEW_SERVERS};
 
     // Settings columns which contain integer values
-    private static String[] intCols = new String[]{
+    private static final String[] intCols = new String[]{
             SETTINGS_RCON_DEFAULT_FONT_SIZE,
             SETTINGS_DEFAULT_QUERY_PORT,
             SETTINGS_DEFAULT_QUERY_TIMEOUT,
@@ -163,7 +165,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             SETTINGS_BACKGROUND_QUERY_FREQUENCY};
 
     // Settings columns which contain string values
-    private static String[] stringCols = new String[]{
+    private static final String[] stringCols = new String[]{
             SETTINGS_DEFAULT_RELAY_HOST,
             SETTINGS_DEFAULT_RELAY_PASSWORD};
 
@@ -173,7 +175,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * Construct a new instance of the DatabaseProvider class.
      * This class provides persistent access to the application's database.
      *
-     * @param c The context to use
+     * @param context The context to use
      */
     public DatabaseProvider(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -506,7 +508,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     }
 
     public long getServerCount() {
-        long result = 0;
+        long result;
 
         synchronized( lock ) {
             SQLiteDatabase db = this.getReadableDatabase();
@@ -565,7 +567,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
 
                 result = db.delete(TABLE_SERVERS, SERVERS_ROWID + "=" + rowId, null) > 0;
 
-                if( result == true ) {
+                if( result ) {
                     c = db.query(
                             TABLE_SERVERS,
                             new String[]{SERVERS_ROWID},
@@ -633,7 +635,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public ServerRecord[] getAllServers() {
         Cursor c;
 
-        ServerRecord[] result = null;
+        ServerRecord[] result;
 
         synchronized( lock ) {
             SQLiteDatabase db = this.getReadableDatabase();
@@ -686,7 +688,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
     public ServerRecord[] getEnabledServers() {
         Cursor c;
 
-        ServerRecord[] result = null;
+        ServerRecord[] result;
 
         synchronized( lock ) {
             SQLiteDatabase db = this.getReadableDatabase();
@@ -989,7 +991,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      */
     public Bundle getSettingsAsBundle() {
         Cursor c;
-        String column = new String();
+        String column;
         Bundle result = new Bundle();
 
         synchronized( lock ) {
@@ -1001,64 +1003,92 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             for( int i = 0; i < c.getColumnCount(); i++ ) {
                 column = c.getColumnName(i);
 
-                if( column.equals(SETTINGS_RCON_WARN_UNSAFE) )
-                    result.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_RCON_SHOW_PASSWORDS) )
-                    result.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_RCON_SHOW_SUGGESTIONS) )
-                    result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_RCON_ENABLE_HISTORY) )
-                    result.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_RCON_VOLUME_BUTTONS) )
-                    result.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_RCON_DEFAULT_FONT_SIZE) )
-                    result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
-                else if( column.equals(SETTINGS_RCON_INCLUDE_SM) )
-                    result.putBoolean(Values.SETTING_RCON_INCLUDE_SM, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_NAME) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_NAME, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_IP) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_GAME) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_MAP) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_PLAYERS) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_TAGS) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_SHOW_SERVER_PING) )
-                    result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_USE_SERVER_NICKNAME) )
-                    result.putBoolean(Values.SETTING_USE_SERVER_NICKNAME, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_VALIDATE_NEW_SERVERS) )
-                    result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_DEFAULT_QUERY_PORT) )
-                    result.putInt(Values.SETTING_DEFAULT_QUERY_PORT, c.getInt(i));
-                else if( column.equals(SETTINGS_DEFAULT_QUERY_TIMEOUT) )
-                    result.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, c.getInt(i));
-                else if( column.equals(SETTINGS_DEFAULT_RELAY_HOST) )
-                    result.putString(Values.SETTING_DEFAULT_RELAY_HOST, c.getString(i));
-                else if( column.equals(SETTINGS_DEFAULT_RELAY_PORT) )
-                    result.putInt(Values.SETTING_DEFAULT_RELAY_PORT, c.getInt(i));
-                else if( column.equals(SETTINGS_DEFAULT_RELAY_PASSWORD) )
-                    result.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, c.getString(i));
-                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_LED) )
-                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_SOUND) )
-                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_ENABLE_NOTIFICATION_VIBRATE) )
-                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_ENABLE_NOTIFICATIONS) )
-                    result.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, (c.getInt(i) == 1) ? true : false);
-                else if( column.equals(SETTINGS_BACKGROUND_QUERY_FREQUENCY) )
-                    result.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, c.getInt(i));
+                switch( column ) {
+                    case SETTINGS_RCON_WARN_UNSAFE:
+                        result.putBoolean(Values.SETTING_RCON_WARN_UNSAFE_COMMAND, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_RCON_SHOW_PASSWORDS:
+                        result.putBoolean(Values.SETTING_RCON_SHOW_PASSWORDS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_RCON_SHOW_SUGGESTIONS:
+                        result.putBoolean(Values.SETTING_RCON_SHOW_SUGGESTIONS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_RCON_ENABLE_HISTORY:
+                        result.putBoolean(Values.SETTING_RCON_ENABLE_HISTORY, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_RCON_VOLUME_BUTTONS:
+                        result.putBoolean(Values.SETTING_RCON_VOLUME_BUTTONS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_RCON_DEFAULT_FONT_SIZE:
+                        result.putInt(Values.SETTING_RCON_DEFAULT_FONT_SIZE, c.getInt(i));
+                        break;
+                    case SETTINGS_RCON_INCLUDE_SM:
+                        result.putBoolean(Values.SETTING_RCON_INCLUDE_SM, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_NAME:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_NAME, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_IP:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_IP, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_GAME:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_GAME_INFO, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_MAP:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_MAP_NAME, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_PLAYERS:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_NUM_PLAYERS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_TAGS:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_TAGS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_SHOW_SERVER_PING:
+                        result.putBoolean(Values.SETTING_SHOW_SERVER_PING, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_USE_SERVER_NICKNAME:
+                        result.putBoolean(Values.SETTING_USE_SERVER_NICKNAME, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_VALIDATE_NEW_SERVERS:
+                        result.putBoolean(Values.SETTING_VALIDATE_NEW_SERVERS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_DEFAULT_QUERY_PORT:
+                        result.putInt(Values.SETTING_DEFAULT_QUERY_PORT, c.getInt(i));
+                        break;
+                    case SETTINGS_DEFAULT_QUERY_TIMEOUT:
+                        result.putInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT, c.getInt(i));
+                        break;
+                    case SETTINGS_DEFAULT_RELAY_HOST:
+                        result.putString(Values.SETTING_DEFAULT_RELAY_HOST, c.getString(i));
+                        break;
+                    case SETTINGS_DEFAULT_RELAY_PORT:
+                        result.putInt(Values.SETTING_DEFAULT_RELAY_PORT, c.getInt(i));
+                        break;
+                    case SETTINGS_DEFAULT_RELAY_PASSWORD:
+                        result.putString(Values.SETTING_DEFAULT_RELAY_PASSWORD, c.getString(i));
+                        break;
+                    case SETTINGS_ENABLE_NOTIFICATION_LED:
+                        result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_LED, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_ENABLE_NOTIFICATION_SOUND:
+                        result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_SOUND, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_ENABLE_NOTIFICATION_VIBRATE:
+                        result.putBoolean(Values.SETTING_ENABLE_NOTIFICATION_VIBRATE, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_ENABLE_NOTIFICATIONS:
+                        result.putBoolean(Values.SETTING_ENABLE_NOTIFICATIONS, (c.getInt(i) == 1));
+                        break;
+                    case SETTINGS_BACKGROUND_QUERY_FREQUENCY:
+                        result.putInt(Values.SETTING_BACKGROUND_QUERY_FREQUENCY, c.getInt(i));
+                        break;
+                }
             }
 
             c.close();
         }
 
-        Log.i(TAG, "getSettingsAsBundle(): Returning Bundle " + result.toString());
+        Log.i(TAG, "getSettingsAsBundle(): Returning Bundle " + result);
         return result;
     }
 
@@ -1134,12 +1164,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         synchronized( lock ) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            Log.i(TAG, "Updating " + TABLE_SETTINGS + " with ContentValues " + values.toString());
+            Log.i(TAG, "Updating " + TABLE_SETTINGS + " with ContentValues " + values);
             result = db.update(TABLE_SETTINGS, values, null, null);
             Log.i(TAG, "Updated " + result + " row(s)");
         }
 
-        return (result == 0) ? false : true;
+        return (result != 0);
     }
 
     /**
@@ -1149,7 +1179,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * @return A boolean value indicating whether or not the update was successful.
      */
     public boolean putRelayHost(String host) {
-        if( host.length() == 0 ) {
+        if( host.isEmpty() ) {
             Log.d(TAG, "putRelayHost(): Host parameter was an empty string; returning false.");
             return false;
         }
@@ -1162,12 +1192,12 @@ public class DatabaseProvider extends SQLiteOpenHelper {
         synchronized( lock ) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            Log.i(TAG, "Inserting row into " + TABLE_RELAY_HOSTS + " with ContentValues " + values.toString());
+            Log.i(TAG, "Inserting row into " + TABLE_RELAY_HOSTS + " with ContentValues " + values);
             result = db.insert(TABLE_RELAY_HOSTS, null, values);
             Log.i(TAG, "Inserted row ID = " + result);
         }
 
-        return (result < 0) ? false : true;
+        return (result >= 0);
     }
 
     /**
@@ -1176,7 +1206,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      * @return A <tt>String[]</tt> array containing the results of the query.
      */
     public String[] getRelayHosts() {
-        String[] result = null;
+        String[] result;
 
         Cursor c;
 
@@ -1253,15 +1283,15 @@ public class DatabaseProvider extends SQLiteOpenHelper {
                             SERVERS_LISTPOS);
 
                     int rowCount = c.getCount();
-                    String rconRaw = new String();
-                    String rconB64 = new String();
+                    String rconRaw;
+                    String rconB64;
 
                     for( int i = 0; i < rowCount; i++ ) {
                         c.moveToPosition(i);
 
                         // Base64 encode the RCON password
                         rconRaw = c.getString(6);
-                        rconB64 = (rconRaw.length() > 0) ? Base64.encodeToString(rconRaw.getBytes("UTF-8"), Base64.NO_WRAP) : "";
+                        rconB64 = (!rconRaw.isEmpty()) ? Base64.encodeToString(rconRaw.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP) : "";
 
                         // Add this server as a CheckValve backup file stanza
                         sb.append("[server]").append("\r\n")
@@ -1282,7 +1312,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             if( includeSettings ) {
                 synchronized( lock ) {
                     SQLiteDatabase db = this.getReadableDatabase();
-                    int columnCount = 0;
+                    int columnCount;
 
                     // Get settings with boolean values
                     c = db.query(TABLE_SETTINGS, boolCols, null, null, null, null, SETTINGS_ROWID);
@@ -1380,7 +1410,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      *
      * @param s The name of the column for which the value should be returned
      * @return The value of the column
-     * @throws <tt>InvalidDataTypeException</tt> if the specified column does not hold a boolean setting
+     * @throws InvalidDataTypeException if the specified column does not hold a boolean setting
      */
     public boolean getBooleanSetting(String s) throws InvalidDataTypeException {
         if( !isBooleanColumn(s) )
@@ -1397,7 +1427,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
             if( c != null ) {
                 if( c.getCount() > 0 ) {
                     c.moveToFirst();
-                    result = (c.getInt(0) == 1) ? true : false;
+                    result = (c.getInt(0) == 1);
                 }
             }
 
@@ -1412,7 +1442,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      *
      * @param s The name of the column for which the value should be returned
      * @return The value of the column
-     * @throws <tt>InvalidDataTypeException</tt> if the specified column does not hold an integer setting
+     * @throws InvalidDataTypeException if the specified column does not hold an integer setting
      */
     public int getIntSetting(String s) throws InvalidDataTypeException {
         if( !isIntColumn(s) )
@@ -1444,7 +1474,7 @@ public class DatabaseProvider extends SQLiteOpenHelper {
      *
      * @param s The name of the column for which the value should be returned
      * @return The value of the column
-     * @throws <tt>InvalidDataTypeException</tt> if the specified column does not hold a String setting
+     * @throws InvalidDataTypeException if the specified column does not hold a String setting
      */
     public String getStringSetting(String s) throws InvalidDataTypeException {
         if( !isStringColumn(s) )

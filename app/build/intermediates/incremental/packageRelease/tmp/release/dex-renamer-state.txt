@@ -1,4 +1,4 @@
-#Tue Sep 19 00:14:00 EDT 2023
-base.0=/Users/daparker/CheckValve/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
+#Thu Aug 08 09:24:01 EDT 2024
+base.0=/Users/daparker/StudioProjects/checkvalve/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

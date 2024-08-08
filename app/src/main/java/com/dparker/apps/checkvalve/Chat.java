@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -34,6 +34,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class implements a CheckValve Chat Relay client.
@@ -41,22 +42,14 @@ import java.nio.ByteOrder;
 public class Chat implements Runnable {
     private static final String TAG = "Chat";
 
-    private static byte responseType;
-    private static short contentLength;
-    private static int packetHeader;
-    private static String passwordString;
-    private static StringBuilder responseMessage;
     private static Socket s;
     private static Message msg;
-    private static ChatMessage chatMsg;
-    private static InputStream in;
-    private static OutputStream out;
 
     // Make sure the data and request buffers have backing arrays
-    private static byte[] dataBytes = new byte[1024];
-    private static byte[] requestBytes = new byte[256];
-    private static ByteBuffer dataBuffer = ByteBuffer.wrap(dataBytes);
-    private static ByteBuffer requestBuffer = ByteBuffer.wrap(requestBytes);
+    private static final byte[] dataBytes = new byte[1024];
+    private static final byte[] requestBytes = new byte[256];
+    private static final ByteBuffer dataBuffer = ByteBuffer.wrap(dataBytes);
+    private static final ByteBuffer requestBuffer = ByteBuffer.wrap(requestBytes);
 
     // Fields set by the constructor
     private static int chatRelayPort;
@@ -97,29 +90,28 @@ public class Chat implements Runnable {
         catch( Exception e ) {
             StackTraceElement[] ste = e.getStackTrace();
 
-            Log.i(TAG, this.toString() + " caught an exception: " + e.toString());
-            Log.i(TAG, "Stack trace:");
+            Log.i(TAG, "run(): Caught an exception: ", e);
+            Log.i(TAG, "run(): Stack trace:");
 
             for( StackTraceElement x : ste )
                 Log.i(TAG, "    " + x.toString());
 
             handler.sendEmptyMessage(-2);
-            return;
         }
         finally {
             if( s != null ) {
                 if( !s.isClosed() ) {
                     try {
                         s.close();
-                        Log.i(TAG, "The socket has been closed.");
+                        Log.i(TAG, "run(): The socket has been closed.");
                     }
                     catch( IOException ioe ) {
-                        Log.w(TAG, "Caught an exception while shutting down the socket:", ioe);
+                        Log.w(TAG, "run(): Caught an exception while shutting down the socket:", ioe);
                     }
                 }
             }
 
-            Log.i(TAG, "Chat Relay client thread is shutting down.");
+            Log.i(TAG, "run(): Chat Relay client thread is shutting down.");
         }
     }
 
@@ -146,18 +138,25 @@ public class Chat implements Runnable {
         requestBuffer.order(ByteOrder.LITTLE_ENDIAN);
         requestBuffer.clear();
 
-        passwordString = "P ";
+        String passwordString = "P ";
 
-        if( chatRelayPassword.length() > 0 ) passwordString += chatRelayPassword;
+        if( ! chatRelayPassword.isEmpty() ) passwordString += chatRelayPassword;
 
         // Build the connection request packet
         requestBuffer.putInt(PACKET_HEADER);
         requestBuffer.put(PTYPE_CONNECTION_REQUEST);
         requestBuffer.putShort((short) (passwordString.length() + gameServerIP.length() + gameServerPort.length() + 3));
-        requestBuffer.put(passwordString.getBytes("UTF-8")).put((byte) 0);
-        requestBuffer.put(gameServerIP.getBytes("UTF-8")).put((byte) 0);
-        requestBuffer.put(gameServerPort.getBytes("UTF-8")).put((byte) 0);
+        requestBuffer.put(passwordString.getBytes(StandardCharsets.UTF_8)).put((byte) 0);
+        requestBuffer.put(gameServerIP.getBytes(StandardCharsets.UTF_8)).put((byte) 0);
+        requestBuffer.put(gameServerPort.getBytes(StandardCharsets.UTF_8)).put((byte) 0);
         requestBuffer.flip();
+
+        byte responseType;
+        int packetHeader;
+        short contentLength;
+        StringBuilder responseMessage;
+        InputStream in;
+        OutputStream out;
 
         try {
             //s = new Socket(chatRelayIP, chatRelayPort);
@@ -171,16 +170,16 @@ public class Chat implements Runnable {
 
             dataBuffer.clear();
 
-            Log.d(TAG, "Waiting for server identity string.");
+            Log.d(TAG, "runChatRelayClient(): Waiting for server identity string.");
 
             // Get the first 5 bytes of the packet data (header and packet type)
             if( (in.read(dataBytes, 0, 5)) == -1 ) return;
 
-            Log.d(TAG, "Received a packet.");
+            Log.d(TAG, "runChatRelayClient(): Received a packet.");
 
             // Make sure the header is valid
             if( (packetHeader = dataBuffer.getInt()) != PACKET_HEADER ) {
-                Log.w(TAG, "Rejecting packet: invalid header 0x" + String.format("%s", Integer.toHexString(packetHeader)) + ".");
+                Log.w(TAG, "runChatRelayClient(): Rejecting packet: invalid header 0x" + String.format("%s", Integer.toHexString(packetHeader)) + ".");
                 handler.sendEmptyMessage(-1);
                 return;
             }
@@ -189,7 +188,7 @@ public class Chat implements Runnable {
             responseType = dataBuffer.get();
 
             if( responseType == PTYPE_IDENTITY_STRING ) {
-                Log.d(TAG, "Received server identity string.");
+                Log.d(TAG, "runChatRelayClient(): Received server identity string.");
 
                 responseMessage = new StringBuilder();
 
@@ -197,11 +196,11 @@ public class Chat implements Runnable {
                 if( (in.read(dataBytes, dataBuffer.position(), 2)) == -1 ) return;
 
                 contentLength = dataBuffer.getShort();
-                Log.d(TAG, "Content length is " + contentLength + " bytes.");
+                Log.d(TAG, "runChatRelayClient(): Content length is " + contentLength + " bytes.");
 
                 // Make sure the content length is valid
                 if( contentLength < 1 || contentLength > 1024 ) {
-                    Log.w(TAG, "Packet contained an invalid content length (" + contentLength + ")");
+                    Log.w(TAG, "runChatRelayClient(): Packet contained an invalid content length (" + contentLength + ")");
                     handler.sendEmptyMessage(-1);
                     return;
                 }
@@ -214,7 +213,7 @@ public class Chat implements Runnable {
                 while( dataBuffer.hasRemaining() )
                     responseMessage.append((char) dataBuffer.get());
 
-                Log.i(TAG, "Server identity string is " + responseMessage.toString().trim());
+                Log.i(TAG, "runChatRelayClient(): Server identity string is " + responseMessage.toString().trim());
 
                 out.write(requestBuffer.array(), requestBuffer.position(), requestBuffer.limit());
                 out.flush();
@@ -222,14 +221,14 @@ public class Chat implements Runnable {
                 s.setSoTimeout(60000);
             }
             else {
-                Log.w(TAG, "Unexpected packet type 0x" + String.format("%s", Byte.toString(responseType)) + ".");
+                Log.w(TAG, "runChatRelayClient(): Unexpected packet type 0x" + String.format("%s", Byte.toString(responseType)) + ".");
                 Log.d(TAG, "runChatRelayClient(): Sending -1 to handler.");
                 handler.sendEmptyMessage(-1);
                 return;
             }
         }
         catch( Exception e ) {
-            Log.w(TAG, "Caught an exception:", e);
+            Log.w(TAG, "runChatRelayClient(): Caught an exception:", e);
             handler.sendEmptyMessage(-1);
             return;
         }
@@ -244,32 +243,32 @@ public class Chat implements Runnable {
             dataBuffer.clear();
 
             try {
-                Log.d(TAG, "Waiting for the next packet.");
+                Log.d(TAG, "runChatRelayClient(): Waiting for the next packet.");
 
                 // Get the first 5 bytes of the packet data (header and packet type)
                 if( (in.read(dataBytes, 0, 5)) == -1 ) return;
 
-                Log.d(TAG, "Received a packet.");
+                Log.d(TAG, "runChatRelayClient(): Received a packet.");
             }
             catch( SocketTimeoutException ste ) {
-                Log.w(TAG, "Timed out while waiting for next packet.");
+                Log.w(TAG, "runChatRelayClient(): Timed out while waiting for next packet.");
                 continue;
             }
             catch( SocketException se ) {
-                Log.d(TAG, "Caught a socket exception.");
+                Log.e(TAG, "runChatRelayClient(): Caught a socket exception.", se);
                 return;
             }
 
             // Make sure the header is valid
             if( (packetHeader = dataBuffer.getInt()) != PACKET_HEADER ) {
-                Log.w(TAG, "Rejecting packet: invalid header 0x" + String.format("%s", Integer.toHexString(packetHeader)) + ".");
+                Log.w(TAG, "runChatRelayClient(): Rejecting packet: invalid header 0x" + String.format("%s", Integer.toHexString(packetHeader)) + ".");
                 continue;
             }
 
             // Get the packet type
             responseType = dataBuffer.get();
 
-            Log.d(TAG, "Packet type is 0x" + String.format("%s", Byte.toString(responseType)) + ".");
+            Log.d(TAG, "runChatRelayClient(): Packet type is 0x" + String.format("%s", Byte.toString(responseType)) + ".");
 
             // No need to do anything if this is a heartbeat
             if( responseType == PTYPE_HEARTBEAT ) {
@@ -284,10 +283,10 @@ public class Chat implements Runnable {
                 if( (in.read(dataBytes, dataBuffer.position(), 2)) == -1 ) return;
 
                 contentLength = dataBuffer.getShort();
-                Log.d(TAG, "Content length is " + contentLength + " bytes.");
+                Log.d(TAG, "runChatRelayClient(): Content length is " + contentLength + " bytes.");
             }
             catch( SocketTimeoutException ste ) {
-                Log.w(TAG, "Timed out while reading content length.");
+                Log.w(TAG, "runChatRelayClient(): Timed out while reading content length.");
                 continue;
             }
 
@@ -299,15 +298,15 @@ public class Chat implements Runnable {
                 if( (in.read(dataBytes, dataBuffer.position(), contentLength)) == -1 ) return;
             }
             catch( SocketTimeoutException ste ) {
-                Log.w(TAG, "Timed out while reading packet data.");
+                Log.w(TAG, "runChatRelayClient(): Timed out while reading packet data.");
                 continue;
             }
 
             dataBuffer.limit(dataBuffer.position() + contentLength);
 
-            switch( responseType ) {
+            switch(responseType) {
                 case PTYPE_CONNECTION_SUCCESS:
-                    Log.i(TAG, "Connected to " + chatRelayIP.getHostAddress() + ":" + Integer.toString(chatRelayPort) + ".");
+                    Log.i(TAG, "runChatRelayClient(): Connected to " + chatRelayIP.getHostAddress() + ":" + Integer.toString(chatRelayPort) + ".");
                     handler.sendEmptyMessage(4);
                     break;
 
@@ -319,7 +318,7 @@ public class Chat implements Runnable {
                     msg = Message.obtain(handler, 3, error);
                     handler.sendMessage(msg);
 
-                    Log.i(TAG, "Connection refused by Chat Relay server: " + error);
+                    Log.i(TAG, "runChatRelayClient(): Connection refused by Chat Relay server: " + error);
                     break;
 
                 case PTYPE_MESSAGE_DATA:
@@ -328,7 +327,7 @@ public class Chat implements Runnable {
 
                     PacketData pd = new PacketData(tmp);
 
-                    chatMsg = new ChatMessage(
+                    ChatMessage chatMsg = new ChatMessage(
                             pd.getByte(),        // Protocol version
                             pd.getInt(),         // Epoch timestamp from the Chat Relay
                             pd.getByte(),        // say_team flag
@@ -344,7 +343,7 @@ public class Chat implements Runnable {
                     break;
 
                 default:
-                    Log.w(TAG, "Unknown packet type, re-sending request.");
+                    Log.w(TAG, "runChatRelayClient(): Unknown packet type, re-sending request.");
                     out.write(requestBuffer.array(), 0, requestBuffer.position());
                     out.flush();
                     break;
@@ -361,21 +360,21 @@ public class Chat implements Runnable {
      */
     public void shutDown() {
         try {
-            Log.d(TAG, this.toString() + ": Shutdown was requested.");
+            Log.d(TAG, "shutDown(): Shutdown was requested.");
 
             if( s != null ) {
                 if( !s.isClosed() ) {
-                    Log.d(TAG, this.toString() + ": Closing socket " + s.toString() + ".");
+                    Log.d(TAG, "shutDown(): Closing socket " + s.toString() + ".");
                     s.close();
                 }
             }
         }
         catch( Exception e ) {
-            Log.w(TAG, "Caught an exception while closing socket:", e);
+            Log.w(TAG, "shutDown(): Caught an exception while closing socket:", e);
             handler.sendEmptyMessage(-2);
         }
 
-        Log.d(TAG, this.toString() + ": Calling interrupt() on " + Thread.currentThread().toString());
+        Log.d(TAG, "shutDown(): Calling interrupt() on " + Thread.currentThread().toString());
         Thread.currentThread().interrupt();
     }
 }

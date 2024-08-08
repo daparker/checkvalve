@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -32,11 +32,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class DebugConsoleActivity extends Activity {
-    private TextView debug_console;
-    private Intent thisIntent;
-    private Button dismiss_button;
 
-    private OnClickListener dismissButtonListener = new OnClickListener() {
+    private final OnClickListener dismissButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Dismiss" button was clicked
@@ -51,20 +48,19 @@ public class DebugConsoleActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        thisIntent = this.getIntent();
+        Intent thisIntent = this.getIntent();
         String debugText = thisIntent.getStringExtra(Values.EXTRA_DEBUG_TEXT);
         setResult(0, thisIntent);
 
         setContentView(R.layout.debug_console);
 
-        dismiss_button = (Button) findViewById(R.id.debugconsole_dismiss_button);
+        Button dismiss_button = findViewById(R.id.debugconsole_dismiss_button);
         dismiss_button.setOnClickListener(dismissButtonListener);
-        debug_console = (TextView) findViewById(R.id.debugconsole_textview);
+
+        TextView debug_console = findViewById(R.id.debugconsole_textview);
         debug_console.setText(debugText);
     }
 
@@ -82,6 +78,5 @@ public class DebugConsoleActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -19,26 +19,24 @@
 
 package com.dparker.apps.checkvalve;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
-//import android.support.v4.app.ActivityCompat;
-import androidx.core.app.ActivityCompat;
-//import android.support.v4.content.ContextCompat;
-import androidx.core.content.ContextCompat;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,6 +46,8 @@ import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.dparker.apps.checkvalve.backup.BackupParser;
 import com.dparker.apps.checkvalve.exceptions.InvalidBackupFileException;
@@ -60,23 +60,20 @@ public class RestoreBackupActivity extends Activity {
     private static final String TAG = RestoreBackupActivity.class.getSimpleName();
 
     private EditText field_backup_file;
-    private TextView help_text;
     private TableLayout file_details_table;
-    private File storageDir;
     private ProgressDialog p;
+    private Uri chosenUri;
 
     private DatabaseProvider database;
 
-    private boolean canReadExternal;
-
-    private OnClickListener restoreButtonListener = new OnClickListener() {
+    private final OnClickListener restoreButtonListener = new OnClickListener() {
         @SuppressLint({"InlinedApi", "NewApi"})
         public void onClick(View v) {
             /*
              * "Restore" button was clicked
              */
 
-            if( field_backup_file.getText().toString().length() == 0 ) {
+            if(field_backup_file.getText().toString().isEmpty()) {
                 UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_empty_fields);
             }
             else {
@@ -111,7 +108,7 @@ public class RestoreBackupActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -122,7 +119,7 @@ public class RestoreBackupActivity extends Activity {
         }
     };
 
-    private OnClickListener chooserButtonListener = new OnClickListener() {
+    private final OnClickListener chooserButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -133,8 +130,8 @@ public class RestoreBackupActivity extends Activity {
     };
 
     @SuppressLint("HandlerLeak")
-    private Handler backupParserHandler = new Handler() {
-        public void handleMessage(Message msg) {
+    private final Handler backupParserHandler = new Handler(Looper.myLooper()) {
+        public void handleMessage(@NonNull Message msg) {
             if( p.isShowing() )
                 p.dismiss();
 
@@ -170,10 +167,8 @@ public class RestoreBackupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         this.setContentView(R.layout.restore_backup);
         this.setResult(1);
@@ -181,35 +176,22 @@ public class RestoreBackupActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(RestoreBackupActivity.this);
 
-        // Default backup file location
-        //storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        //String sep = File.separator;
-        storageDir = this.getExternalFilesDir(null);
-        //String[] pathArray = storageDir.getAbsolutePath().split(sep);
-        //String shortPath = sep + pathArray[pathArray.length-2]
-        //        + sep + pathArray[pathArray.length-1];
-        String ap = storageDir.getAbsolutePath();
-        String shortPath = ap.substring(
-                ap.lastIndexOf("/", ap.lastIndexOf("/")-1)).substring(1);
-
         // Set button listeners
         this.findViewById(R.id.restorebackup_cancel_button).setOnClickListener(cancelButtonListener);
         this.findViewById(R.id.restorebackup_restore_button).setOnClickListener(restoreButtonListener);
         this.findViewById(R.id.restorebackup_chooser_button).setOnClickListener(chooserButtonListener);
 
-        field_backup_file = (EditText) findViewById(R.id.restorebackup_field_backup_file);
+        field_backup_file = findViewById(R.id.restorebackup_field_backup_file);
+        field_backup_file.setEnabled(false);
 
-        help_text = (TextView) findViewById(R.id.restorebackup_help_text);
-        //help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), storageDir.getName()));
-        help_text.setText(String.format(this.getString(R.string.help_text_restore_backup), shortPath));
+        TextView help_text = findViewById(R.id.restorebackup_help_text);
+        help_text.setText(this.getString(R.string.help_text_restore_backup));
 
-        file_details_table = (TableLayout) findViewById(R.id.restorebackup_file_details_table);
+        file_details_table = findViewById(R.id.restorebackup_file_details_table);
+        file_details_table.setColumnShrinkable(0, false);
+        file_details_table.setColumnShrinkable(1, true);
 
-        canReadExternal = true;
-
-        if( ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-            canReadExternal = false;
-        }
+        runFileChooser();
     }
 
     @Override
@@ -218,14 +200,6 @@ public class RestoreBackupActivity extends Activity {
 
         if( database == null )
             database = new DatabaseProvider(RestoreBackupActivity.this);
-
-        if( ! canReadExternal ) {
-            String[] EXTERNAL_PERM = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-            };
-
-            ActivityCompat.requestPermissions(this, EXTERNAL_PERM, Values.PERMISSIONS_REQUEST);
-        }
     }
 
     @Override
@@ -239,9 +213,8 @@ public class RestoreBackupActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void onActivityResult(int request, int result, Intent data) {
@@ -253,13 +226,42 @@ public class RestoreBackupActivity extends Activity {
                     field_backup_file.setText(filename);
 
                     try {
-                        if( !showFileDetails(selectedFile) ) {
+                        ParcelFileDescriptor pfd = ParcelFileDescriptor.open(selectedFile, ParcelFileDescriptor.MODE_READ_ONLY);
+                        if( ! showFileDetails(filename, pfd) ) {
                             this.findViewById(R.id.restorebackup_file_details_layout).setVisibility(View.GONE);
                             UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
                         }
                     }
                     catch( InvalidBackupFileException ibfe ) {
                         UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_file_invalid);
+                    }
+                    catch( Exception e ) {
+                        Log.e(TAG, "onActivityResult(): Caught an exception:", e);
+                        UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
+                    }
+                }
+                break;
+            case Values.ACTIVITY_OPEN_DOCUMENT:
+                if( result == Activity.RESULT_OK ) {
+                    chosenUri = data.getData();
+                    Log.d(TAG, "onActivityResult(): Chosen URI is " + chosenUri.toString());
+                    String[] segments = chosenUri.getLastPathSegment().split(":");
+                    String f = segments[segments.length-1];
+                    field_backup_file.setText(f);
+
+                    try {
+                        ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(chosenUri, "r");
+                        if( ! showFileDetails(f, pfd) ) {
+                            this.findViewById(R.id.restorebackup_file_details_layout).setVisibility(View.GONE);
+                            UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
+                        }
+                    }
+                    catch( InvalidBackupFileException ibfe ) {
+                        UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_file_invalid);
+                    }
+                    catch( Exception e ) {
+                        Log.e(TAG, "onActivityResult(): Caught an exception:", e);
+                        UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
                     }
                 }
                 break;
@@ -268,92 +270,92 @@ public class RestoreBackupActivity extends Activity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if( requestCode == Values.PERMISSIONS_REQUEST ) {
-            if( grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
-                canReadExternal = true;
-            }
-            else {
-                UserVisibleMessage.showMessage(this, R.string.msg_external_read_denied);
-                setResult(1);
-                finish();
-            }
-        }
-    }
-
     public void restoreBackupFile() {
-        String filename = field_backup_file.getText().toString().trim();
-        File backupFile = new File(storageDir, filename);
-        String filepath = backupFile.getAbsolutePath();
-
         try {
-            if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
-                if( !backupFile.exists() ) {
-                    UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_file_does_not_exist);
-                }
-                else {
-                    // Show the progress dialog
-                    p = ProgressDialog.show(RestoreBackupActivity.this, "", getText(R.string.status_restoring_backup), true, false);
+            // Show the progress dialog
+            p = ProgressDialog.show(RestoreBackupActivity.this, "", getText(R.string.status_restoring_backup), true, false);
 
-                    BackupParser b = new BackupParser(RestoreBackupActivity.this, filepath, backupParserHandler);
-                    Thread t = new Thread(b);
-                    t.start();
-                }
-            }
-            else {
-                UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_storage_not_mounted);
-            }
+            BackupParser b = new BackupParser(RestoreBackupActivity.this, chosenUri, backupParserHandler);
+            Thread t = new Thread(b);
+            t.start();
         }
         catch( Exception e ) {
             Log.e(TAG, "restoreBackupFile(): Caught an exception:", e);
             UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
-            backupFile.delete();
         }
     }
 
     public void runFileChooser() {
-        if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
-            Intent settingsIntent = new Intent();
-            settingsIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.backup.FileChooserActivity");
-            startActivityForResult(settingsIntent, Values.ACTIVITY_FILE_CHOOSER);
+        String filename = "";
+        Uri uri;
+
+        if( chosenUri == null ) {
+            uri = Uri.fromFile(new File(Environment.DIRECTORY_DOWNLOADS));
         }
         else {
-            UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_backup_storage_not_mounted);
-        }
-    }
+            try {
+                String s = chosenUri.getLastPathSegment();
 
-    public boolean showFileDetails(File file) throws InvalidBackupFileException {
-        String appVersion = new String();
-        String fileDate = new String();
-        String line = new String();
+                if( s.contains("/") ) {
+                    filename = s.substring(s.lastIndexOf('/'));
+                }
+                else {
+                    filename = s.split(":")[1];
+                }
+
+                uri = chosenUri;
+            }
+            catch( Exception e ) {
+                Log.e(TAG, "runFileChooser(): Caught an exception:", e);
+                UserVisibleMessage.showMessage(RestoreBackupActivity.this, R.string.msg_general_error);
+                return;
+            }
+        }
+
+        Intent createDocument = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        createDocument.addCategory(Intent.CATEGORY_OPENABLE);
+        createDocument.setType("text/plain");
+        createDocument.putExtra(Intent.EXTRA_TITLE, filename);
+
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
+            createDocument.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+
+        startActivityForResult(createDocument, Values.ACTIVITY_OPEN_DOCUMENT);
+    }
+    
+    public boolean showFileDetails(String fileName, ParcelFileDescriptor pfd) throws InvalidBackupFileException {
+        String appVersion = "";
+        String fileDate = "";
+        String line;
+
         boolean valid = false;
 
         try {
             file_details_table.removeAllViews();
 
-            BufferedReader r = new BufferedReader(new FileReader(file));
-            Log.d(TAG, "Reading file " + file.getAbsolutePath());
+            Log.d(TAG, "showFileDetails(): Reading file " + fileName);
+            BufferedReader r = new BufferedReader(new FileReader(pfd.getFileDescriptor()));
+
             int lineNum = 0;
 
             while( (line = r.readLine()) != null ) {
                 lineNum++;
 
                 if( line.startsWith("## Version: ") ) {
-                    Log.d(TAG, "Found version header on line " + lineNum);
+                    Log.d(TAG, "showFileDetails(): Found version header on line " + lineNum);
                     appVersion = line.replaceFirst("## Version: ", "").trim();
-                    Log.i(TAG, "Backup file is from app version " + appVersion);
+                    Log.i(TAG, "showFileDetails(): Backup file is from app version " + appVersion);
                     continue;
                 }
 
                 if( line.startsWith("## Created: ") ) {
-                    Log.d(TAG, "Found date header on line " + lineNum);
+                    Log.d(TAG, "showFileDetails(): Found date header on line " + lineNum);
                     fileDate = line.replaceFirst("## Created: ", "").trim();
-                    Log.i(TAG, "Backup file was created " + fileDate);
+                    Log.i(TAG, "showFileDetails(): Backup file was created " + fileDate);
                     continue;
                 }
 
-                if( appVersion.length() > 0 && fileDate.length() > 0 ) {
+                if( (!appVersion.isEmpty()) && (!fileDate.isEmpty()) ) {
                     valid = true;
                     break;
                 }
@@ -362,18 +364,18 @@ public class RestoreBackupActivity extends Activity {
             r.close();
 
             if( !valid ) {
-                Log.e(TAG, "Backup file is not valid!");
+                Log.e(TAG, "showFileDetails(): Backup file is not valid!");
                 throw new InvalidBackupFileException();
             }
 
-            long sizeInKB = file.length() / 1024;
+            long sizeInKB = pfd.getStatSize() / 1024;
 
             TextView versionLabel = new TextView(RestoreBackupActivity.this);
             versionLabel.setText(R.string.label_backup_app_version);
             versionLabel.setTextColor(Color.WHITE);
             versionLabel.setTextSize(14);
             versionLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            versionLabel.setPadding(0, 0, 10, 0);
+            versionLabel.setPadding(0, 0, 25, 0);
 
             TextView versionText = new TextView(RestoreBackupActivity.this);
             versionText.setText(appVersion);
@@ -385,7 +387,7 @@ public class RestoreBackupActivity extends Activity {
             dateLabel.setTextColor(Color.WHITE);
             dateLabel.setTextSize(14);
             dateLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            dateLabel.setPadding(0, 0, 10, 0);
+            dateLabel.setPadding(0, 0, 25, 0);
 
             TextView dateText = new TextView(RestoreBackupActivity.this);
             dateText.setText(fileDate);
@@ -397,7 +399,7 @@ public class RestoreBackupActivity extends Activity {
             sizeLabel.setTextColor(Color.WHITE);
             sizeLabel.setTextSize(14);
             sizeLabel.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            sizeLabel.setPadding(0, 0, 10, 0);
+            sizeLabel.setPadding(0, 0, 25, 0);
 
             TextView sizeText = new TextView(RestoreBackupActivity.this);
             sizeText.setText(Long.valueOf(sizeInKB).toString() + " KB");
@@ -405,16 +407,19 @@ public class RestoreBackupActivity extends Activity {
             sizeText.setTextSize(14);
 
             TableRow versionRow = new TableRow(RestoreBackupActivity.this);
+            //versionRow.addView(versionLabel, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.2f));
             versionRow.addView(versionLabel);
-            versionRow.addView(versionText);
+            versionRow.addView(versionText, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
 
             TableRow dateRow = new TableRow(RestoreBackupActivity.this);
+            //dateRow.addView(dateLabel, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.2f));
             dateRow.addView(dateLabel);
-            dateRow.addView(dateText);
+            dateRow.addView(dateText, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
 
             TableRow sizeRow = new TableRow(RestoreBackupActivity.this);
             sizeRow.addView(sizeLabel);
-            sizeRow.addView(sizeText);
+            //sizeRow.addView(sizeLabel, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.2f));
+            sizeRow.addView(sizeText, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
 
             file_details_table.addView(versionRow);
             file_details_table.addView(dateRow);
@@ -425,9 +430,11 @@ public class RestoreBackupActivity extends Activity {
             return true;
         }
         catch( InvalidBackupFileException ibfe ) {
+            Log.d(TAG, "showFileDetails(): Caught an exception:", ibfe);
             throw ibfe;
         }
         catch( Exception e ) {
+            Log.d(TAG, "showFileDetails(): Caught an exception:", e);
             return false;
         }
     }

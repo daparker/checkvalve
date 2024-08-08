@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -51,6 +51,8 @@ public final class Values {
     public static final int ACTIVITY_CREATE_BACKUP = 16;
     public static final int ACTIVITY_RESTORE_BACKUP = 17;
     public static final int ACTIVITY_FILE_CHOOSER = 18;
+    public static final int ACTIVITY_CREATE_DOCUMENT = 19;
+    public static final int ACTIVITY_OPEN_DOCUMENT = 20;
 
     // Intent extra names
     public static final String EXTRA_ROW_ID = "rowId";
@@ -70,6 +72,7 @@ public final class Values {
     public static final String EXTRA_REFRESH_SERVERS = "refreshServers";
     public static final String EXTRA_RESTART_SERVICE = "restartService";
     public static final String EXTRA_QUERY_SERVERS = "queryServers";
+    public static final String EXTRA_DO_NOT_SHOW = "doNotShow";
 
     // Bundle keys
     public static final String MESSAGES = "messages";
@@ -128,6 +131,8 @@ public final class Values {
     public static final String FILE_HIDE_CHAT_RELAY_NOTE = ".hide_chat_relay_note";
     public static final String FILE_HIDE_CONSOLE_RELAY_NOTE = ".hide_console_relay_note";
     public static final String FILE_HIDE_ANDROID_VERSION_NOTE = ".hide_android_version_note";
+    public static final String FILE_NEVER_HIDE = ".never_hide";
+    public static final String FILE_DUMMY_TEMP = "DELETE_ME";
 
     // Server query values
     public static final int INT_PACKET_HEADER = 0xFFFFFFFF;
@@ -161,7 +166,7 @@ public final class Values {
     public static final byte BYTE_ZERO = (byte) 0x00;
     public static final byte BYTE_ONE = (byte) 0x01;
 
-    public static final Bundle getSettings(Context c) {
+    public static Bundle getSettings(Context c) {
         DatabaseProvider d = new DatabaseProvider(c);
         Bundle s = d.getSettingsAsBundle();
         d.close();

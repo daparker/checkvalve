@@ -52,7 +52,7 @@ public class BackgroundQueryService extends Service {
     private static Context context;
     private static Thread t;
 
-    private static Runnable r = new Runnable() {
+    private static final Runnable r = new Runnable() {
         public void run() {
             Thread q = new Thread();
 
@@ -70,7 +70,7 @@ public class BackgroundQueryService extends Service {
                 }
             }
             else {
-                Log.w(TAG, "Background query is still running on thread " + q.toString());
+                Log.w(TAG, "Background query is still running on thread " + q);
             }
         }
     };
@@ -232,13 +232,7 @@ public class BackgroundQueryService extends Service {
             }
 
             nb.setDefaults(defaults);
-
-            if( android.os.Build.VERSION.SDK_INT < 16 ) {
-                n = nb.getNotification();
-            }
-            else {
-                n = nb.build();
-            }
+            n = nb.build();
 
             Log.d(TAG, "Showing notification.");
             nm.notify(tag, 1, n);
@@ -250,7 +244,7 @@ public class BackgroundQueryService extends Service {
 
         try {
             int freq = db.getIntSetting(DatabaseProvider.SETTINGS_BACKGROUND_QUERY_FREQUENCY);
-            interval = (freq * 60000);
+            interval = (freq * 60000L);
         }
         catch( InvalidDataTypeException e ) {
             interval = 300000L;

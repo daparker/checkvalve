@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -26,7 +26,7 @@ import android.os.Build;
  * Define the QueryDebugLog class
  */
 public class QueryDebugLog {
-    private StringBuilder sb;
+    private final StringBuilder sb;
 
     /**
      * Construct a new instance of the QueryDebugLog class.
@@ -47,27 +47,14 @@ public class QueryDebugLog {
 
         sb.append("Device: ");
 
-        if( brand != null && brand.length() > 0 ) {
+        if( brand != null && !brand.isEmpty() )
             sb.append(brand).append(" ");
-        }
 
-        if( manufacturer != null && manufacturer.length() > 0 ) {
+        if( manufacturer != null && !manufacturer.isEmpty() )
             sb.append(manufacturer).append(" ");
-        }
 
-        if( model != null && model.length() > 0 ) {
+        if( model != null && !model.isEmpty() )
             sb.append(model).append(" ");
-        }
-
-        sb.append('\n');
-
-        if( Build.VERSION.SDK_INT > 8 ) {
-            String serial = Build.SERIAL;
-
-            if( serial != null && serial.length() > 0 ) {
-                sb.append("Serial: ").append(serial).append('\n');
-            }
-        }
 
         sb.append('\n');
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -51,7 +51,7 @@ along with the CheckValve source code.  If not, see
         android:padding="10dp"
         android:text=""
         android:textSize="14sp" />
-
+<!--
     <LinearLayout
         android:id="@+id/createbackup_edittext_layout"
         android:layout_width="match_parent"
@@ -80,6 +80,47 @@ along with the CheckValve source code.  If not, see
             android:text=""
             android:textSize="14sp" />
     </LinearLayout>
+-->
+    <RelativeLayout
+        android:id="@+id/createbackup_edittext_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:orientation="vertical"
+        android:paddingTop="25dp" >
+
+        <TextView
+            android:id="@+id/createbackup_label_save_as"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:singleLine="true"
+            android:text="@string/label_save_as"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/createbackup_chooser_button"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/createbackup_label_save_as"
+            android:gravity="center"
+            android:text="@string/button_ellipsis" />
+
+        <EditText
+            android:id="@+id/createbackup_field_save_as"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/createbackup_chooser_button"
+            android:layout_below="@id/createbackup_label_save_as"
+            android:layout_toLeftOf="@id/createbackup_chooser_button"
+            android:gravity="left|center_vertical"
+            android:inputType="text"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="14sp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/createbackup_checkbox_layout"

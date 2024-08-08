@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,9 +38,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 
+import androidx.annotation.NonNull;
+
 public class SearchPlayersActivity extends Activity {
     private ProgressDialog p;
-    private SearchPlayers q;
     private DatabaseProvider database;
     private TableLayout search_results_table;
     private TableLayout message_table;
@@ -51,10 +53,8 @@ public class SearchPlayersActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         if( database == null )
             database = new DatabaseProvider(SearchPlayersActivity.this);
@@ -64,8 +64,8 @@ public class SearchPlayersActivity extends Activity {
 
         setContentView(R.layout.searchresults);
 
-        search_results_table = (TableLayout) findViewById(R.id.searchresults_main_table);
-        message_table = (TableLayout) findViewById(R.id.searchresults_message_table);
+        search_results_table = findViewById(R.id.searchresults_main_table);
+        message_table = findViewById(R.id.searchresults_message_table);
 
         searchPlayers(search);
     }
@@ -91,9 +91,8 @@ public class SearchPlayersActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     @Override
@@ -105,12 +104,12 @@ public class SearchPlayersActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.back:
-                quit();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.back ) {
+            quit();
+            return true;
+        }
+        else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -127,13 +126,13 @@ public class SearchPlayersActivity extends Activity {
         messageRows = new TableRow[(count * 50)];
 
         // Run the server queries in a new thread
-        q = new SearchPlayers(SearchPlayersActivity.this, tableRows, messageRows, progressHandler, search);
+        SearchPlayers q = new SearchPlayers(SearchPlayersActivity.this, tableRows, messageRows, progressHandler, search);
         q.start();
     }
 
     // Handler for the player search thread
-    Handler progressHandler = new Handler() {
-        public void handleMessage(Message msg) {
+    Handler progressHandler = new Handler(Looper.myLooper()) {
+        public void handleMessage(@NonNull Message msg) {
             /*
              * Build and display the error messages table if there are errors to be displayed
              */

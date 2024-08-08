@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CheckValve.iml" filepath="$PROJECT_DIR$/.idea/modules/CheckValve.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/CheckValve.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/CheckValve.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/CheckValve.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/CheckValve.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/checkvalve.iml" filepath="$PROJECT_DIR$/.idea/modules/checkvalve.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/checkvalve.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/checkvalve.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/checkvalve.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/checkvalve.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.unitTest.iml" />
     </modules>
   </component>
 </project>

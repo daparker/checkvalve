@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -31,10 +31,10 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class ServerCheck implements Runnable {
-    private Handler handler;
-    private String server;
-    private int port;
-    private int timeout;
+    private final Handler handler;
+    private final String server;
+    private final int port;
+    private final int timeout;
 
     private static final String TAG = ServerCheck.class.getSimpleName();
 

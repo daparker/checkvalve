@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -28,6 +28,7 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
@@ -65,7 +66,6 @@ public class ChatViewerActivity extends Activity {
 
     private Animation fade_in;
     private Animation fade_out;
-    private Button say_button;
     private Chat chatRunnable;
     private EditText message_field;
     private NetworkEventReceiver receiverRunnable;
@@ -75,31 +75,20 @@ public class ChatViewerActivity extends Activity {
     private String chatRelayIP;
     private String chatRelayPassword;
     private String chatRelayPort;
-    private String command;
     private String gameServerIP;
     private String message;
     private String gameServerPort;
     private String rconPassword;
     private String rconServer;
-    private String st;
     private TableLayout chat_table;
     private TableLayout.LayoutParams bottomRowParams;
-    private TableRow bottomRow;
     private TableRow row;
     private TableRow spacerRow;
-    private TableRow topRow;
-    private TableRow.LayoutParams chatTextParams;
     private TableRow.LayoutParams notificationDateParams;
     private TableRow.LayoutParams notificationTextParams;
-    private TextView msgPlayerName;
-    private TextView msgPlayerSays;
-    private TextView msgPlayerTeam;
-    private TextView msgSayTeam;
-    private TextView msgTimestamp;
     private TextView notificationDate;
     private TextView notificationText;
     private TextView sending;
-    private TextView subtitle;
     private Thread chatThread;
     private Thread receiverThread;
     private DatabaseProvider database;
@@ -114,7 +103,7 @@ public class ChatViewerActivity extends Activity {
 
     private GameServer srv;
 
-    private OnClickListener sayButtonListener = new OnClickListener() {
+    private final OnClickListener sayButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Say" button was clicked
@@ -122,14 +111,14 @@ public class ChatViewerActivity extends Activity {
 
             message = message_field.getText().toString();
 
-            if( message.length() == 0 )
+            if( message.isEmpty() )
                 UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_empty_rcon_command);
             else
                 sendCommand();
         }
     };
 
-    private OnKeyListener enterKeyListener = new OnKeyListener() {
+    private final OnKeyListener enterKeyListener = new OnKeyListener() {
         public boolean onKey(View v, int k, KeyEvent e) {
             /*
              * "Enter" or "Done" key was pressed
@@ -138,7 +127,7 @@ public class ChatViewerActivity extends Activity {
             if( (e.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (e.getAction() == KeyEvent.ACTION_UP) ) {
                 message = message_field.getText().toString();
 
-                if( message.length() == 0 )
+                if( message.isEmpty() )
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_empty_rcon_command);
                 else
                     sendCommand();
@@ -150,18 +139,18 @@ public class ChatViewerActivity extends Activity {
         }
     };
 
-    private OnTouchListener touchListener = new OnTouchListener() {
+    private final OnTouchListener touchListener = new OnTouchListener() {
         public boolean onTouch(View v, MotionEvent m) {
             /*
              * Screen was touched
              */
-            scrollLock = (m.getAction() == MotionEvent.ACTION_UP) ? false : true;
+            scrollLock = (m.getAction() != MotionEvent.ACTION_UP);
             return false;
         }
     };
 
     // Handler for the Chat Relay client thread
-    private Handler chatClientHandler = new Handler() {
+    private final Handler chatClientHandler = new Handler(Looper.myLooper()) {
         public void handleMessage(Message msg) {
             /*
              * Message object "what" codes:
@@ -192,7 +181,7 @@ public class ChatViewerActivity extends Activity {
                     break;
 
                 case 3:
-                    String errorMsg = (String) ChatViewerActivity.this.getText(R.string.msg_chat_connection_refused) + " " + (String) msg.obj;
+                    String errorMsg = ChatViewerActivity.this.getText(R.string.msg_chat_connection_refused) + " " + msg.obj;
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, errorMsg);
                     getChatRelayDetails(chatRelayIP, chatRelayPort, null);
                     break;
@@ -233,35 +222,36 @@ public class ChatViewerActivity extends Activity {
                     try {
                         ChatMessage chatMsg = (ChatMessage) msg.obj;
 
-                        st = (chatMsg.sayTeamFlag == (byte) 0x00) ? "" : "(Say Team)";
+                        String st = (chatMsg.sayTeamFlag == (byte) 0x00) ? "" : "(Say Team)";
 
-                        msgTimestamp = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
+                        TextView msgTimestamp = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
                         msgTimestamp.setText(chatMsg.messageTimestamp.substring(13));
 
-                        msgPlayerName = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
+                        TextView msgPlayerName = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
                         msgPlayerName.setText(chatMsg.playerName);
                         msgPlayerName.setTypeface(null, Typeface.BOLD);
 
-                        msgPlayerTeam = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
+                        TextView msgPlayerTeam = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
                         msgPlayerTeam.setText("(" + chatMsg.playerTeam + ")");
 
-                        msgSayTeam = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
+                        TextView msgSayTeam = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_top, null);
                         msgSayTeam.setText(st);
 
-                        msgPlayerSays = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_bottom, null);
+                        TextView msgPlayerSays = (TextView) View.inflate(ChatViewerActivity.this, R.layout.chat_textview_bottom, null);
                         msgPlayerSays.setText(chatMsg.message);
 
-                        topRow = (TableRow) View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_top, null);
+                        TableRow topRow = (TableRow) View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_top, null);
                         topRow.setId(rowNum);
                         topRow.addView(msgTimestamp);
                         topRow.addView(msgPlayerName);
                         topRow.addView(msgPlayerTeam);
                         topRow.addView(msgSayTeam);
 
-                        bottomRow = (TableRow) View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_bottom, null);
+                        TableRow bottomRow = (TableRow) View.inflate(ChatViewerActivity.this, R.layout.chat_tablerow_bottom, null);
                         bottomRow.setId(rowNum);
                         bottomRow.addView(msgPlayerSays);
-                        chatTextParams = (TableRow.LayoutParams) msgPlayerSays.getLayoutParams();
+
+                        TableRow.LayoutParams chatTextParams = (TableRow.LayoutParams) msgPlayerSays.getLayoutParams();
                         chatTextParams.span = 4;
 
                         msgPlayerSays.setLayoutParams(chatTextParams);
@@ -328,10 +318,10 @@ public class ChatViewerActivity extends Activity {
     };
 
     // Handler for the "Sending" pop-up thread
-    private Handler popUpHandler = new Handler() {
+    private final Handler popUpHandler = new Handler(Looper.myLooper()) {
         public void handleMessage(Message msg) {
             // sending.setVisibility(View.GONE);
-            runFadeOutAnimation(ChatViewerActivity.this, sending);
+            runFadeOutAnimation(sending);
 
             switch( msg.what ) {
                 case 0:
@@ -350,7 +340,7 @@ public class ChatViewerActivity extends Activity {
     };
 
     // Handler for the network event receiver thread
-    private Handler networkEventHandler = new Handler() {
+    private final Handler networkEventHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             /*
@@ -401,8 +391,8 @@ public class ChatViewerActivity extends Activity {
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_connection_lost);
                     break;
 
-                case 0:
-                    break;
+                //case 0:
+                //    break;
 
                 case 1:
                     UserVisibleMessage.showMessage(ChatViewerActivity.this, R.string.msg_network_change);
@@ -425,7 +415,7 @@ public class ChatViewerActivity extends Activity {
     };
 
     // Handler for the EngineQuery thread
-    private Handler engineQueryHandler = new Handler() {
+    private final Handler engineQueryHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if( msg.obj != null ) {
@@ -446,7 +436,7 @@ public class ChatViewerActivity extends Activity {
         }
     };
 
-    private Handler rconAuthHandler = new Handler() {
+    private final Handler rconAuthHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             p.dismiss();
@@ -457,7 +447,7 @@ public class ChatViewerActivity extends Activity {
                     rconIsAuthenticated = true;
 
                     if( message != null )
-                        if( message.length() > 0 )
+                        if( ! message.isEmpty() )
                             sendCommand();
 
                     break;
@@ -501,10 +491,8 @@ public class ChatViewerActivity extends Activity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
 
         this.setContentView(R.layout.chatui);
 
@@ -558,12 +546,12 @@ public class ChatViewerActivity extends Activity {
                 TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.MATCH_PARENT);
 
-        chat_table = (TableLayout) findViewById(R.id.chatui_chat_table);
+        chat_table = findViewById(R.id.chatui_chat_table);
 
-        layout = (ScrollView) findViewById(R.id.chatui_scrollview);
+        layout = findViewById(R.id.chatui_scrollview);
         layout.setOnTouchListener(touchListener);
 
-        subtitle = (TextView) findViewById(R.id.chatui_subtitle);
+        TextView subtitle = findViewById(R.id.chatui_subtitle);
 
         if( thisIntent.getStringExtra(Values.EXTRA_NICKNAME) != null ) {
             subtitle.setText(thisIntent.getStringExtra(Values.EXTRA_NICKNAME));
@@ -572,13 +560,13 @@ public class ChatViewerActivity extends Activity {
             subtitle.setText(gameServerIP + ":" + gameServerPort);
         }
 
-        sending = (TextView) findViewById(R.id.chatui_sending);
+        sending = findViewById(R.id.chatui_sending);
         sending.setVisibility(View.GONE);
 
-        message_field = (EditText) findViewById(R.id.chatui_message_field);
+        message_field = findViewById(R.id.chatui_message_field);
         message_field.setOnKeyListener(enterKeyListener);
 
-        say_button = (Button) findViewById(R.id.chatui_say_button);
+        Button say_button = findViewById(R.id.chatui_say_button);
         say_button.setOnClickListener(sayButtonListener);
 
         receiverRunnable = new NetworkEventReceiver(this, networkEventHandler);
@@ -609,7 +597,6 @@ public class ChatViewerActivity extends Activity {
         chatRelayPort = Integer.valueOf(settings.getInt(Values.SETTING_DEFAULT_RELAY_PORT)).toString();
         chatRelayPassword = settings.getString(Values.SETTING_DEFAULT_RELAY_PASSWORD);
 
-        //showNote();
         getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
 
         UserVisibleMessage.showNote(
@@ -653,23 +640,23 @@ public class ChatViewerActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.back:
-                finish();
-                return true;
-            case R.id.clear_console:
-                chat_table.removeAllViews();
-                chat_table.invalidate();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.back ) {
+            finish();
+            return true;
+        }
+        else if( item.getItemId() == R.id.clear_console ) {
+            chat_table.removeAllViews();
+            chat_table.invalidate();
+            return true;
+        }
+        else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void onActivityResult(int request, int result, Intent data) {
@@ -703,8 +690,6 @@ public class ChatViewerActivity extends Activity {
         else if( request == Values.ACTIVITY_SHOW_NOTE ) {
             getChatRelayDetails(chatRelayIP, chatRelayPort, chatRelayPassword);
         }
-
-        return;
     }
 
     public void getRCONPassword() {
@@ -714,7 +699,7 @@ public class ChatViewerActivity extends Activity {
     }
 
     public void rconAuthenticate() {
-        if( rconPassword.length() == 0 ) {
+        if( rconPassword.isEmpty() ) {
             getRCONPassword();
             return;
         }
@@ -731,11 +716,11 @@ public class ChatViewerActivity extends Activity {
             return;
         }
 
-        command = "say " + message;
+        String command = "say " + message;
         message_field.setText("");
         message = new String();
         sending.setText(R.string.status_rcon_sending);
-        runFadeInAnimation(ChatViewerActivity.this, sending);
+        runFadeInAnimation(sending);
         new Thread(new RconQuery(command, srv, popUpHandler)).start();
     }
 
@@ -801,11 +786,11 @@ public class ChatViewerActivity extends Activity {
         }
     }
 
-    public void runFadeInAnimation(Context c, View v) {
+    public void runFadeInAnimation(View v) {
         v.startAnimation(fade_in);
     }
 
-    public void runFadeOutAnimation(Context c, View v) {
+    public void runFadeOutAnimation(View v) {
         v.startAnimation(fade_out);
     }
 

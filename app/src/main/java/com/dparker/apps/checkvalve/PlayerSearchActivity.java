@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -32,16 +32,14 @@ import android.widget.EditText;
 
 public class PlayerSearchActivity extends Activity {
     private EditText field_playersearch;
-    private Button search_button;
-    private Button cancel_button;
 
-    private OnClickListener searchButtonListener = new OnClickListener() {
+    private final OnClickListener searchButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Search" button was clicked
              */
 
-            field_playersearch = (EditText) findViewById(R.id.playersearch_field_search_for);
+            field_playersearch = findViewById(R.id.playersearch_field_search_for);
 
             // Explicitly hide the soft keyboard because sometimes it doesn't close
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -59,7 +57,7 @@ public class PlayerSearchActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -76,12 +74,12 @@ public class PlayerSearchActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.playersearch);
 
-        field_playersearch = (EditText) findViewById(R.id.playersearch_field_search_for);
+        field_playersearch = findViewById(R.id.playersearch_field_search_for);
 
-        search_button = (Button) findViewById(R.id.playersearch_search_button);
-        cancel_button = (Button) findViewById(R.id.playersearch_cancel_button);
-
+        Button search_button = findViewById(R.id.playersearch_search_button);
         search_button.setOnClickListener(searchButtonListener);
+
+        Button cancel_button = findViewById(R.id.playersearch_cancel_button);
         cancel_button.setOnClickListener(cancelButtonListener);
     }
 

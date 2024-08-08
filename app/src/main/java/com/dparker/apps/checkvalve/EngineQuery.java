@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -33,11 +33,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class EngineQuery implements Runnable {
-    private Handler handler;
-    private String server;
-    private int port;
-    private int timeout;
-    private GameServer gs;
+    private final Handler handler;
+    private final String server;
+    private final int port;
+    private final int timeout;
 
     private static final String TAG = EngineQuery.class.getSimpleName();
 
@@ -61,19 +60,18 @@ public class EngineQuery implements Runnable {
 
         Message msg = new Message();
 
-        gs = getServerEngine(server, port, timeout);
-        msg.obj = gs;
+        msg.obj = getServerEngine(server, port, timeout);
         handler.sendMessage(msg);
     }
 
     public GameServer getServerEngine(String s, int p, int t) {
-        int appId = 0;
-        int byteNum = 0;
-        int firstByte = 0;
-        int secondByte = 0;
+        int appId;
+        int byteNum;
+        int firstByte;
+        int secondByte;
 
         try {
-            int engine = 0;
+            int engine;
 
             DatagramSocket socket = new DatagramSocket();
 
@@ -143,8 +141,8 @@ public class EngineQuery implements Runnable {
                 byteNum++;
 
                 // Get the old Steam application ID
-                firstByte = (int) (arrayIn[byteNum] & 0xff);
-                secondByte = (int) (arrayIn[byteNum + 1] & 0xff);
+                firstByte = arrayIn[byteNum] & 0xff;
+                secondByte = arrayIn[byteNum + 1] & 0xff;
                 appId = firstByte | (secondByte << 8);
 
                 // If the app ID is less than 200 then the engine is assumed to be GoldSource,
@@ -164,7 +162,7 @@ public class EngineQuery implements Runnable {
                 // If we're not at the end of the array then get the additional data
                 if (byteNum < arrayIn.length) {
                     // This byte is the Extra Data Flag (EDF)
-                    int EDF = (int) arrayIn[byteNum];
+                    int EDF = arrayIn[byteNum];
                     byteNum++;
 
                     // Skip the port number if included
@@ -223,8 +221,7 @@ public class EngineQuery implements Runnable {
                 return null;
             }
 
-            GameServer result = Server.getServer(engine, InetAddress.getByName(server), port);
-            return result;
+            return Server.getServer(engine, InetAddress.getByName(server), port);
         }
         // Handle an exception (socket timeout or incorrect response type)
         catch( Exception e ) {

@@ -55,7 +55,7 @@ public class AddServerActivity extends Activity {
     private EditText field_timeout;
     private EditText field_rcon_password;
 
-    private OnClickListener addButtonListener = new OnClickListener() {
+    private final OnClickListener addButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Add" button was clicked
@@ -81,7 +81,7 @@ public class AddServerActivity extends Activity {
                 password = (password_len > 0) ? field_rcon_password.getText().toString().trim() : "";
                 nickname = (nickname_len > 0) ? field_nickname.getText().toString().trim() : "";
 
-                if( nickname.length() > 0 ) {
+                if( ! nickname.isEmpty() ) {
                     if( database.serverNicknameExists(nickname) ) {
                         Log.w(TAG, "addButtonListener: Server nickname '" + nickname + "' is a duplicate!");
                         UserVisibleMessage.showMessage(AddServerActivity.this, "The server nickname is already in use.");
@@ -144,12 +144,12 @@ public class AddServerActivity extends Activity {
                             case 2:
                             case 3:
                             case 4:
-                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unable_to_connect), server);
+                                errorMsg = String.format(AddServerActivity.this.getString(R.string.msg_unable_to_connect_to), server);
                                 UserVisibleMessage.showMessage(AddServerActivity.this, errorMsg);
                                 break;
-                            case 5:
-                                UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_server_validation_failed);
-                                break;
+                            //case 5:
+                            //    UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_server_validation_failed);
+                            //    break;
                             default:
                                 UserVisibleMessage.showMessage(AddServerActivity.this, R.string.msg_server_validation_failed);
                                 break;
@@ -157,7 +157,7 @@ public class AddServerActivity extends Activity {
                     }
                 };
 
-                if( settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS) == true ) {
+                if( settings.getBoolean(Values.SETTING_VALIDATE_NEW_SERVERS) ) {
                     // Show the progress dialog
                     p = ProgressDialog.show(AddServerActivity.this, "", AddServerActivity.this.getText(R.string.status_verifying_server), true, false);
 
@@ -170,8 +170,7 @@ public class AddServerActivity extends Activity {
                         setResult(1);
                     }
                     else {
-                        String errorMsg = new String();
-                        errorMsg = "Database insert failed! [db=" + database.toString() + "]";
+                        String errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                         errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
                         Log.w(TAG, errorMsg);
 
@@ -184,7 +183,7 @@ public class AddServerActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -206,22 +205,22 @@ public class AddServerActivity extends Activity {
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
 
-        addButton = (Button) findViewById(R.id.addnewserver_add_button);
+        addButton = findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button) findViewById(R.id.addnewserver_cancel_button);
+        cancelButton = findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        field_server = (EditText) findViewById(R.id.addnewserver_field_server);
-        field_port = (EditText) findViewById(R.id.addnewserver_field_port);
-        field_timeout = (EditText) findViewById(R.id.addnewserver_field_timeout);
-        field_rcon_password = (EditText) findViewById(R.id.addnewserver_field_rcon_password);
-        field_nickname = (EditText) findViewById(R.id.addnewserver_field_nickname);
+        field_server = findViewById(R.id.addnewserver_field_server);
+        field_port = findViewById(R.id.addnewserver_field_port);
+        field_timeout = findViewById(R.id.addnewserver_field_timeout);
+        field_rcon_password = findViewById(R.id.addnewserver_field_rcon_password);
+        field_nickname = findViewById(R.id.addnewserver_field_nickname);
 
         field_port.setText(Integer.toString(settings.getInt(Values.SETTING_DEFAULT_QUERY_PORT)));
         field_timeout.setText(Integer.toString(settings.getInt(Values.SETTING_DEFAULT_QUERY_TIMEOUT)));
 
-        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
+        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) ) {
             ((CheckBox) findViewById(R.id.addnewserver_checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
@@ -245,10 +244,10 @@ public class AddServerActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        addButton = (Button) findViewById(R.id.addnewserver_add_button);
+        addButton = findViewById(R.id.addnewserver_add_button);
         addButton.setOnClickListener(addButtonListener);
 
-        cancelButton = (Button) findViewById(R.id.addnewserver_cancel_button);
+        cancelButton = findViewById(R.id.addnewserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
         if( database == null ) database = new DatabaseProvider(AddServerActivity.this);
@@ -257,7 +256,6 @@ public class AddServerActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void showPasswordCheckboxHandler(View view) {

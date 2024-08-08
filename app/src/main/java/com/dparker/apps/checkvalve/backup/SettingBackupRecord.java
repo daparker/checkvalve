@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -77,7 +77,7 @@ public class SettingBackupRecord {
             return false;
         }
 
-        if( type.length() == 0 || id.length() == 0 ) {
+        if( type.isEmpty() || id.isEmpty() ) {
             return false;
         }
 

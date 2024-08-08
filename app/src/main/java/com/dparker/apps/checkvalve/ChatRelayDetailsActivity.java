@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -47,7 +47,7 @@ public class ChatRelayDetailsActivity extends Activity {
     private DatabaseProvider database;
     private String[] previousHosts;
 
-    private OnClickListener connectButtonListener = new OnClickListener() {
+    private final OnClickListener connectButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Connect" button was clicked
@@ -94,7 +94,7 @@ public class ChatRelayDetailsActivity extends Activity {
                     database.putRelayHost(server);
                 }
 
-                if( password.length() == 0 )
+                if( password.isEmpty() )
                     password = "";
 
                 returned.putExtra(Values.EXTRA_SERVER, server);
@@ -107,7 +107,7 @@ public class ChatRelayDetailsActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -131,29 +131,29 @@ public class ChatRelayDetailsActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
-        field_server = (AutoCompleteTextView) findViewById(R.id.chatrelaydetails_field_server);
-        field_port = (EditText) findViewById(R.id.chatrelaydetails_field_port);
-        field_password = (EditText) findViewById(R.id.chatrelaydetails_field_password);
+        field_server = findViewById(R.id.chatrelaydetails_field_server);
+        field_port = findViewById(R.id.chatrelaydetails_field_port);
+        field_password = findViewById(R.id.chatrelaydetails_field_password);
 
-        if( thisIntent.getStringExtra(Values.EXTRA_SERVER).length() != 0 )
+        if( ! thisIntent.getStringExtra(Values.EXTRA_SERVER).isEmpty() )
             field_server.setText(thisIntent.getStringExtra(Values.EXTRA_SERVER));
 
-        if( thisIntent.getStringExtra(Values.EXTRA_PORT).length() != 0 )
+        if( ! thisIntent.getStringExtra(Values.EXTRA_PORT).isEmpty() )
             field_port.setText(thisIntent.getStringExtra(Values.EXTRA_PORT));
 
-        if( thisIntent.getStringExtra(Values.EXTRA_PASSWORD).length() != 0 )
+        if( ! thisIntent.getStringExtra(Values.EXTRA_PASSWORD).isEmpty() )
             field_password.setText(thisIntent.getStringExtra(Values.EXTRA_PASSWORD));
 
-        connectButton = (Button) findViewById(R.id.chatrelaydetails_connect_button);
+        connectButton = findViewById(R.id.chatrelaydetails_connect_button);
         connectButton.setOnClickListener(connectButtonListener);
 
-        cancelButton = (Button) findViewById(R.id.chatrelaydetails_cancel_button);
+        cancelButton = findViewById(R.id.chatrelaydetails_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
         previousHosts = database.getRelayHosts();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview_custom, previousHosts);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.autocomplete_textview_custom, previousHosts);
 
-        field_server = (AutoCompleteTextView) findViewById(R.id.chatrelaydetails_field_server);
+        field_server = findViewById(R.id.chatrelaydetails_field_server);
         field_server.setAdapter(adapter);
         field_server.setThreshold(1);
     }
@@ -175,16 +175,15 @@ public class ChatRelayDetailsActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(ChatRelayDetailsActivity.this);
 
-        connectButton = (Button) findViewById(R.id.chatrelaydetails_connect_button);
+        connectButton = findViewById(R.id.chatrelaydetails_connect_button);
         connectButton.setOnClickListener(connectButtonListener);
 
-        cancelButton = (Button) findViewById(R.id.chatrelaydetails_cancel_button);
+        cancelButton = findViewById(R.id.chatrelaydetails_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 }

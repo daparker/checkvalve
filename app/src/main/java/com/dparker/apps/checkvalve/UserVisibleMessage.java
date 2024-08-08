@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -79,12 +79,38 @@ public class UserVisibleMessage {
 
         Log.d(TAG, "showNote(): Marker file " + file + " does not exist; showing note.");
 
+        Intent showNoteIntent = new Intent();
+        showNoteIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowNoteActivity");
+        showNoteIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        showNoteIntent.putExtra(Values.EXTRA_NOTE_ID, resId);
+        showNoteIntent.putExtra(Values.EXTRA_FILE_NAME, file);
+        context.startActivity(showNoteIntent);
+    }
+
+    /**
+     * Displays a note to the user and includes the option to not show this note again.
+     *
+     * @param context   The context to use
+     * @param file      The filename of the marker file to create or delete
+     * @param resId     The resource ID of the message to display in the note
+     * @param doNotShow 'Do Not Show Again' checkbox (true=displayed, false=hidden)
+     */
+    public static void showNote(Context context, String file, int resId, Boolean doNotShow) {
+        File f = new File(context.getFilesDir(), file);
+
+        if( f.exists() ) {
+            Log.d(TAG, "showNote(): Marker file " + file + " exists; note will not be displayed.");
+            return;
+        }
+
+        Log.d(TAG, "showNote(): Marker file " + file + " does not exist; showing note.");
 
         Intent showNoteIntent = new Intent();
         showNoteIntent.setClassName("com.dparker.apps.checkvalve", "com.dparker.apps.checkvalve.ShowNoteActivity");
         showNoteIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         showNoteIntent.putExtra(Values.EXTRA_NOTE_ID, resId);
         showNoteIntent.putExtra(Values.EXTRA_FILE_NAME, file);
+        showNoteIntent.putExtra(Values.EXTRA_DO_NOT_SHOW, doNotShow);
         context.startActivity(showNoteIntent);
     }
 }

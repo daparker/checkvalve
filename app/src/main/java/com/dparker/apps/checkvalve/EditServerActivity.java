@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -34,7 +34,6 @@ import android.widget.EditText;
 
 public class EditServerActivity extends Activity {
     private static final String TAG = EditServerActivity.class.getSimpleName();
-    private static Bundle settings;
 
     private DatabaseProvider database;
     private ServerRecord sr;
@@ -43,12 +42,9 @@ public class EditServerActivity extends Activity {
     private EditText field_timeout;
     private EditText field_rcon_password;
     private EditText field_nickname;
-    private Button saveButton;
-    private Button cancelButton;
-    private String errorMsg;
     private long rowId;
 
-    private OnClickListener saveButtonListener = new OnClickListener() {
+    private final OnClickListener saveButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * Handle button click here
@@ -72,15 +68,16 @@ public class EditServerActivity extends Activity {
                 password = field_rcon_password.getText().toString().trim();
                 nickname = field_nickname.getText().toString().trim();
 
-                if( password.length() == 0 ) password = "";
+                if( password.isEmpty() )
+                    password = "";
 
-                if( nickname.length() == 0 ) {
+                if( nickname.isEmpty() ) {
                     nickname = "";
                 }
                 else {
                     // Fix for GitHub issue #10:
                     // Only check the nickname if the value of that field has changed
-                    if( !nickname.equals(sr.getServerNickname()) ) {
+                    if( ! nickname.equals(sr.getServerNickname()) ) {
                         if( database.serverNicknameExists(nickname) ) {
                             Log.w(TAG, "saveButtonListener: Server nickname '" + nickname + "' is a duplicate!");
                             UserVisibleMessage.showMessage(EditServerActivity.this, "The server nickname is already in use.");
@@ -119,7 +116,7 @@ public class EditServerActivity extends Activity {
                     UserVisibleMessage.showMessage(EditServerActivity.this, R.string.msg_success);
                 }
                 else {
-                    errorMsg = "Database insert failed! [db=" + database.toString() + "]";
+                    String errorMsg = "Database insert failed! [db=" + database.toString() + "]";
                     errorMsg += "[params=" + server + "," + port + "," + timeout + "," + password + "]";
                     Log.w(TAG, errorMsg);
 
@@ -131,7 +128,7 @@ public class EditServerActivity extends Activity {
         }
     };
 
-    private OnClickListener cancelButtonListener = new OnClickListener() {
+    private final OnClickListener cancelButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Cancel" button was clicked
@@ -152,7 +149,7 @@ public class EditServerActivity extends Activity {
         if( database == null )
             database = new DatabaseProvider(EditServerActivity.this);
 
-        settings = Values.getSettings(EditServerActivity.this);
+        Bundle settings = Values.getSettings(EditServerActivity.this);
 
         Intent thisIntent = getIntent();
         rowId = thisIntent.getLongExtra(Values.EXTRA_ROW_ID, -1);
@@ -164,17 +161,17 @@ public class EditServerActivity extends Activity {
 
         sr = database.getServer(rowId);
 
-        saveButton = (Button) findViewById(R.id.editserver_save_button);
+        Button saveButton = findViewById(R.id.editserver_save_button);
         saveButton.setOnClickListener(saveButtonListener);
 
-        cancelButton = (Button) findViewById(R.id.editserver_cancel_button);
+        Button cancelButton = findViewById(R.id.editserver_cancel_button);
         cancelButton.setOnClickListener(cancelButtonListener);
 
-        field_server = (EditText) findViewById(R.id.editserver_field_server);
-        field_port = (EditText) findViewById(R.id.editserver_field_port);
-        field_timeout = (EditText) findViewById(R.id.editserver_field_timeout);
-        field_rcon_password = (EditText) findViewById(R.id.editserver_field_rcon_password);
-        field_nickname = (EditText) findViewById(R.id.editserver_field_nickname);
+        field_server = findViewById(R.id.editserver_field_server);
+        field_port = findViewById(R.id.editserver_field_port);
+        field_timeout = findViewById(R.id.editserver_field_timeout);
+        field_rcon_password = findViewById(R.id.editserver_field_rcon_password);
+        field_nickname = findViewById(R.id.editserver_field_nickname);
 
         field_server.setText(sr.getServerURL());
         field_port.setText(Integer.toString(sr.getServerPort()));
@@ -182,7 +179,7 @@ public class EditServerActivity extends Activity {
         field_rcon_password.setText(sr.getServerRCONPassword());
         field_nickname.setText(sr.getServerNickname());
 
-        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) == true ) {
+        if( settings.getBoolean(Values.SETTING_RCON_SHOW_PASSWORDS) ) {
             ((CheckBox) findViewById(R.id.editserver_checkbox_show_password)).setChecked(true);
             field_rcon_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
@@ -213,7 +210,6 @@ public class EditServerActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void showPasswordCheckboxHandler(View view) {

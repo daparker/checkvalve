@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -43,6 +43,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 //import android.widget.Switch;
 
 @SuppressLint("NewApi")
@@ -50,9 +52,8 @@ public class ManageServersActivity extends Activity {
     private DatabaseProvider database;
     private TableLayout server_table;
     private Intent thisIntent;
-    private Button x_button;
 
-    private OnClickListener xButtonListener = new OnClickListener() {
+    private final OnClickListener xButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "X" button was clicked
@@ -62,25 +63,25 @@ public class ManageServersActivity extends Activity {
         }
     };
 
-    private OnClickListener editButtonListener = new OnClickListener() {
+    private final OnClickListener editButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Edit" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
-            long rowId = (long) v.getId();
+            long rowId = v.getId();
             updateServer(rowId);
         }
     };
 
-    private OnClickListener deleteButtonListener = new OnClickListener() {
+    private final OnClickListener deleteButtonListener = new OnClickListener() {
         @SuppressLint("InlinedApi")
         public void onClick(View v) {
             /*
              * "Delete" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
-            final long rowId = (long) v.getId();
+            final long rowId = v.getId();
 
             AlertDialog.Builder alertDialogBuilder;
 
@@ -120,13 +121,13 @@ public class ManageServersActivity extends Activity {
         }
     };
 
-    private OnClickListener moveUpButtonListener = new OnClickListener() {
+    private final OnClickListener moveUpButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Move Up" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
-            long rowId = (long) v.getId();
+            long rowId = v.getId();
 
             if( database.moveServerUp(rowId) ) {
                 setResult(1, thisIntent);
@@ -138,13 +139,13 @@ public class ManageServersActivity extends Activity {
         }
     };
 
-    private OnClickListener moveDownButtonListener = new OnClickListener() {
+    private final OnClickListener moveDownButtonListener = new OnClickListener() {
         public void onClick(View v) {
             /*
              * "Move Down" button was clicked
              */
             v.setBackgroundColor(getResources().getColor(R.color.steam_blue));
-            long rowId = (long) v.getId();
+            long rowId = v.getId();
 
             if( database.moveServerDown(rowId) ) {
                 setResult(1, thisIntent);
@@ -156,9 +157,9 @@ public class ManageServersActivity extends Activity {
         }
     };
 
-    private OnCheckedChangeListener toggleListener = new OnCheckedChangeListener() {
+    private final OnCheckedChangeListener toggleListener = new OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
-            long rowId = (long) buttonView.getId();
+            long rowId = buttonView.getId();
 
             if( checked ) {
                 if( database.enableServer(rowId) ) {
@@ -185,10 +186,8 @@ public class ManageServersActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-            if( ViewConfiguration.get(this).hasPermanentMenuKey() )
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }
+        if( ViewConfiguration.get(this).hasPermanentMenuKey() )
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         thisIntent = this.getIntent();
         setResult(0, thisIntent);
@@ -198,9 +197,9 @@ public class ManageServersActivity extends Activity {
 
         setContentView(R.layout.manageservers);
 
-        x_button = (Button) findViewById(R.id.manageservers_x_button);
+        Button x_button = findViewById(R.id.manageservers_x_button);
         x_button.setOnClickListener(xButtonListener);
-        server_table = (TableLayout) findViewById(R.id.manageservers_server_table);
+        server_table = findViewById(R.id.manageservers_server_table);
 
         showServerList();
     }
@@ -226,9 +225,8 @@ public class ManageServersActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        return;
     }
 
     public void onActivityResult(int request, int result, Intent data) {
@@ -242,8 +240,6 @@ public class ManageServersActivity extends Activity {
 
             showServerList();
         }
-
-        return;
     }
 
     @Override
@@ -255,15 +251,16 @@ public class ManageServersActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.back:
-                finish();
-                return true;
-            case R.id.add_server:
-                addNewServer();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.back ) {
+            finish();
+            return true;
+        }
+        else if( item.getItemId() == R.id.add_server ) {
+            addNewServer();
+            return true;
+        }
+        else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -285,8 +282,8 @@ public class ManageServersActivity extends Activity {
             String server = sr.getServerNickname();
 
             // If there's no nickname then use the URL as the server name 
-            if( server.length() == 0 ) {
-                server = sr.getServerURL() + ":" + Integer.toString(port);
+            if( server.isEmpty() ) {
+                server = sr.getServerURL() + ":" + port;
             }
 
             View buttonBar = View.inflate(ManageServersActivity.this, R.layout.manageservers_button_bar, null);
@@ -296,41 +293,23 @@ public class ManageServersActivity extends Activity {
             serverName.setText(server);
             serverName.setId(i);
 
-            Button editButton = (Button) buttonBar.findViewById(R.id.buttonbar_edit_button);
+            Button editButton = buttonBar.findViewById(R.id.buttonbar_edit_button);
             editButton.setId(rowId);
             editButton.setOnClickListener(editButtonListener);
 
-            Button deleteButton = (Button) buttonBar.findViewById(R.id.buttonbar_delete_button);
+            Button deleteButton = buttonBar.findViewById(R.id.buttonbar_delete_button);
             deleteButton.setId(rowId);
             deleteButton.setOnClickListener(deleteButtonListener);
 
-            Button moveUpButton = (Button) buttonBar.findViewById(R.id.buttonbar_up_button);
+            Button moveUpButton = buttonBar.findViewById(R.id.buttonbar_up_button);
             moveUpButton.setId(rowId);
             moveUpButton.setOnClickListener(moveUpButtonListener);
 
-            Button moveDownButton = (Button) buttonBar.findViewById(R.id.buttonbar_down_button);
+            Button moveDownButton = buttonBar.findViewById(R.id.buttonbar_down_button);
             moveDownButton.setId(rowId);
             moveDownButton.setOnClickListener(moveDownButtonListener);
-            
-            /*
-            if( android.os.Build.VERSION.SDK_INT >= 14 ) {
-                Switch toggle = (Switch)buttonBar.findViewById(R.id.buttonbar_toggle);
-                toggle.setId(rowId);
-                
-                if( sr.isEnabled() ) {
-                    toggle.setChecked(true);
-                    serverName.setTextColor(Color.WHITE);
-                }
-                else {
-                    toggle.setChecked(false);
-                    serverName.setTextColor(Color.GRAY);
-                }
-                
-                toggle.setOnCheckedChangeListener(toggleListener);
-            }
-            else {
-            */
-            CheckBox toggle = (CheckBox) buttonBar.findViewById(R.id.buttonbar_toggle);
+
+            CheckBox toggle = buttonBar.findViewById(R.id.buttonbar_toggle);
             toggle.setId(rowId);
 
             if( sr.isEnabled() ) {
@@ -343,7 +322,6 @@ public class ManageServersActivity extends Activity {
             }
 
             toggle.setOnCheckedChangeListener(toggleListener);
-            //}
 
             TableRow serverRow = new TableRow(ManageServersActivity.this);
             serverRow.setId(i);

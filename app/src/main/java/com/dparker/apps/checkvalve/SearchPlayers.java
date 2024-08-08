@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -30,26 +30,22 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.dparker.apps.checkvalve.exceptions.NullResponseException;
-import com.dparker.apps.checkvalve.exceptions.SocketNotConnectedException;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 @SuppressLint({"NewApi", "DefaultLocale"})
 public class SearchPlayers extends Thread {
     private static final String TAG = SearchPlayers.class.getSimpleName();
 
-    private Handler handler;
-    private Context context;
-    private TableRow[] tableRows;
-    private TableRow[] messageRows;
-    private String search;
+    private final Handler handler;
+    private final Context context;
+    private final TableRow[] tableRows;
+    private final TableRow[] messageRows;
+    private final String search;
 
     public SearchPlayers(Context c, TableRow[] t, TableRow[] m, Handler h, String s) {
         this.context = c;
@@ -74,14 +70,11 @@ public class SearchPlayers extends Thread {
         DatagramPacket packetOut;
         DatagramPacket packetIn;
 
-        // String variables
-        String serverNickname = new String();
-        String serverURL = new String();
-        String resultString = new String();
-
         String[] packets;
+        String resultString;
+        String serverNickname;
+        String serverURL = new String();
 
-        // Integer variables
         int serverPort = 0;
         int serverTimeout = 0;
         int numResults = 0;
@@ -156,9 +149,9 @@ public class SearchPlayers extends Thread {
                     socket.receive(packetIn);
                 }
 
-                int header = 0;
-                String name = new String();
-                String host = new String();
+                int header;
+                String name;
+                String host;
 
                 short numplayers = 0;
                 short numpackets = 0;
@@ -170,8 +163,6 @@ public class SearchPlayers extends Thread {
                 // Get the header info to see if data has been split over multiple packets
                 header = bufferIn.getInt();
 
-                numpackets = 1;
-
                 // If the first 4 header bytes are 0xFFFFFFFE then there are multiple packets
                 if( header == Values.INT_SPLIT_HEADER ) {
                     /*
@@ -181,8 +172,8 @@ public class SearchPlayers extends Thread {
                      */
 
                     bufferIn.getInt();    // Discard the answer ID
-                    numpackets = (short) bufferIn.get();
-                    thispacket = (short) bufferIn.get();
+                    numpackets = bufferIn.get();
+                    thispacket = bufferIn.get();
                     bufferIn.get();       // Discard the next byte
 
                     // Initialize the array to hold the number of packets in this response
@@ -191,7 +182,7 @@ public class SearchPlayers extends Thread {
                     // If this is packet 0 then skip the next 5 header bytes
                     if( thispacket == 0 ) {
                         bufferIn.position(bufferIn.position() + 6);
-                        numplayers = (short) bufferIn.get();
+                        numplayers = bufferIn.get();
                     }
 
                     packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
@@ -204,13 +195,13 @@ public class SearchPlayers extends Thread {
 
                         // Get rid of 12 header bytes
                         bufferIn.position(9);
-                        thispacket = (short) bufferIn.get();
+                        thispacket = bufferIn.get();
                         bufferIn.position(bufferIn.position() + 2);
 
                         // If this is packet 0 then skip the next 6 header bytes
                         if( thispacket == 0 ) {
                             bufferIn.position(bufferIn.position() + 6);
-                            numplayers = (short) bufferIn.get();
+                            numplayers = bufferIn.get();
                         }
 
                         packets[thispacket] = new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1");
@@ -219,7 +210,7 @@ public class SearchPlayers extends Thread {
                 else {
                     // Get number of players (6th byte)
                     bufferIn.get();
-                    numplayers = (short) bufferIn.get();
+                    numplayers = bufferIn.get();
                     packets = new String[]{new String(arrayIn, bufferIn.position(), bufferIn.remaining(), "ISO8859_1")};
                 }
 
@@ -232,9 +223,6 @@ public class SearchPlayers extends Thread {
                     PacketData pd = new PacketData(byteArray);
 
                     while( pd.hasRemaining() ) {
-                        name = new String();
-                        resultString = new String();
-
                         // Skip the player index
                         pd.skip(1);
 
@@ -247,12 +235,12 @@ public class SearchPlayers extends Thread {
                             numResults++;
 
                             // Use the server nickname if there is one, otherwise server:port
-                            if( serverNickname.length() > 0 ) {
+                            if( ! serverNickname.isEmpty() ) {
                                 resultString = String.format(context.getString(R.string.playing_on),
                                         "<b>" + name + "</b>", serverNickname);
                             }
                             else {
-                                host = serverURL + ":" + Integer.toString(serverPort);
+                                host = serverURL + ":" + serverPort;
                                 resultString = String.format(context.getString(R.string.playing_on),
                                         "<b>" + name + "</b>", host);
                             }
@@ -282,7 +270,7 @@ public class SearchPlayers extends Thread {
             catch( Exception e ) {
                 Log.w(TAG, "queryPlayers(): Caught an exception:", e);
 
-                String host = serverURL + ":" + Integer.toString(serverPort);
+                String host = serverURL + ":" + serverPort;
                 String message = String.format(context.getString(R.string.msg_no_response), host);
 
                 TextView errorMessage = new TextView(context);
