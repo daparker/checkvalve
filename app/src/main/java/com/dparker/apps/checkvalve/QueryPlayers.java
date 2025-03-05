@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
+ * Copyright 2010-2025 by David A. Parker <parker.david.a@gmail.com>
  *
  * This file is part of CheckValve, an HLDS/SRCDS query app for Android.
  *
@@ -241,7 +241,19 @@ public class QueryPlayers implements Runnable {
                         totaltime = hourString + ":" + minuteString + ":" + secondString;
 
                         Log.d(TAG, "Adding player [index=" + index + "][name=" + name + "][kills=" + kills + "][time=" + totaltime + "]");
-                        playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
+
+                        // Add this player record to the playerList array at the correct position based on its index
+                        if( playerList.isEmpty() || (index >= playerList.get(playerList.size()-1).getIndex()) ) {
+                            playerList.add(new PlayerRecord(name, totaltime, kills, index));
+                        }
+                        else {
+                            for( PlayerRecord p : playerList ) {
+                                if( index < p.getIndex() ) {
+                                    playerList.add(playerList.indexOf(p), new PlayerRecord(name, totaltime, kills, index));
+                                }
+                            }
+                        }
+                        // playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                     }
                 }
             }

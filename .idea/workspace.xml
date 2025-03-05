@@ -50,106 +50,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d0fe0f29-61d0-4947-9ebe-38a5280899e4" name="Default Changelist" comment="Version 2.0.12-stable">
-      <change afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_annotation_annotation_experimental_1_4_0_aar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_arch_core_core_common_2_2_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_core_core_1_13_1_aar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_6_2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_6_2_aar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlinx_kotlinx_coroutines_android_1_6_4.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlinx_kotlinx_coroutines_core_jvm_1_6_4.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/migrations.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle____app_libs_commons_compress_1_1_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle____app_libs_commons_compress_1_1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle____app_libs_commons_lang3_3_3_2_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle____app_libs_commons_lang3_3_3_2_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_annotation_annotation_1_0_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_annotation_annotation_experimental_1_3_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_annotation_annotation_jvm_1_6_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_annotation_annotation_jvm_1_6_0.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_arch_core_core_common_2_0_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_arch_core_core_common_2_1_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_collection_collection_1_0_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_collection_collection_1_0_0.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_core_core_1_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_core_core_1_12_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_0_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_3_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_3_1_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_1_1_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_1_1_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_annotations_13_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_annotations_13_0.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_1_8_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_1_8_22.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_1_8_22.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_common_1_8_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_common_1_8_22.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_jetbrains_kotlin_kotlin_stdlib_common_1_8_22.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/CheckValve.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/checkvalve.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.androidTest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.androidTest.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.main.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/app/CheckValve.app.unitTest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/app/checkvalve.app.unitTest.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
+    <list default="true" id="d0fe0f29-61d0-4947-9ebe-38a5280899e4" name="Default Changelist" comment="Version 2.0.15-stable">
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/generated/source/buildConfig/release/com/dparker/apps/checkvalve/BuildConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/generated/source/buildConfig/release/com/dparker/apps/checkvalve/BuildConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseAssets/merger.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseAssets/merger.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseJniLibFolders/merger.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseJniLibFolders/merger.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseShaders/merger.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/mergeReleaseShaders/merger.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/packageRelease/tmp/release/dex-renamer-state.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/packageRelease/tmp/release/dex-renamer-state.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/intermediates/incremental/release-mergeJavaRes/merge-state" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/intermediates/incremental/release-mergeJavaRes/merge-state" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build/outputs/logs/manifest-merger-release-report.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/build/outputs/logs/manifest-merger-release-report.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/release/app-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/app/release/app-release.apk" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/AboutActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/AboutActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/AddServerActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/AddServerActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundJobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundJobService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundJobUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundJobUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundQueryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundQueryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundServerQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BackgroundServerQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BootCompletedReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/BootCompletedReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ChallengeResponseQuery.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/Chat.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/Chat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ChatRelayDetailsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ChatRelayDetailsActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ChatViewerActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ChatViewerActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/CheckValve.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/CheckValve.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/CreateBackupActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/CreateBackupActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/DatabaseProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/DatabaseProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/DebugConsoleActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/DebugConsoleActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/EditServerActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/EditServerActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/EngineQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/EngineQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ManageServersActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ManageServersActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/NetworkEventReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/NetworkEventReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PacketData.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PacketData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PacketFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PacketFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PlayerSearchActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/PlayerSearchActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/QueryDebugLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/QueryDebugLog.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/QueryPlayers.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/QueryPlayers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconAuth.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconAuth.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconPasswordActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconPasswordActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RconQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RestoreBackupActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/RestoreBackupActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SearchPlayers.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SearchPlayers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SearchPlayersActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SearchPlayersActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerCheck.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerCheck.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ServerRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SettingsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/SettingsActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ShowNoteActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ShowNoteActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ShowPlayersActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/ShowPlayersActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/UserVisibleMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/UserVisibleMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/Values.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/Values.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/BackupParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/BackupParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/BackupWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/BackupWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/FileChooserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/FileChooserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/ServerBackupRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/ServerBackupRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/SettingBackupRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/dparker/apps/checkvalve/backup/SettingBackupRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/create_backup.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/create_backup.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/restore_backup.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/restore_backup.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +67,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/Users/daparker/.android/avd/Pixel_3a_API_34_extension_level_7_arm64-v8a.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=R3CN50JN42N)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -409,6 +317,23 @@
       <option name="presentableId" value="Default" />
       <updated>1566404303497</updated>
     </task>
+    <task id="LOCAL-00001" summary="Version 2.0.15-stable">
+      <option name="closed" value="true" />
+      <created>1723123875533</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1723123875533</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Version 2.0.15-stable">
+      <option name="closed" value="true" />
+      <created>1723125202618</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1723125202618</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -424,6 +349,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Version 2.0.12-stable" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 2.0.12-stable" />
+    <MESSAGE value="Version 2.0.15-stable" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 2.0.15-stable" />
   </component>
 </project>

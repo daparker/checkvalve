@@ -1,6 +1,9 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.16**
+- Fixed a bug affecting player information queries (issue #16).
+
 **2.0.15**
 - Updated the app to target Android 14 per the new Google Play requirements
 - Updated to allow any storage location (local or external) when creating or restoring a backup
