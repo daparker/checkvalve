@@ -1,6 +1,13 @@
 CheckValve 2.0 Change Log
 =========================
 
+**2.0.17**
+- Updated the app to target Android 16 per the new Google Play requirements
+- Removed unused permission READ_EXTERNAL_STORAGE
+- Removed unused permission WRITE_EXTERNAL_STORAGE
+- Updated the build toolchain and JDK version
+- General code cleanup and updates to address deprecated features, etc.
+
 **2.0.16**
 - Fixed a bug affecting player information queries (issue #16).
 
