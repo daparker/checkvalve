@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: ./app/libs/commons-lang3-3.3.2.jar" external-system-id="GRADLE">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/commons-lang3-3.3.2.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

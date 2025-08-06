@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.dparker.apps.checkvalve"
-        minSdkVersion 19
-        targetSdkVersion 34
+        minSdkVersion 21
+        targetSdkVersion 36
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -25,5 +25,10 @@ android {
 dependencies {
     implementation files('libs/commons-compress-1.1.jar')
     implementation files('libs/commons-lang3-3.3.2.jar')
-    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.core:core:1.16.0'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

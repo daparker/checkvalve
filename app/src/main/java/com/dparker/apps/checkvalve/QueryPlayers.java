@@ -221,8 +221,8 @@ public class QueryPlayers implements Runnable {
                     PacketData pd = new PacketData(byteArray);
 
                     while (pd.hasRemaining()) {
-                        index = pd.getByte(); // Get this player's index
-                        name = pd.getUTF8String(); // Determine the length of the player name
+                        index = pd.getByte();      // Get the player's index
+                        name = pd.getUTF8String(); // Get the player's name
                         kills = pd.getInt();       // Get the number of kills
                         time = pd.getFloat();      // Get the connected time
 
@@ -232,7 +232,7 @@ public class QueryPlayers implements Runnable {
                         minutes = (short) ((time / 60) % 60);
                         hours = (short) (Math.floor(time / 3600));
 
-                        // Values less than 10 should be left-padded with a zero
+                        // Values less than 10 should be prefixed with a zero
                         String hourString = (hours < 10) ? "0" + Integer.toString(hours) : Integer.toString(hours);
                         String minuteString = (minutes < 10) ? "0" + Integer.toString(minutes) : Integer.toString(minutes);
                         String secondString = (seconds < 10) ? "0" + Integer.toString(seconds) : Integer.toString(seconds);
@@ -250,10 +250,10 @@ public class QueryPlayers implements Runnable {
                             for( PlayerRecord p : playerList ) {
                                 if( index < p.getIndex() ) {
                                     playerList.add(playerList.indexOf(p), new PlayerRecord(name, totaltime, kills, index));
+                                    break;
                                 }
                             }
                         }
-                        // playerList.add(index, new PlayerRecord(name, totaltime, kills, index));
                     }
                 }
             }

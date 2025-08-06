@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright 2010-2024 by David A. Parker <parker.david.a@gmail.com>
+Copyright 2010-2025 by David A. Parker <parker.david.a@gmail.com>
 
 This file is part of CheckValve, an HLDS/SRCDS query app for Android.
 
@@ -34,7 +34,7 @@ along with the CheckValve source code.  If not, see
         &#8226; <a href="https://github.com/daparker/checkvalve/issues">Report an issue on GitHub</a>\n\n
         &#8226; <a href="https://sites.google.com/site/checkvalveapp/documentation/app/change-log">View the change log</a>\n\n
         &#8226; <a href="mailto:checkvalvedev@gmail.com">E-mail the developer</a></string>
-    <string name="app_version">CheckValve version 2.0.16</string>
+    <string name="app_version">CheckValve version 2.0.17</string>
 
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
@@ -178,7 +178,7 @@ along with the CheckValve source code.  If not, see
 
     <string name="note_android_version_support"><b>Your device is running and old version of Android.</b>\n\nThe next release of CheckValve will only support devices running Android 3.0 (Honeycomb) and above.  You may continue using this version of CheckValve on your device, but if you wish to use any future versions, please upgrade to a newer device or Android version.</string>
     <string name="note_chat_relay_required">This feature requires the use of a CheckValve Chat Relay.  The Chat Relay receives log messages from the game server and relays player chats to CheckValve.  If you do not currently have a Chat Relay, it\'s easy to set one up and start using this feature.\n\nDocumentation and downloads can be found at the following URL:\n\nhttps://sites.google.com/site/checkvalveapp/chatrelay</string>
-    <string name="note_write_permission_needed">CheckValve needs access to the internal storage on this device in order to save a backup file. Please grant the requested permission for before attempting to create a backup.</string>
+    <string name="note_write_permission_needed">CheckValve needs access to the internal storage on this device in order to save a backup file. Please grant the requested permission before attempting to create a backup.</string>
 
     <string name="notification_multiple_servers_down">%1$s servers are not responding.</string>
     <string name="notification_single_server_down">1 server is not responding.</string>
